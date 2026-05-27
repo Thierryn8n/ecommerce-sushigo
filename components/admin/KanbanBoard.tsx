@@ -745,7 +745,7 @@ export function KanbanBoard() {
             {columns.map((column, colIdx) => (
               <div
                 key={column.status.id}
-                className={`w-64 flex-shrink-0 transition-all duration-300 ${
+                className={`w-64 flex-shrink-0 transition-all duration-300 flex flex-col h-full ${
                   colIdx >= carouselIndex && colIdx < carouselIndex + columnsPerView
                     ? 'opacity-100'
                     : 'opacity-40'
@@ -788,7 +788,7 @@ export function KanbanBoard() {
                 </div>
                 
                 {/* Área de pedidos */}
-                <div className="bg-card rounded-b-xl border-x border-b border-border p-3 space-y-3 min-h-[300px] max-h-[calc(100vh-16rem)] overflow-y-auto">
+                <div className="bg-card rounded-b-xl border-x border-b border-border p-3 space-y-3 flex-1 overflow-y-auto">
                   <AnimatePresence>
                     {column.orders.map(order => (
                       <motion.div
