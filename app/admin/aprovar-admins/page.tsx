@@ -135,17 +135,18 @@ export default function AprovarAdminsPage() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-6">
+        <main className="p-3 sm:p-6 pb-20 lg:pb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-foreground">Gerenciar Administradores</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Administradores</h1>
               <Link href="/admin/cadastrar-admin">
-                <Button className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold">
-                  <UserCheck className="w-5 h-5 mr-2" />
-                  Cadastrar Novo Admin
+                <Button className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold w-full sm:w-auto">
+                  <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  <span className="hidden sm:inline">Cadastrar Novo Admin</span>
+                  <span className="sm:hidden">Novo Admin</span>
                 </Button>
               </Link>
             </div>

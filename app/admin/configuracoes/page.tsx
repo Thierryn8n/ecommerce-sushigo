@@ -239,7 +239,7 @@ export default function AdminConfiguracoes() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-3 sm:p-6">
+        <main className="p-3 sm:p-6 pb-20 lg:pb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

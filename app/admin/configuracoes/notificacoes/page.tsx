@@ -148,18 +148,18 @@ export default function NotificationSettingsPage() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-6">
+        <main className="p-3 sm:p-6 pb-20 lg:pb-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Bell className="w-6 h-6 text-primary" />
+            <div className="flex items-center gap-3 mb-4 sm:mb-6">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Bell className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Configuracoes de Notificacao</h1>
-                <p className="text-muted-foreground text-sm">Personalize como voce recebe alertas de novos pedidos</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">Notificacoes</h1>
+                <p className="text-muted-foreground text-xs sm:text-sm">Alertas de novos pedidos</p>
               </div>
             </div>
 

@@ -9,7 +9,7 @@ export default function KanbanPedidosPage() {
       <AdminSidebar />
       <div className="lg:ml-56 min-h-screen flex flex-col">
         <AdminHeader />
-        <main className="flex-1">
+        <main className="flex-1 pb-20 lg:pb-0">
           <KanbanBoard />
         </main>
       </div>
