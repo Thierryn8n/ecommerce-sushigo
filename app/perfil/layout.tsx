@@ -105,15 +105,15 @@ export default function PerfilLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-50/50 to-slate-50 dark:from-slate-950 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-b from-violet-50/50 to-slate-50">
       {/* Mobile Header - Estilo da loja */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="flex items-center justify-between px-4 py-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="text-slate-700 dark:text-white h-10 w-10"
+            className="text-slate-700 h-10 w-10"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
@@ -123,12 +123,12 @@ export default function PerfilLayout({
             <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
               <UtensilsCrossed className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-slate-900 dark:text-white">Acai da Praia</span>
+            <span className="font-bold text-slate-900">Acai da Praia</span>
           </Link>
           
           {/* Botao voltar para loja */}
           <Link href="/cardapio">
-            <Button variant="ghost" size="icon" className="text-violet-600 dark:text-violet-400 h-10 w-10">
+            <Button variant="ghost" size="icon" className="text-violet-600 h-10 w-10">
               <Home className="h-5 w-5" />
             </Button>
           </Link>
@@ -136,8 +136,8 @@ export default function PerfilLayout({
         
         {/* Titulo da pagina atual */}
         <div className="px-4 pb-3">
-          <p className="text-xs text-slate-500 dark:text-slate-400">Minha Conta</p>
-          <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
+          <p className="text-xs text-slate-500">Minha Conta</p>
+          <h1 className="text-lg font-semibold text-slate-900">
             {menuItems.find(item => pathname === item.href || pathname?.startsWith(item.href + '/'))?.label || 'Perfil'}
           </h1>
         </div>
@@ -147,26 +147,26 @@ export default function PerfilLayout({
         {/* Sidebar Desktop */}
         <aside className={`
           fixed lg:sticky lg:top-0 lg:h-screen inset-y-0 left-0 z-40
-          w-[280px] bg-white dark:bg-slate-900
-          border-r border-slate-200 dark:border-slate-800
+          w-[280px] bg-white
+          border-r border-slate-200
           flex flex-col shadow-xl lg:shadow-none
           transform transition-transform duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
           {/* Logo/Header - Estilo da loja */}
-          <div className="p-5 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-violet-500/5 to-purple-500/5">
+          <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-violet-500/5 to-purple-500/5">
             <Link href="/" className="flex items-center gap-3 group mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
                 <UtensilsCrossed className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-slate-900 dark:text-white font-bold text-lg tracking-tight">Acai da Praia</h1>
-                <p className="text-violet-600 dark:text-violet-400 text-xs font-medium">Minha Conta</p>
+                <h1 className="text-slate-900 font-bold text-lg tracking-tight">Acai da Praia</h1>
+                <p className="text-violet-600 text-xs font-medium">Minha Conta</p>
               </div>
             </Link>
             
             {/* Botao voltar para cardapio */}
-            <Link href="/cardapio" className="flex items-center gap-2 text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors">
+            <Link href="/cardapio" className="flex items-center gap-2 text-sm text-violet-600 hover:text-violet-700 transition-colors">
               <Home className="w-4 h-4" />
               <span>Voltar para o cardapio</span>
             </Link>
@@ -187,7 +187,7 @@ export default function PerfilLayout({
                     flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
                     ${isActive 
                       ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25' 
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                      : 'hover:bg-slate-50'
                     }
                   `}
                 >
@@ -195,13 +195,13 @@ export default function PerfilLayout({
                     p-2 rounded-lg transition-colors
                     ${isActive 
                       ? 'bg-white/20' 
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:text-violet-500 group-hover:bg-violet-50 dark:group-hover:bg-violet-500/10'
+                      : 'bg-slate-100 text-slate-500 group-hover:text-violet-500 group-hover:bg-violet-50'
                     }
                   `}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-medium text-sm truncate ${isActive ? '' : 'text-slate-700 dark:text-slate-300'}`}>
+                    <p className={`font-medium text-sm truncate ${isActive ? '' : 'text-slate-700'}`}>
                       {item.label}
                     </p>
                     <p className={`text-xs truncate ${isActive ? 'text-white/70' : 'text-slate-400'}`}>
@@ -210,7 +210,7 @@ export default function PerfilLayout({
                   </div>
                   <ChevronRight className={`
                     w-4 h-4 flex-shrink-0 transition-transform
-                    ${isActive ? 'text-white/70' : 'text-slate-300 dark:text-slate-600 group-hover:text-violet-500'}
+                    ${isActive ? 'text-white/70' : 'text-slate-300 group-hover:text-violet-500'}
                   `} />
                 </Link>
               )
@@ -218,7 +218,7 @@ export default function PerfilLayout({
           </nav>
 
           {/* Footer com acoes */}
-          <div className="p-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+          <div className="p-3 border-t border-slate-100 space-y-2">
             {/* Fazer novo pedido */}
             <Link href="/cardapio">
               <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25">
@@ -231,7 +231,7 @@ export default function PerfilLayout({
             <Button
               onClick={handleLogout}
               variant="ghost"
-              className="w-full justify-start gap-3 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              className="w-full justify-start gap-3 text-slate-500 hover:text-red-500 hover:bg-red-50 transition-colors"
             >
               <LogOut className="w-4 h-4" />
               <span className="font-medium">Sair da Conta</span>
@@ -257,7 +257,7 @@ export default function PerfilLayout({
           </div>
           
           {/* Mobile Bottom Navigation - Estilo loja */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-2 z-40">
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-2 z-40">
             <div className="flex items-center justify-around">
               <Link href="/cardapio" className="flex flex-col items-center gap-1 p-2 text-slate-500 hover:text-violet-600 transition-colors">
                 <Home className="w-5 h-5" />
