@@ -206,15 +206,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         }
       }
 
-      // Buscar tamanhos para usar como sauces se nao houver tabela de sauces
+      // Buscar coberturas da tabela toppings com category='cobertura'
       const { data: saucesData } = await supabase
-        .from('sizes')
+        .from('toppings')
         .select('*')
+        .eq('category', 'cobertura')
         .eq('is_active', true)
         .order('display_order')
 
       if (saucesData) {
-        // Usar sizes como coberturas temporariamente
         setSauces(saucesData.map(s => ({
           id: s.id,
           name: s.name,

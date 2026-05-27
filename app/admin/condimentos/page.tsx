@@ -42,6 +42,7 @@ export default function CondimentosPage() {
     const { data, error } = await supabase
       .from('toppings')
       .select('*')
+      .neq('category', 'cobertura')
       .order('display_order')
     
     if (error) {

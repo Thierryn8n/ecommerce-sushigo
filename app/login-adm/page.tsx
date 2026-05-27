@@ -257,10 +257,10 @@ export default function AdminLoginPage() {
   // Loading inicial enquanto verifica se tem admin
   if (checkingAdmin) {
     return (
-      <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-10 h-10 animate-spin text-[#FF8C00] mx-auto mb-4" />
-          <p className="text-white/60">Verificando sistema...</p>
+          <p className="text-muted-foreground">Verificando sistema...</p>
         </div>
       </main>
     )
@@ -269,27 +269,27 @@ export default function AdminLoginPage() {
   // Tela de sucesso após cadastro do primeiro admin
   if (success) {
     return (
-      <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-[#1a0a25] rounded-3xl p-8 border border-[#3a2a45] max-w-md w-full text-center"
+          className="bg-card rounded-3xl p-8 border border-border max-w-md w-full text-center"
         >
           <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
             <Shield className="w-10 h-10 text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Cadastro Realizado!</h2>
-          <p className="text-white/70 mb-4">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Cadastro Realizado!</h2>
+          <p className="text-muted-foreground mb-4">
             Primeiro administrador cadastrado com sucesso!
           </p>
           
           {/* Alerta sobre confirmação de email */}
           <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
-            <p className="text-yellow-400 text-sm font-medium mb-1">⚠️ Atenção</p>
-            <p className="text-white/80 text-sm">
+            <p className="text-yellow-500 dark:text-yellow-400 text-sm font-medium mb-1">Atenção</p>
+            <p className="text-foreground/80 text-sm">
               Enviamos um email de confirmação para <strong>{registerData.email}</strong>
             </p>
-            <p className="text-white/60 text-xs mt-2">
+            <p className="text-muted-foreground text-xs mt-2">
               Clique no link do email para ativar sua conta antes de fazer login.
             </p>
           </div>
@@ -307,10 +307,10 @@ export default function AdminLoginPage() {
   // MODO CADASTRO: Se não tem admin, mostra formulário de cadastro
   if (hasAdmin === false) {
     return (
-      <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Back Button */}
-          <Link href="/" className="inline-flex items-center text-white/70 hover:text-white mb-8 transition-colors">
+          <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Voltar ao Site
           </Link>
@@ -318,7 +318,7 @@ export default function AdminLoginPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1a0a25] rounded-3xl p-8 border border-[#3a2a45]"
+            className="bg-card rounded-3xl p-8 border border-border"
           >
             {/* Logo */}
             <div className="flex justify-center mb-6">
@@ -341,80 +341,80 @@ export default function AdminLoginPage() {
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Shield className="w-6 h-6 text-[#FF8C00]" />
-                <h1 className="text-2xl font-bold text-white">Primeiro Acesso</h1>
+                <h1 className="text-2xl font-bold text-foreground">Primeiro Acesso</h1>
               </div>
-              <p className="text-white/60 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Cadastre o primeiro administrador do sistema
               </p>
               <div className="mt-3 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full inline-block">
-                <span className="text-green-400 text-xs">✓ Aprovação automática</span>
+                <span className="text-green-500 dark:text-green-400 text-xs">Aprovacao automatica</span>
               </div>
             </div>
 
             {error && (
               <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 mb-6">
-                <p className="text-red-400 text-sm text-center">{error}</p>
+                <p className="text-red-500 dark:text-red-400 text-sm text-center">{error}</p>
               </div>
             )}
 
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Nome Completo</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Nome Completo</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                   <Input
                     type="text"
                     value={registerData.fullName}
                     onChange={(e) => setRegisterData({ ...registerData, fullName: e.target.value })}
                     placeholder="João Silva"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">E-mail</label>
+                <label className="text-muted-foreground text-sm mb-2 block">E-mail</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                   <Input
                     type="email"
                     value={registerData.email}
                     onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                     placeholder="admin@loja.com"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Telefone</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Telefone</label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                   <Input
                     type="tel"
                     value={registerData.phone}
                     onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
                     placeholder="(88) 9 9999-9999"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Senha</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     value={registerData.password}
                     onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                     placeholder="********"
-                    className="pl-10 pr-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 pr-10 bg-muted border-border text-foreground"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -422,15 +422,15 @@ export default function AdminLoginPage() {
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Confirmar Senha</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Confirmar Senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     value={registerData.confirmPassword}
                     onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                     placeholder="********"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
@@ -452,9 +452,9 @@ export default function AdminLoginPage() {
             </form>
 
             {/* Info */}
-            <div className="mt-6 p-4 bg-[#2a1a35] rounded-xl">
-              <p className="text-white/60 text-xs text-center">
-                Como é o primeiro acesso, você será cadastrado como <strong>dono da loja</strong> com aprovação automática.
+            <div className="mt-6 p-4 bg-muted rounded-xl">
+              <p className="text-muted-foreground text-xs text-center">
+                Como e o primeiro acesso, voce sera cadastrado como <strong className="text-foreground">dono da loja</strong> com aprovacao automatica.
               </p>
             </div>
           </motion.div>
@@ -465,10 +465,10 @@ export default function AdminLoginPage() {
 
   // MODO LOGIN: Se já tem admin, mostra formulário de login
   return (
-    <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
-        <Link href="/" className="inline-flex items-center text-white/70 hover:text-white mb-8 transition-colors">
+        <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
           Voltar ao Site
         </Link>
@@ -476,7 +476,7 @@ export default function AdminLoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1a0a25] rounded-3xl p-8 border border-[#3a2a45]"
+          className="bg-card rounded-3xl p-8 border border-border"
         >
           {/* Logo */}
           <div className="flex justify-center mb-6">
@@ -499,47 +499,47 @@ export default function AdminLoginPage() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
               <Shield className="w-6 h-6 text-[#FF8C00]" />
-              <h1 className="text-2xl font-bold text-white">Painel Admin</h1>
+              <h1 className="text-2xl font-bold text-foreground">Painel Admin</h1>
             </div>
-            <p className="text-white/60 text-sm">Acesso restrito a administradores aprovados</p>
+            <p className="text-muted-foreground text-sm">Acesso restrito a administradores aprovados</p>
           </div>
 
           {error && (
             <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 mb-6">
-              <p className="text-red-400 text-sm text-center">{error}</p>
+              <p className="text-red-500 dark:text-red-400 text-sm text-center">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="text-white/70 text-sm mb-2 block">E-mail</label>
+              <label className="text-muted-foreground text-sm mb-2 block">E-mail</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                 <Input
                   type="email"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                   placeholder="admin@loja.com"
-                  className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                  className="pl-10 bg-muted border-border text-foreground"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-white/70 text-sm mb-2 block">Senha</label>
+              <label className="text-muted-foreground text-sm mb-2 block">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                   placeholder="********"
-                  className="pl-10 pr-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                  className="pl-10 pr-10 bg-muted border-border text-foreground"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -563,8 +563,8 @@ export default function AdminLoginPage() {
           </form>
 
           {/* Info */}
-          <div className="mt-6 p-4 bg-[#2a1a35] rounded-xl">
-            <p className="text-white/60 text-xs text-center mb-2">
+          <div className="mt-6 p-4 bg-muted rounded-xl">
+            <p className="text-muted-foreground text-xs text-center mb-2">
               Precisa de acesso administrativo?
             </p>
             <Link href="/admin/cadastrar-admin" className="text-[#FF8C00] text-xs text-center block hover:text-[#FFC300]">
