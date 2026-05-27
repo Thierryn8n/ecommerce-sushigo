@@ -239,25 +239,25 @@ export default function AdminConfiguracoes() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-6">
+        <main className="p-3 sm:p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-2xl font-bold text-foreground mb-6">Configurações da Loja</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Configuracoes da Loja</h1>
 
             <form onSubmit={handleSubmit}>
-              <div className="grid lg:grid-cols-2 gap-6">
+              <div className="grid lg:grid-cols-2 gap-4 sm:gap-6">
                 {/* Store Info */}
-                <div className="bg-card rounded-2xl p-6 border border-border">
-                  <h2 className="text-lg font-bold text-foreground mb-6">Informações da Loja</h2>
+                <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border">
+                  <h2 className="text-base sm:text-lg font-bold text-foreground mb-4 sm:mb-6">Informacoes da Loja</h2>
                   
                   {/* Logo Upload - Melhorado */}
-                  <div className="mb-6">
+                  <div className="mb-4 sm:mb-6">
                     <label className="text-foreground/70 text-sm mb-2 block">Logo da Loja</label>
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-3 sm:gap-4">
                       {/* Preview da Logo */}
-                      <div className="relative w-24 h-24 rounded-xl bg-muted overflow-hidden border border-border flex-shrink-0">
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-muted overflow-hidden border border-border flex-shrink-0">
                         {settings.logoUrl ? (
                           <>
                             <Image
@@ -270,7 +270,7 @@ export default function AdminConfiguracoes() {
                             <button
                               type="button"
                               onClick={handleRemoveLogo}
-                              className="absolute top-1 right-1 w-6 h-6 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center text-foreground transition-colors"
+                              className="absolute top-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-red-500/80 hover:bg-red-500 rounded-full flex items-center justify-center text-foreground transition-colors"
                               title="Remover logo"
                             >
                               <X className="w-3 h-3" />
@@ -278,16 +278,16 @@ export default function AdminConfiguracoes() {
                           </>
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center text-foreground/40">
-                            <ImageIcon className="w-8 h-8 mb-1" />
-                            <span className="text-xs">Sem logo</span>
+                            <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 mb-1" />
+                            <span className="text-[10px] sm:text-xs">Sem logo</span>
                           </div>
                         )}
                         
                         {/* Overlay de loading */}
                         {uploading && (
                           <div className="absolute inset-0 bg-card/80 flex flex-col items-center justify-center">
-                            <Loader2 className="w-6 h-6 text-[#FF8C00] animate-spin mb-1" />
-                            <span className="text-foreground/70 text-xs">Enviando...</span>
+                            <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF8C00] animate-spin mb-1" />
+                            <span className="text-foreground/70 text-[10px] sm:text-xs">Enviando...</span>
                           </div>
                         )}
                       </div>

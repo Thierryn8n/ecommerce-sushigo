@@ -41,11 +41,11 @@ const menuItems = [
   { href: '/admin/coberturas', label: 'Coberturas', icon: Tag },
   { href: '/admin/banners', label: 'Banners', icon: Bell },
   { href: '/admin/pedidos', label: 'Lista de Pedidos', icon: ShoppingCart },
-  { href: '/admin/pedidos/kanban', label: 'Kanban de Pedidos', icon: Columns2 },
+  { href: '/admin/pedidos/kanban', label: 'Kanban', icon: Columns2 },
   { href: '/admin/cupons', label: 'Cupons', icon: Ticket },
   { href: '/admin/entrega', label: 'Entrega', icon: ChevronDown },
   { href: '/admin/aprovar-admins', label: 'Admins', icon: Users },
-  { href: '/admin/configuracoes', label: 'Configurações', icon: Settings },
+  { href: '/admin/configuracoes', label: 'Config', icon: Settings },
 ]
 
 export function AdminSidebar() {
@@ -53,28 +53,130 @@ export function AdminSidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const { store } = useStore()
 
+  // Fechar sidebar ao mudar de rota em mobile
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
+
   return (
     <>
-      {/* Mobile Toggle */}
-      <button
+      {/* Mobile Toggle - Fixed Bottom */}
+      <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center text-foreground"
+        className="lg:hidden fixed bottom-4 left-4 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center"
+        whileTap={{ scale: 0.95 }}
+        animate={{ rotate: isOpen ? 90 : 0 }}
       >
-        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
+        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+      </motion.button>
 
       {/* Backdrop */}
-      {isOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            onClick={() => setIsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Sidebar */}
-      <aside className={`fixed top-0 left-0 h-full w-56 bg-card border-r border-border z-40 transform transition-transform lg:translate-x-0 ${
-        isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}>
+      {/* Mobile Bottom Sheet Sidebar */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.aside
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl border-t border-border max-h-[85vh] overflow-hidden"
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-12 h-1.5 bg-muted-foreground/30 rounded-full" />
+            </div>
+
+            {/* Logo */}
+            <div className="px-5 pb-4 border-b border-border">
+              <div className="flex items-center gap-3">
+                {store?.logo_url ? (
+                  <Image
+                    src={store.logo_url}
+                    alt={store.name}
+                    width={44}
+                    height={44}
+                    className="rounded-xl object-contain"
+                  />
+                ) : (
+                  <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
+                    {store?.name?.charAt(0) || 'A'}
+                  </div>
+                )}
+                <div>
+                  <h1 className="text-foreground font-bold">{store?.name || 'Loja'}</h1>
+                  <p className="text-muted-foreground text-xs">Painel Admin</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation Grid */}
+            <nav className="p-4 overflow-y-auto max-h-[60vh]">
+              <div className="grid grid-cols-3 gap-3">
+                {menuItems.map((item, index) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <motion.div
+                      key={item.href}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.03 }}
+                    >
+                      <Link
+                        href={item.href}
+                        className={`flex flex-col items-center gap-2 p-4 rounded-2xl transition-all ${
+                          isActive 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground'
+                        }`}
+                      >
+                        <item.icon className="w-6 h-6" />
+                        <span className="text-xs font-medium text-center leading-tight">{item.label}</span>
+                      </Link>
+                    </motion.div>
+                  )
+                })}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="mt-4 pt-4 border-t border-border flex gap-3">
+                <Link
+                  href="/"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-muted text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span className="text-sm font-medium">Ver Loja</span>
+                </Link>
+                <button
+                  onClick={() => {
+                    const supabase = createClient()
+                    supabase.auth.signOut()
+                    window.location.href = '/login-adm'
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="text-sm font-medium">Sair</span>
+                </button>
+              </div>
+            </nav>
+          </motion.aside>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:block fixed top-0 left-0 h-full w-56 bg-card border-r border-border z-40">
         {/* Logo */}
         <div className="p-4 border-b border-border">
           <Link href="/admin" className="flex items-center gap-2">
@@ -99,7 +201,7 @@ export function AdminSidebar() {
         </div>
 
         {/* Navigation */}
-        <nav className="p-3">
+        <nav className="p-3 overflow-y-auto h-[calc(100%-8rem)]">
           <ul className="space-y-1">
             {menuItems.map((item) => {
               const isActive = pathname === item.href
@@ -107,7 +209,6 @@ export function AdminSidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm ${
                       isActive 
                         ? 'bg-primary text-primary-foreground' 
@@ -129,8 +230,8 @@ export function AdminSidebar() {
             href="/"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
           >
-            <LogOut className="w-4 h-4" />
-            <span className="font-medium">Sair</span>
+            <ExternalLink className="w-4 h-4" />
+            <span className="font-medium">Ver Loja</span>
           </Link>
         </div>
       </aside>
@@ -332,12 +433,14 @@ export function AdminHeader() {
   }, [])
 
   return (
-    <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 lg:pl-[14rem] relative">
-      <div className="flex items-center gap-4">
-        <h2 className="text-foreground font-semibold hidden sm:block">Painel Admin - {store?.name || 'Loja'}</h2>
+    <header className="h-14 sm:h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-6 lg:pl-[14.5rem] relative">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <h2 className="text-foreground font-semibold text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">
+          {store?.name || 'Admin'}
+        </h2>
       </div>
       
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         <ThemeToggle />
         
         {/* Notifications Button */}
@@ -397,7 +500,7 @@ export function AdminHeader() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
               transition={{ duration: 0.2 }}
-              className="notifications-dropdown absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+              className="notifications-dropdown fixed sm:absolute right-2 sm:right-0 top-14 sm:top-full sm:mt-2 w-[calc(100vw-1rem)] sm:w-80 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
             >
               <div className="p-4 border-b border-border flex items-center justify-between">
                 <h3 className="font-semibold text-foreground">Notificacoes</h3>
@@ -471,18 +574,23 @@ export function AdminHeader() {
         <div className="relative">
           <button 
             onClick={() => setShowProfile(!showProfile)}
-            className="profile-btn flex items-center gap-3 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+            className="profile-btn flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm sm:text-base">
               {store?.name?.charAt(0) || 'A'}
             </div>
-            <span className="text-foreground font-medium hidden sm:block">{store?.name || 'Admin'}</span>
             <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showProfile ? 'rotate-180' : ''}`} />
           </button>
           
           {/* Profile Dropdown */}
+          <AnimatePresence>
           {showProfile && (
-            <div className="profile-dropdown absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className="profile-dropdown fixed sm:absolute right-2 sm:right-0 top-14 sm:top-full sm:mt-2 w-56 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+            >
               <div className="p-4 border-b border-border">
                 <p className="font-semibold text-foreground">{store?.name || 'Admin'}</p>
                 <p className="text-xs text-muted-foreground">Administrador</p>
@@ -510,8 +618,9 @@ export function AdminHeader() {
                   <span className="text-sm font-medium">Sair</span>
                 </button>
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
       </div>
     </header>

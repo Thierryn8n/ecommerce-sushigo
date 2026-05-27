@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Plus, Search, Edit, Trash2, Eye, EyeOff, Copy } from 'lucide-react'
+import { Plus, Search, Edit, Edit2, Trash2, Eye, EyeOff, Copy } from 'lucide-react'
 import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -154,17 +154,17 @@ export default function AdminProdutos() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-6">
+        <main className="p-3 sm:p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <h1 className="text-2xl font-bold text-foreground">Produtos</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Produtos</h1>
               <Button 
                 onClick={() => openModal()}
-                className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground"
+                className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground w-full sm:w-auto"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Produto
@@ -172,21 +172,101 @@ export default function AdminProdutos() {
             </div>
 
             {/* Search */}
-            <div className="bg-card rounded-2xl p-4 border border-border mb-6">
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50" />
+            <div className="bg-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-border mb-4 sm:mb-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-foreground/50" />
                 <Input
                   type="text"
                   placeholder="Buscar produtos..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-muted border-border text-foreground"
+                  className="pl-9 sm:pl-10 bg-muted border-border text-foreground text-sm sm:text-base"
                 />
               </div>
             </div>
 
-            {/* Products Table */}
-            <div className="bg-card rounded-2xl border border-border overflow-hidden">
+            {/* Products - Mobile Cards / Desktop Table */}
+            <div className="block sm:hidden space-y-3">
+              {loading ? (
+                [...Array(3)].map((_, i) => (
+                  <div key={i} className="bg-card rounded-xl p-4 border border-border animate-pulse">
+                    <div className="flex gap-3">
+                      <div className="w-16 h-16 bg-muted rounded-lg" />
+                      <div className="flex-1">
+                        <div className="h-4 bg-muted rounded w-3/4 mb-2" />
+                        <div className="h-3 bg-muted rounded w-1/2" />
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                filteredProducts.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    className="bg-card rounded-xl p-4 border border-border"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    <div className="flex gap-3">
+                      <div className="w-16 h-16 rounded-lg bg-muted overflow-hidden flex-shrink-0">
+                        <Image
+                          src={product.image_url || 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png'}
+                          alt={product.name}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-foreground font-medium text-sm truncate">{product.name}</p>
+                            <span 
+                              className="inline-block px-2 py-0.5 rounded-full text-[10px] mt-1"
+                              style={{ 
+                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#8A2BE220',
+                                color: product.category?.color || '#8A2BE2'
+                              }}
+                            >
+                              {product.category?.name || 'Sem categoria'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => toggleProductStatus(product.id, product.is_active)}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              product.is_active ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
+                            }`}
+                          >
+                            {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between mt-2">
+                          {product.promotion_price ? (
+                            <div>
+                              <span className="text-foreground/50 text-xs line-through mr-2">R$ {formatPrice(product.base_price)}</span>
+                              <span className="text-[#00BFFF] font-bold text-sm">R$ {formatPrice(product.promotion_price)}</span>
+                            </div>
+                          ) : (
+                            <span className="text-foreground font-medium text-sm">R$ {formatPrice(product.base_price)}</span>
+                          )}
+                          <div className="flex gap-1">
+                            <button onClick={() => openModal(product)} className="p-1.5 rounded-lg hover:bg-muted text-foreground/60">
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => deleteProduct(product.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-500">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
+
+            {/* Desktop Table */}
+            <div className="hidden sm:block bg-card rounded-2xl border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
