@@ -745,11 +745,7 @@ export function KanbanBoard() {
             {columns.map((column, colIdx) => (
               <div
                 key={column.status.id}
-                className={`w-48 flex-shrink-0 transition-all duration-300 flex flex-col h-full ${
-                  colIdx >= carouselIndex && colIdx < carouselIndex + columnsPerView
-                    ? 'opacity-100'
-                    : 'opacity-40'
-                } ${dragOverColumn === column.status.id ? 'ring-4 ring-[#FF8C00] ring-opacity-50 scale-105' : ''}`}
+                className={`w-48 flex-shrink-0 transition-all duration-300 flex flex-col h-full ${dragOverColumn === column.status.id ? 'ring-4 ring-[#FF8C00] ring-opacity-50 scale-105' : ''}`}
                 onDragOver={(e) => {
                   e.preventDefault()
                   e.dataTransfer.dropEffect = 'move'
