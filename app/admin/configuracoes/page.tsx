@@ -24,9 +24,13 @@ export default function AdminConfiguracoes() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingHero, setUploadingHero] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [heroUploadError, setHeroUploadError] = useState<string | null>(null)
+  const [heroUploadSuccess, setHeroUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const heroFileInputRef = useRef<HTMLInputElement>(null)
   const [settings, setSettings] = useState({
     storeName: '',
     whatsapp: '',
@@ -40,6 +44,7 @@ export default function AdminConfiguracoes() {
     facebook: '',
     logoUrl: '',
     description: '',
+    heroBgUrl: '',
   })
 
   useEffect(() => {
@@ -61,6 +66,15 @@ export default function AdminConfiguracoes() {
           settingsObj[item.key] = item.value || ''
         })
 
+        // Buscar imagem de fundo do hero em app_settings
+        const { data: heroData } = await supabase
+          .from('app_settings')
+          .select('value')
+          .eq('store_id', store.id)
+          .eq('section', 'hero')
+          .eq('key', 'background_image')
+          .single()
+
         setSettings({
           storeName: settingsObj.store_name || store.name || '',
           whatsapp: settingsObj.whatsapp || store.whatsapp_number || '',
@@ -74,6 +88,7 @@ export default function AdminConfiguracoes() {
           facebook: settingsObj.facebook || store.facebook_url || '',
           logoUrl: store.logo_url || '',
           description: store.description || '',
+          heroBgUrl: heroData?.value || '',
         })
       } catch (error) {
         console.error('Erro ao buscar configurações:', error)
@@ -126,6 +141,17 @@ export default function AdminConfiguracoes() {
           console.log(`✅ ${setting.key} salvo com sucesso`)
         }
       }
+
+      // Salvar imagem de fundo do hero em app_settings
+      await supabase
+        .from('app_settings')
+        .upsert({
+          store_id: store.id,
+          section: 'hero',
+          key: 'background_image',
+          value: settings.heroBgUrl || null,
+          updated_at: new Date().toISOString(),
+        })
 
       // Atualizar tabela stores com logo e descrição
       if (settings.logoUrl || settings.description) {
@@ -223,6 +249,32 @@ export default function AdminConfiguracoes() {
     setSettings({ ...settings, logoUrl: '' })
     setUploadError(null)
     setUploadSuccess(false)
+  }
+
+  const handleHeroBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !store?.id) return
+    const file = e.target.files[0]
+    setUploadingHero(true)
+    setHeroUploadError(null)
+    setHeroUploadSuccess(false)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `hero-bg-${Date.now()}.${fileExt}`
+      const filePath = `${store.id}/${fileName}`
+      const { error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(filePath, file, { upsert: true, cacheControl: '3600' })
+      if (uploadError) throw new Error(uploadError.message)
+      const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(filePath)
+      setSettings(prev => ({ ...prev, heroBgUrl: publicUrl }))
+      setHeroUploadSuccess(true)
+      setTimeout(() => setHeroUploadSuccess(false), 3000)
+    } catch (error: any) {
+      setHeroUploadError(error.message || 'Erro ao fazer upload.')
+    } finally {
+      setUploadingHero(false)
+      if (heroFileInputRef.current) heroFileInputRef.current.value = ''
+    }
   }
 
   if (loading) {
@@ -467,6 +519,79 @@ export default function AdminConfiguracoes() {
                         className="bg-muted border-border text-foreground"
                       />
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Imagem de Fundo do Hero */}
+              <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border mt-4 sm:mt-6">
+                <h2 className="text-base sm:text-lg font-bold text-foreground mb-1">Imagem de Fundo da Pagina Inicial</h2>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-4">Esta imagem aparece na primeira secao da loja, atras do titulo principal.</p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  {/* Preview */}
+                  <div className="relative w-full sm:w-64 h-36 rounded-xl overflow-hidden border border-border bg-muted flex-shrink-0">
+                    {settings.heroBgUrl ? (
+                      <>
+                        <Image src={settings.heroBgUrl} alt="Fundo Hero" fill className="object-cover" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => setSettings(prev => ({ ...prev, heroBgUrl: '' }))}
+                            className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-3 py-1.5 text-xs flex items-center gap-1"
+                          >
+                            <X className="w-3 h-3" /> Remover
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2">
+                        <ImageIcon className="w-8 h-8" />
+                        <span className="text-xs">Sem imagem de fundo</span>
+                      </div>
+                    )}
+                    {uploadingHero && (
+                      <div className="absolute inset-0 bg-card/80 flex flex-col items-center justify-center gap-2">
+                        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                        <span className="text-xs text-muted-foreground">Enviando...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Acoes */}
+                  <div className="flex flex-col gap-2 justify-center">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleHeroBgUpload}
+                      className="hidden"
+                      ref={heroFileInputRef}
+                      disabled={uploadingHero}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={uploadingHero}
+                      onClick={() => heroFileInputRef.current?.click()}
+                      className="border-border text-foreground/70 hover:bg-muted w-fit"
+                    >
+                      {uploadingHero ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Enviando...</>
+                      ) : (
+                        <><Upload className="w-4 h-4 mr-2" />{settings.heroBgUrl ? 'Trocar Imagem' : 'Enviar Imagem'}</>
+                      )}
+                    </Button>
+                    {heroUploadError && (
+                      <div className="flex items-center gap-1 text-red-400 text-xs">
+                        <AlertCircle className="w-3 h-3" /><span>{heroUploadError}</span>
+                      </div>
+                    )}
+                    {heroUploadSuccess && (
+                      <div className="flex items-center gap-1 text-green-400 text-xs">
+                        <Check className="w-3 h-3" /><span>Imagem enviada! Clique em Salvar para aplicar.</span>
+                      </div>
+                    )}
+                    <p className="text-muted-foreground text-xs">Formatos: JPG, PNG, WebP. Recomendado: 1920x1080px</p>
                   </div>
                 </div>
               </div>

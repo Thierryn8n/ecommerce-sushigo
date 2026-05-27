@@ -37,15 +37,27 @@ export function HeroSection() {
   useEffect(() => {
     async function fetchSettings() {
       const supabase = createClient()
-      const { data } = await supabase
+
+      // Buscar store_id atual
+      const { data: storeData } = await supabase
+        .from('stores')
+        .select('id')
+        .limit(1)
+        .single()
+
+      const query = supabase
         .from('app_settings')
         .select('*')
         .eq('section', 'hero')
 
+      if (storeData?.id) query.eq('store_id', storeData.id)
+
+      const { data } = await query
+
       if (data) {
         const settingsObj: Partial<HeroSettings> = {}
         data.forEach((item) => {
-          settingsObj[item.key as keyof HeroSettings] = item.value || ''
+          if (item.value) settingsObj[item.key as keyof HeroSettings] = item.value
         })
         setSettings(prev => ({ ...prev, ...settingsObj }))
       }
