@@ -738,7 +738,7 @@ export function KanbanBoard() {
 
           {/* Container das Colunas */}
           <motion.div 
-            className="flex gap-2 p-4 h-full overflow-x-auto"
+            className="flex gap-2 p-4 h-full"
             animate={{ x: -carouselIndex * (260 + 8) }} // 260px (w-64) + 8px (gap)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
