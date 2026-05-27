@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { Search, Eye, MessageCircle, Truck, CheckCircle, XCircle, Clock, ChefHat, Loader2 } from 'lucide-react'
+import { Search, Eye, MessageCircle, Truck, CheckCircle, XCircle, Clock, ChefHat, Loader2, CalendarDays, CreditCard, Filter, X } from 'lucide-react'
 import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,6 +55,8 @@ export default function AdminPedidos() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+  const [selectedPayment, setSelectedPayment] = useState<string | null>(null)
   const { toast } = useToast()
   const supabase = createClient()
 
@@ -141,17 +143,50 @@ export default function AdminPedidos() {
   }
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    // Usar mapeamento de filtros para agrupar status similares
+    const matchesSearch =
+      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer_phone?.toLowerCase().includes(searchTerm.toLowerCase())
+
     const allowedStatuses = selectedStatus ? (statusFilterMap[selectedStatus] || [selectedStatus]) : null
     const matchesStatus = !selectedStatus || (allowedStatuses ? allowedStatuses.includes(order.status) : true)
-    return matchesSearch && matchesStatus
+
+    const matchesPayment = !selectedPayment || order.payment_method?.toLowerCase().includes(selectedPayment.toLowerCase())
+
+    let matchesDate = true
+    if (selectedDate) {
+      const orderDate = new Date(order.created_at)
+      const now = new Date()
+      if (selectedDate === 'hoje') {
+        matchesDate = orderDate.toDateString() === now.toDateString()
+      } else if (selectedDate === 'ontem') {
+        const yesterday = new Date(now)
+        yesterday.setDate(yesterday.getDate() - 1)
+        matchesDate = orderDate.toDateString() === yesterday.toDateString()
+      } else if (selectedDate === 'semana') {
+        const weekAgo = new Date(now)
+        weekAgo.setDate(weekAgo.getDate() - 7)
+        matchesDate = orderDate >= weekAgo
+      }
+    }
+
+    return matchesSearch && matchesStatus && matchesPayment && matchesDate
   })
 
   const getStatusCount = (status: string) => {
     const allowedStatuses = statusFilterMap[status] || [status]
     return orders.filter(o => allowedStatuses.includes(o.status)).length
+  }
+
+  const paymentMethods = [...new Set(orders.map(o => o.payment_method).filter(Boolean))]
+
+  const hasActiveFilters = selectedStatus || selectedDate || selectedPayment || searchTerm
+
+  const clearFilters = () => {
+    setSelectedStatus(null)
+    setSelectedDate(null)
+    setSelectedPayment(null)
+    setSearchTerm('')
   }
 
   if (loading) {
@@ -181,51 +216,105 @@ export default function AdminPedidos() {
           >
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <h1 className="text-2xl font-bold text-foreground">Pedidos</h1>
-              <div className="flex gap-2">
-                <span className="px-3 py-2 rounded-lg bg-yellow-500/20 text-yellow-500 text-sm font-medium">
-                  5 Pendentes
-                </span>
-                <span className="px-3 py-2 rounded-lg bg-blue-500/20 text-blue-500 text-sm font-medium">
-                  3 Preparando
-                </span>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Pedidos</h1>
+                <p className="text-foreground/50 text-sm mt-1">{filteredOrders.length} de {orders.length} pedidos</p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {Object.entries(statusFilterMap).map(([key]) => {
+                  const config = statusConfig[key]
+                  const count = getStatusCount(key)
+                  if (!config || count === 0) return null
+                  return (
+                    <span key={key} className={`px-3 py-2 rounded-lg ${config.bg} ${config.text} text-sm font-medium`}>
+                      {count} {config.label}
+                    </span>
+                  )
+                })}
               </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-card rounded-2xl p-4 border border-border mb-6">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50" />
+            <div className="bg-card rounded-2xl p-4 border border-border mb-6 space-y-3">
+              {/* Search */}
+              <div className="flex gap-3 flex-col sm:flex-row">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50" />
                   <Input
                     type="text"
-                    placeholder="Buscar por ID ou cliente..."
+                    placeholder="Buscar por ID, cliente ou telefone..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-[#2a1a35] border-border text-foreground"
+                    className="pl-10 border-border text-foreground"
                   />
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
-                  <Button
-                    variant={selectedStatus === null ? 'default' : 'outline'}
-                    onClick={() => setSelectedStatus(null)}
-                    size="sm"
-                    className={selectedStatus === null ? 'bg-[#FF8C00]' : 'border-border text-foreground/70'}
-                  >
-                    Todos
+                {hasActiveFilters && (
+                  <Button variant="outline" size="sm" onClick={clearFilters} className="border-red-500/50 text-red-400 hover:bg-red-500/10 gap-1 shrink-0">
+                    <X className="w-4 h-4" />
+                    Limpar filtros
                   </Button>
-                  {Object.entries(statusConfig).map(([key, config]) => (
+                )}
+              </div>
+
+              {/* Status filters */}
+              <div className="flex gap-2 flex-wrap items-center">
+                <span className="text-foreground/40 text-xs flex items-center gap-1"><Filter className="w-3 h-3" /> Status:</span>
+                <Button
+                  variant={selectedStatus === null ? 'default' : 'outline'}
+                  onClick={() => setSelectedStatus(null)}
+                  size="sm"
+                  className={selectedStatus === null ? 'bg-[#FF8C00] text-white h-7 text-xs' : 'border-border text-foreground/70 h-7 text-xs'}
+                >
+                  Todos ({orders.length})
+                </Button>
+                {Object.entries(statusFilterMap).map(([key]) => {
+                  const config = statusConfig[key]
+                  if (!config) return null
+                  const count = getStatusCount(key)
+                  return (
                     <Button
                       key={key}
                       variant={selectedStatus === key ? 'default' : 'outline'}
-                      onClick={() => setSelectedStatus(key)}
+                      onClick={() => setSelectedStatus(selectedStatus === key ? null : key)}
                       size="sm"
-                      className={selectedStatus === key ? 'bg-[#FF8C00]' : 'border-border text-foreground/70'}
+                      className={selectedStatus === key ? 'bg-[#FF8C00] text-white h-7 text-xs' : 'border-border text-foreground/70 h-7 text-xs'}
                     >
-                      {config.label}
+                      {config.label} ({count})
                     </Button>
-                  ))}
-                </div>
+                  )
+                })}
+              </div>
+
+              {/* Date + Payment filters */}
+              <div className="flex gap-2 flex-wrap items-center">
+                <span className="text-foreground/40 text-xs flex items-center gap-1"><CalendarDays className="w-3 h-3" /> Data:</span>
+                {['hoje', 'ontem', 'semana'].map(d => (
+                  <Button
+                    key={d}
+                    variant={selectedDate === d ? 'default' : 'outline'}
+                    onClick={() => setSelectedDate(selectedDate === d ? null : d)}
+                    size="sm"
+                    className={selectedDate === d ? 'bg-[#FF8C00] text-white h-7 text-xs' : 'border-border text-foreground/70 h-7 text-xs'}
+                  >
+                    {d === 'hoje' ? 'Hoje' : d === 'ontem' ? 'Ontem' : 'Esta semana'}
+                  </Button>
+                ))}
+                {paymentMethods.length > 0 && (
+                  <>
+                    <span className="text-foreground/40 text-xs flex items-center gap-1 ml-2"><CreditCard className="w-3 h-3" /> Pagamento:</span>
+                    {paymentMethods.map(method => (
+                      <Button
+                        key={method}
+                        variant={selectedPayment === method ? 'default' : 'outline'}
+                        onClick={() => setSelectedPayment(selectedPayment === method ? null : method)}
+                        size="sm"
+                        className={selectedPayment === method ? 'bg-[#FF8C00] text-white h-7 text-xs capitalize' : 'border-border text-foreground/70 h-7 text-xs capitalize'}
+                      >
+                        {method}
+                      </Button>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
 
