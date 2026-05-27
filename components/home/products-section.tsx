@@ -34,9 +34,21 @@ export function ProductsSection() {
   const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
   const autoScrollRef = useRef<NodeJS.Timeout | null>(null)
-  const itemsPerView = 4
+  const itemsPerView = isMobile ? 2 : 5
+
+  useEffect(() => {
+    // Detectar tamanho da tela
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768) // md breakpoint
+    }
+
+    handleResize() // Executar na montagem
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   useEffect(() => {
     async function fetchData() {
@@ -206,7 +218,7 @@ export function ProductsSection() {
         >
           <div 
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+            className="flex gap-3 sm:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {products.map((product, index) => (
@@ -216,7 +228,7 @@ export function ProductsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="flex-shrink-0 w-[200px] sm:w-[280px] md:w-[300px] snap-start"
+                className="flex-shrink-0 w-[calc(50%-12px)] sm:w-[calc(20%-24px)] snap-start"
               >
                 <Link href={`/produto/${product.slug}`}>
                   <div className="group bg-card rounded-xl sm:rounded-2xl overflow-hidden border border-border hover:border-primary transition-all hover:scale-[1.02]">
