@@ -22,7 +22,6 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import Header from '@/components/header'
 import { useStore } from '@/lib/store-context'
 
 const menuItems = [
@@ -96,24 +95,26 @@ export default function PerfilLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-violet-50 to-white dark:from-slate-950 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-violet-50 to-white flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <UtensilsCrossed className="w-8 h-8 text-white" />
+            {store?.logo_url ? (
+              <Image src={store.logo_url} alt="Logo" width={64} height={64} className="object-contain rounded-2xl" />
+            ) : (
+              <UtensilsCrossed className="w-8 h-8 text-white" />
+            )}
           </div>
-          <p className="text-slate-500 dark:text-slate-400 text-sm">Carregando...</p>
+          <p className="text-slate-500 text-sm">Carregando...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="light min-h-screen bg-gradient-to-b from-violet-50/50 to-slate-50">
-      {/* Header da loja - fixo no topo */}
-      <Header />
+    <div className="[color-scheme:light] min-h-screen bg-gradient-to-b from-violet-50/50 to-slate-50">
 
       {/* Mobile sub-header com titulo da pagina */}
-      <div className="lg:hidden fixed top-20 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
         <div className="flex items-center justify-between px-4 py-3">
           <Button
             variant="ghost"
@@ -123,12 +124,16 @@ export default function PerfilLayout({
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div>
-            <p className="text-xs text-slate-500 text-center">Minha Conta</p>
-            <h1 className="text-base font-semibold text-slate-900 text-center">
-              {menuItems.find(item => pathname === item.href || pathname?.startsWith(item.href + '/'))?.label || 'Perfil'}
-            </h1>
-          </div>
+          <Link href="/" className="flex items-center gap-2">
+            {store?.logo_url ? (
+              <Image src={store.logo_url} alt={store.name || 'Logo'} width={36} height={36} className="object-contain" />
+            ) : (
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <UtensilsCrossed className="w-4 h-4 text-white" />
+              </div>
+            )}
+            <span className="font-bold text-slate-900 text-base">{store?.name || 'Loja'}</span>
+          </Link>
           <div className="w-10" />
         </div>
       </div>
@@ -136,39 +141,35 @@ export default function PerfilLayout({
       <div className="flex min-h-screen">
         {/* Sidebar Desktop */}
         <aside className={`
-          fixed lg:top-20 lg:h-[calc(100vh-80px)] inset-y-0 left-0 z-40
+          fixed top-0 h-screen inset-y-0 left-0 z-40
           w-[280px] bg-white
           border-r border-slate-200
-          flex flex-col shadow-xl lg:shadow-none
+          flex flex-col shadow-xl lg:shadow-sm
           transform transition-transform duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
-          {/* Logo/Header - Estilo da loja */}
-          <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-violet-500/5 to-purple-500/5">
-            <Link href="/" className="flex items-center gap-3 group mb-4">
+          {/* Logo/Header - busca do Supabase igual ao header principal */}
+          <div className="p-5 border-b border-slate-100 bg-gradient-to-br from-violet-500/10 to-purple-500/5">
+            <Link href="/" className="flex items-center gap-3 group">
               {store?.logo_url ? (
                 <Image
                   src={store.logo_url}
                   alt={store.name || 'Logo'}
-                  width={48}
-                  height={48}
-                  className="object-contain rounded-xl group-hover:scale-105 transition-transform"
+                  width={56}
+                  height={56}
+                  priority
+                  className="object-contain rounded-2xl group-hover:scale-105 transition-transform drop-shadow-sm"
+                  style={{ width: 56, height: 'auto' }}
                 />
               ) : (
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
-                  <UtensilsCrossed className="w-6 h-6 text-white" />
+                <div className="w-14 h-14 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
+                  <UtensilsCrossed className="w-7 h-7 text-white" />
                 </div>
               )}
               <div>
-                <h1 className="text-slate-900 font-bold text-lg tracking-tight">{store?.name || 'Loja'}</h1>
-                <p className="text-violet-600 text-xs font-medium">Minha Conta</p>
+                <h1 className="text-slate-900 font-bold text-lg tracking-tight leading-tight">{store?.name || 'Loja'}</h1>
+                <p className="text-violet-600 text-xs font-semibold uppercase tracking-wide">Minha Conta</p>
               </div>
-            </Link>
-            
-            {/* Botao voltar para cardapio */}
-            <Link href="/cardapio" className="flex items-center gap-2 text-sm text-violet-600 hover:text-violet-700 transition-colors">
-              <Home className="w-4 h-4" />
-              <span>Voltar para o cardapio</span>
             </Link>
           </div>
 
@@ -187,7 +188,7 @@ export default function PerfilLayout({
                     flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group
                     ${isActive 
                       ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25' 
-                      : 'hover:bg-slate-50'
+                      : 'hover:bg-violet-50'
                     }
                   `}
                 >
@@ -195,13 +196,13 @@ export default function PerfilLayout({
                     p-2 rounded-lg transition-colors
                     ${isActive 
                       ? 'bg-white/20' 
-                      : 'bg-slate-100 text-slate-500 group-hover:text-violet-500 group-hover:bg-violet-50'
+                      : 'bg-slate-100 text-slate-500 group-hover:text-violet-500 group-hover:bg-violet-100'
                     }
                   `}>
                     <Icon className="w-4 h-4" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-medium text-sm truncate ${isActive ? '' : 'text-slate-700'}`}>
+                    <p className={`font-medium text-sm truncate ${isActive ? 'text-white' : 'text-slate-700'}`}>
                       {item.label}
                     </p>
                     <p className={`text-xs truncate ${isActive ? 'text-white/70' : 'text-slate-400'}`}>
@@ -219,15 +220,12 @@ export default function PerfilLayout({
 
           {/* Footer com acoes */}
           <div className="p-3 border-t border-slate-100 space-y-2">
-            {/* Fazer novo pedido */}
             <Link href="/cardapio">
               <Button className="w-full bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white shadow-lg shadow-violet-500/25">
                 <UtensilsCrossed className="w-4 h-4 mr-2" />
                 Fazer Pedido
               </Button>
             </Link>
-            
-            {/* Logout */}
             <Button
               onClick={handleLogout}
               variant="ghost"
@@ -240,24 +238,26 @@ export default function PerfilLayout({
         </aside>
 
         {/* Mobile Overlay */}
-        {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-30 lg:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-30 lg:hidden"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+        </AnimatePresence>
 
         {/* Main Content */}
-        <main className="flex-1 w-full">
-          <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto pt-36 lg:pt-6 pb-24 lg:pb-8">
+        <main className="flex-1 w-full lg:ml-[280px]">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto pt-20 lg:pt-8 pb-24 lg:pb-8">
             {children}
           </div>
           
-          {/* Mobile Bottom Navigation - Estilo loja */}
-          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-2 py-2 z-40">
+          {/* Mobile Bottom Navigation */}
+          <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 px-2 py-2 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
             <div className="flex items-center justify-around">
               <Link href="/cardapio" className="flex flex-col items-center gap-1 p-2 text-slate-500 hover:text-violet-600 transition-colors">
                 <Home className="w-5 h-5" />
