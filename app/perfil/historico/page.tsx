@@ -399,8 +399,6 @@ export default function HistoricoPage() {
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </div>
                   )
                 })}
               </div>
