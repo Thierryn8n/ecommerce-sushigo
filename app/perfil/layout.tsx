@@ -68,9 +68,18 @@ export default function PerfilLayout({ children }: { children: React.ReactNode }
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="flex pt-20">
+      <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:block w-64 fixed left-0 top-20 bottom-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto">
+        <aside className="hidden lg:block w-64 fixed left-0 top-0 bottom-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto">
+          <div className="flex items-center gap-3 mb-6 mt-24">
+            <div className="w-10 h-10 bg-violet-600 rounded-lg flex items-center justify-center">
+              <UtensilsCrossed className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="font-bold text-slate-900 dark:text-white">Acai</h1>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Minha Conta</p>
+            </div>
+          </div>
           <nav className="space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon
@@ -115,7 +124,7 @@ export default function PerfilLayout({ children }: { children: React.ReactNode }
                 animate={{ x: 0 }}
                 exit={{ x: '-100%' }}
                 transition={{ type: 'tween' }}
-                className="absolute left-0 top-0 bottom-0 w-72 bg-white dark:bg-slate-900 p-4"
+                className="absolute left-0 top-0 bottom-0 w-72 bg-white dark:bg-slate-900 p-4 pt-24"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-6">
@@ -158,8 +167,8 @@ export default function PerfilLayout({ children }: { children: React.ReactNode }
         </AnimatePresence>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-64 pb-20 lg:pb-6">
-          <div className="p-4 lg:p-6 max-w-5xl mx-auto">
+        <main className="flex-1 lg:ml-64">
+          <div className="p-4 lg:p-8 max-w-6xl mx-auto">
             {children}
           </div>
         </main>
