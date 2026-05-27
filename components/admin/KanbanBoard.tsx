@@ -745,7 +745,7 @@ export function KanbanBoard() {
             {columns.map((column, colIdx) => (
               <div
                 key={column.status.id}
-                className={`w-64 flex-shrink-0 transition-all duration-300 flex flex-col h-full ${
+                className={`w-48 flex-shrink-0 transition-all duration-300 flex flex-col h-full ${
                   colIdx >= carouselIndex && colIdx < carouselIndex + columnsPerView
                     ? 'opacity-100'
                     : 'opacity-40'

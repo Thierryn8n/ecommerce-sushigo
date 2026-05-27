@@ -5,7 +5,7 @@ import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 
 export default function KanbanPedidosPage() {
   return (
-    <div className="min-h-screen bg-background overflow-x-auto">
+    <div className="min-h-screen bg-background">
       <AdminSidebar />
       <div className="lg:ml-56 min-h-screen flex flex-col">
         <AdminHeader />
