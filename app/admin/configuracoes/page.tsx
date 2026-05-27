@@ -45,6 +45,13 @@ export default function AdminConfiguracoes() {
     logoUrl: '',
     description: '',
     heroBgUrl: '',
+    heroTitleLine1: '',
+    heroTitleLine2: '',
+    heroSubtitle: '',
+    heroHighlight: '',
+    heroDescription: '',
+    heroCtaPrimary: '',
+    heroCtaSecondary: '',
   })
 
   useEffect(() => {
@@ -66,14 +73,17 @@ export default function AdminConfiguracoes() {
           settingsObj[item.key] = item.value || ''
         })
 
-        // Buscar imagem de fundo do hero em app_settings
-        const { data: heroData } = await supabase
+        // Buscar todos os campos hero de app_settings
+        const { data: heroAllData } = await supabase
           .from('app_settings')
-          .select('value')
+          .select('key, value')
           .eq('store_id', store.id)
           .eq('section', 'hero')
-          .eq('key', 'background_image')
-          .single()
+
+        const heroObj: Record<string, string> = {}
+        heroAllData?.forEach((item: { key: string; value: string }) => {
+          if (item.value) heroObj[item.key] = item.value
+        })
 
         setSettings({
           storeName: settingsObj.store_name || store.name || '',
@@ -88,7 +98,14 @@ export default function AdminConfiguracoes() {
           facebook: settingsObj.facebook || store.facebook_url || '',
           logoUrl: store.logo_url || '',
           description: store.description || '',
-          heroBgUrl: heroData?.value || '',
+          heroBgUrl: heroObj.background_image || '',
+          heroTitleLine1: heroObj.title_line1 || '',
+          heroTitleLine2: heroObj.title_line2 || '',
+          heroSubtitle: heroObj.subtitle || '',
+          heroHighlight: heroObj.highlight_text || '',
+          heroDescription: heroObj.description || '',
+          heroCtaPrimary: heroObj.cta_primary || '',
+          heroCtaSecondary: heroObj.cta_secondary || '',
         })
       } catch (error) {
         console.error('Erro ao buscar configurações:', error)
@@ -142,16 +159,26 @@ export default function AdminConfiguracoes() {
         }
       }
 
-      // Salvar imagem de fundo do hero em app_settings
-      await supabase
-        .from('app_settings')
-        .upsert({
+      // Salvar todos os campos hero em app_settings
+      const heroFields = [
+        { key: 'background_image', value: settings.heroBgUrl },
+        { key: 'title_line1', value: settings.heroTitleLine1 },
+        { key: 'title_line2', value: settings.heroTitleLine2 },
+        { key: 'subtitle', value: settings.heroSubtitle },
+        { key: 'highlight_text', value: settings.heroHighlight },
+        { key: 'description', value: settings.heroDescription },
+        { key: 'cta_primary', value: settings.heroCtaPrimary },
+        { key: 'cta_secondary', value: settings.heroCtaSecondary },
+      ]
+      for (const field of heroFields) {
+        await supabase.from('app_settings').upsert({
           store_id: store.id,
           section: 'hero',
-          key: 'background_image',
-          value: settings.heroBgUrl || null,
+          key: field.key,
+          value: field.value || null,
           updated_at: new Date().toISOString(),
         })
+      }
 
       // Atualizar tabela stores com logo e descrição
       if (settings.logoUrl || settings.description) {
@@ -592,6 +619,85 @@ export default function AdminConfiguracoes() {
                       </div>
                     )}
                     <p className="text-muted-foreground text-xs">Formatos: JPG, PNG, WebP. Recomendado: 1920x1080px</p>
+                  </div>
+                </div>
+
+                {/* Campos de texto */}
+                <div className="mt-5 border-t border-border pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Titulo - Linha 1</label>
+                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">Açaí</span></p>
+                    <input
+                      type="text"
+                      value={settings.heroTitleLine1}
+                      onChange={e => setSettings(prev => ({ ...prev, heroTitleLine1: e.target.value }))}
+                      placeholder="Açaí"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Titulo - Linha 2</label>
+                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">da Praia</span></p>
+                    <input
+                      type="text"
+                      value={settings.heroTitleLine2}
+                      onChange={e => setSettings(prev => ({ ...prev, heroTitleLine2: e.target.value }))}
+                      placeholder="da Praia"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Subtitulo</label>
+                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">O melhor açaí, com o sabor</span></p>
+                    <input
+                      type="text"
+                      value={settings.heroSubtitle}
+                      onChange={e => setSettings(prev => ({ ...prev, heroSubtitle: e.target.value }))}
+                      placeholder="O melhor açaí, com o sabor"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Texto em Destaque</label>
+                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">do paraíso!</span> (aparece em laranja)</p>
+                    <input
+                      type="text"
+                      value={settings.heroHighlight}
+                      onChange={e => setSettings(prev => ({ ...prev, heroHighlight: e.target.value }))}
+                      placeholder="do paraíso!"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-foreground mb-1">Descricao</label>
+                    <p className="text-xs text-muted-foreground mb-1.5">Texto pequeno abaixo do destaque</p>
+                    <textarea
+                      value={settings.heroDescription}
+                      onChange={e => setSettings(prev => ({ ...prev, heroDescription: e.target.value }))}
+                      placeholder="Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!"
+                      rows={2}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Botao Principal</label>
+                    <input
+                      type="text"
+                      value={settings.heroCtaPrimary}
+                      onChange={e => setSettings(prev => ({ ...prev, heroCtaPrimary: e.target.value }))}
+                      placeholder="PEÇA AGORA"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Botao Secundario</label>
+                    <input
+                      type="text"
+                      value={settings.heroCtaSecondary}
+                      onChange={e => setSettings(prev => ({ ...prev, heroCtaSecondary: e.target.value }))}
+                      placeholder="VER CARDÁPIO"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
                   </div>
                 </div>
               </div>
