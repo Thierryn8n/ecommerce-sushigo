@@ -91,7 +91,7 @@ function CardapioContent() {
   })
 
   return (
-    <main className="min-h-screen bg-[#120018]">
+    <main className="min-h-screen bg-background">
       <Header />
       
       {/* Hero Banner */}
@@ -259,7 +259,7 @@ function CardapioContent() {
 export default function CardapioPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-[#120018]">
+      <main className="min-h-screen bg-background">
         <Header />
         <section className="pt-24 pb-12">
           <div className="container mx-auto px-4">
