@@ -215,10 +215,10 @@ export default function AdminPedidos() {
             animate={{ opacity: 1, y: 0 }}
           >
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col gap-3 mb-4 sm:mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-foreground">Pedidos</h1>
-                <p className="text-foreground/50 text-sm mt-1">{filteredOrders.length} de {orders.length} pedidos</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">Pedidos</h1>
+                <p className="text-foreground/50 text-xs sm:text-sm mt-1">{filteredOrders.length} de {orders.length} pedidos</p>
               </div>
               <div className="flex gap-2 flex-wrap">
                 {Object.entries(statusFilterMap).map(([key]) => {
@@ -226,7 +226,7 @@ export default function AdminPedidos() {
                   const count = getStatusCount(key)
                   if (!config || count === 0) return null
                   return (
-                    <span key={key} className={`px-3 py-2 rounded-lg ${config.bg} ${config.text} text-sm font-medium`}>
+                    <span key={key} className={`px-2 sm:px-3 py-1 sm:py-2 rounded-lg ${config.bg} ${config.text} text-[10px] sm:text-sm font-medium`}>
                       {count} {config.label}
                     </span>
                   )
@@ -235,37 +235,37 @@ export default function AdminPedidos() {
             </div>
 
             {/* Filters */}
-            <div className="bg-card rounded-2xl p-4 border border-border mb-6 space-y-3">
+            <div className="bg-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-border mb-4 sm:mb-6 space-y-3">
               {/* Search */}
-              <div className="flex gap-3 flex-col sm:flex-row">
+              <div className="flex gap-2 sm:gap-3 flex-col sm:flex-row">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/50" />
                   <Input
                     type="text"
-                    placeholder="Buscar por ID, cliente ou telefone..."
+                    placeholder="Buscar pedidos..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-border text-foreground"
+                    className="pl-9 sm:pl-10 border-border text-foreground text-sm"
                   />
                 </div>
                 {hasActiveFilters && (
-                  <Button variant="outline" size="sm" onClick={clearFilters} className="border-red-500/50 text-red-400 hover:bg-red-500/10 gap-1 shrink-0">
-                    <X className="w-4 h-4" />
-                    Limpar filtros
+                  <Button variant="outline" size="sm" onClick={clearFilters} className="border-red-500/50 text-red-400 hover:bg-red-500/10 gap-1 shrink-0 text-xs sm:text-sm">
+                    <X className="w-3 h-3 sm:w-4 sm:h-4" />
+                    Limpar
                   </Button>
                 )}
               </div>
 
-              {/* Status filters */}
-              <div className="flex gap-2 flex-wrap items-center">
-                <span className="text-foreground/40 text-xs flex items-center gap-1"><Filter className="w-3 h-3" /> Status:</span>
+              {/* Status filters - scrollable on mobile */}
+              <div className="flex gap-2 flex-wrap items-center overflow-x-auto pb-2">
+                <span className="text-foreground/40 text-[10px] sm:text-xs flex items-center gap-1 shrink-0"><Filter className="w-3 h-3" /> Status:</span>
                 <Button
                   variant={selectedStatus === null ? 'default' : 'outline'}
                   onClick={() => setSelectedStatus(null)}
                   size="sm"
-                  className={selectedStatus === null ? 'bg-[#FF8C00] text-white h-7 text-xs' : 'border-border text-foreground/70 h-7 text-xs'}
+                  className={selectedStatus === null ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs shrink-0' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs shrink-0'}
                 >
-                  Todos ({orders.length})
+                  Todos
                 </Button>
                 {Object.entries(statusFilterMap).map(([key]) => {
                   const config = statusConfig[key]
@@ -277,9 +277,9 @@ export default function AdminPedidos() {
                       variant={selectedStatus === key ? 'default' : 'outline'}
                       onClick={() => setSelectedStatus(selectedStatus === key ? null : key)}
                       size="sm"
-                      className={selectedStatus === key ? 'bg-[#FF8C00] text-white h-7 text-xs' : 'border-border text-foreground/70 h-7 text-xs'}
+                      className={selectedStatus === key ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs shrink-0' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs shrink-0'}
                     >
-                      {config.label} ({count})
+                      {config.label}
                     </Button>
                   )
                 })}
@@ -287,28 +287,28 @@ export default function AdminPedidos() {
 
               {/* Date + Payment filters */}
               <div className="flex gap-2 flex-wrap items-center">
-                <span className="text-foreground/40 text-xs flex items-center gap-1"><CalendarDays className="w-3 h-3" /> Data:</span>
+                <span className="text-foreground/40 text-[10px] sm:text-xs flex items-center gap-1 shrink-0"><CalendarDays className="w-3 h-3" /> Data:</span>
                 {['hoje', 'ontem', 'semana'].map(d => (
                   <Button
                     key={d}
                     variant={selectedDate === d ? 'default' : 'outline'}
                     onClick={() => setSelectedDate(selectedDate === d ? null : d)}
                     size="sm"
-                    className={selectedDate === d ? 'bg-[#FF8C00] text-white h-7 text-xs' : 'border-border text-foreground/70 h-7 text-xs'}
+                    className={selectedDate === d ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs'}
                   >
-                    {d === 'hoje' ? 'Hoje' : d === 'ontem' ? 'Ontem' : 'Esta semana'}
+                    {d === 'hoje' ? 'Hoje' : d === 'ontem' ? 'Ontem' : 'Semana'}
                   </Button>
                 ))}
                 {paymentMethods.length > 0 && (
                   <>
-                    <span className="text-foreground/40 text-xs flex items-center gap-1 ml-2"><CreditCard className="w-3 h-3" /> Pagamento:</span>
+                    <span className="text-foreground/40 text-[10px] sm:text-xs flex items-center gap-1 ml-2 shrink-0"><CreditCard className="w-3 h-3" /> Pgto:</span>
                     {paymentMethods.map(method => (
                       <Button
                         key={method}
                         variant={selectedPayment === method ? 'default' : 'outline'}
                         onClick={() => setSelectedPayment(selectedPayment === method ? null : method)}
                         size="sm"
-                        className={selectedPayment === method ? 'bg-[#FF8C00] text-white h-7 text-xs capitalize' : 'border-border text-foreground/70 h-7 text-xs capitalize'}
+                        className={selectedPayment === method ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs'}
                       >
                         {method}
                       </Button>
@@ -319,7 +319,7 @@ export default function AdminPedidos() {
             </div>
 
             {/* Orders Grid */}
-            <div className="grid gap-4">
+            <div className="grid gap-3 sm:gap-4">
               {filteredOrders.map((order) => {
                 const status = statusConfig[order.status as keyof typeof statusConfig] || statusConfig.pendente
                 const StatusIcon = status?.icon || Clock
@@ -328,50 +328,50 @@ export default function AdminPedidos() {
                     key={order.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-card rounded-2xl p-6 border border-border"
+                    className="bg-card rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-border"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
                       {/* Order Info */}
                       <div className="flex-1">
-                        <div className="flex items-center gap-4 mb-3">
-                          <span className="text-foreground font-bold text-lg">{order.id}</span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${status.bg} ${status.text}`}>
+                        <div className="flex items-center gap-2 sm:gap-4 mb-2 sm:mb-3">
+                          <span className="text-foreground font-bold text-base sm:text-lg">#{order.id.slice(-6)}</span>
+                          <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1 ${status.bg} ${status.text}`}>
                             <StatusIcon className="w-3 h-3" />
                             {status.label}
                           </span>
-                          <span className="text-foreground/50 text-sm">{order.time} atrás</span>
+                          <span className="text-foreground/50 text-[10px] sm:text-sm">{order.time} atrás</span>
                         </div>
-                        <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="grid sm:grid-cols-2 gap-2 sm:gap-4">
                           <div>
-                            <p className="text-foreground font-medium">{order.customer}</p>
-                            <p className="text-foreground/50 text-sm">{order.phone}</p>
+                            <p className="text-foreground font-medium text-sm">{order.customer}</p>
+                            <p className="text-foreground/50 text-xs sm:text-sm">{order.phone}</p>
                           </div>
-                          <div>
+                          <div className="hidden sm:block">
                             <p className="text-foreground/70 text-sm">{order.address}</p>
-                            <p className="text-foreground/50 text-sm">Pagamento: {order.payment}</p>
+                            <p className="text-foreground/50 text-xs sm:text-sm">Pagamento: {order.payment}</p>
                           </div>
                         </div>
-                        <div className="mt-3 pt-3 border-t border-border">
-                          <p className="text-foreground/70 text-sm">
+                        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-border">
+                          <p className="text-foreground/70 text-xs sm:text-sm line-clamp-2">
                             {order.items.map(item => `${item.qty}x ${item.name}`).join(', ')}
                           </p>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="flex flex-col gap-2 sm:gap-4 items-start sm:items-center">
                         <div className="text-right">
-                          <p className="text-foreground/50 text-sm">Total</p>
-                          <p className="text-[#00BFFF] font-bold text-xl">R$ {order.total.toFixed(2).replace('.', ',')}</p>
+                          <p className="text-foreground/50 text-[10px] sm:text-sm">Total</p>
+                          <p className="text-[#00BFFF] font-bold text-base sm:text-xl">R$ {order.total.toFixed(2).replace('.', ',')}</p>
                         </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="border-border text-foreground/70 hover:bg-[#2a1a35]">
-                            <Eye className="w-4 h-4 mr-2" />
-                            Detalhes
+                        <div className="flex gap-1 sm:gap-2 w-full sm:w-auto">
+                          <Button size="sm" variant="outline" className="border-border text-foreground/70 hover:bg-[#2a1a35] flex-1 sm:flex-none text-xs h-8 sm:h-auto">
+                            <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                            <span className="hidden sm:inline">Detalhes</span>
                           </Button>
-                          <Button size="sm" className="bg-[#25D366] hover:bg-[#20bd5a] text-foreground">
-                            <MessageCircle className="w-4 h-4 mr-2" />
-                            WhatsApp
+                          <Button size="sm" className="bg-[#25D366] hover:bg-[#20bd5a] text-foreground flex-1 sm:flex-none text-xs h-8 sm:h-auto">
+                            <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                            <span className="hidden sm:inline">WhatsApp</span>
                           </Button>
                         </div>
                       </div>
@@ -379,50 +379,54 @@ export default function AdminPedidos() {
 
                     {/* Status Actions */}
                     {order.status !== 'entregue' && order.status !== 'cancelado' && (
-                      <div className="mt-4 pt-4 border-t border-border flex flex-wrap gap-2">
-                        <p className="text-foreground/50 text-sm mr-2">Atualizar status:</p>
+                      <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border flex flex-wrap gap-1 sm:gap-2">
+                        <p className="text-foreground/50 text-[10px] sm:text-sm mr-1 sm:mr-2 w-full sm:w-auto">Atualizar:</p>
                         {updating === order.id ? (
-                          <Loader2 className="w-5 h-5 animate-spin text-[#FF8C00]" />
+                          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-[#FF8C00]" />
                         ) : (
                           <>
                             {(order.status === 'pendente' || order.status === 'confirmado') && (
                               <Button 
                                 size="sm" 
-                                className="bg-blue-500 hover:bg-blue-600 text-foreground"
+                                className="bg-blue-500 hover:bg-blue-600 text-foreground text-xs h-7 sm:h-auto"
                                 onClick={() => updateStatus(order.id, 'preparando')}
                               >
-                                <ChefHat className="w-4 h-4 mr-2" />
-                                Preparando
+                                <ChefHat className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                <span className="hidden sm:inline">Preparando</span>
+                                <span className="sm:hidden">Prep</span>
                               </Button>
                             )}
                             {order.status === 'preparando' && (
                               <Button 
                                 size="sm" 
-                                className="bg-purple-500 hover:bg-purple-600 text-foreground"
+                                className="bg-purple-500 hover:bg-purple-600 text-foreground text-xs h-7 sm:h-auto"
                                 onClick={() => updateStatus(order.id, 'saiu_entrega')}
                               >
-                                <Truck className="w-4 h-4 mr-2" />
-                                Saiu p/ Entrega
+                                <Truck className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                <span className="hidden sm:inline">Saiu p/ Entrega</span>
+                                <span className="sm:hidden">Saiu</span>
                               </Button>
                             )}
                             {order.status === 'saiu_entrega' && (
                               <Button 
                                 size="sm" 
-                                className="bg-green-500 hover:bg-green-600 text-foreground"
+                                className="bg-green-500 hover:bg-green-600 text-foreground text-xs h-7 sm:h-auto"
                                 onClick={() => updateStatus(order.id, 'entregue')}
                               >
-                                <CheckCircle className="w-4 h-4 mr-2" />
-                                Entregue
+                                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                <span className="hidden sm:inline">Entregue</span>
+                                <span className="sm:hidden">Ok</span>
                               </Button>
                             )}
                             <Button 
                               size="sm" 
-                              variant="outline" 
-                              className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                              variant="outline"
+                              className="border-red-500/50 text-red-400 hover:bg-red-500/10 text-xs h-7 sm:h-auto"
                               onClick={() => updateStatus(order.id, 'cancelado')}
                             >
-                              <XCircle className="w-4 h-4 mr-2" />
-                              Cancelar
+                              <X className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                              <span className="hidden sm:inline">Cancelar</span>
+                              <span className="sm:hidden">Can</span>
                             </Button>
                           </>
                         )}
@@ -434,8 +438,8 @@ export default function AdminPedidos() {
             </div>
 
             {filteredOrders.length === 0 && (
-              <div className="bg-card rounded-2xl p-12 border border-border text-center">
-                <p className="text-foreground/60">Nenhum pedido encontrado</p>
+              <div className="bg-card rounded-xl sm:rounded-2xl p-6 sm:p-12 border border-border text-center">
+                <p className="text-foreground/60 text-sm">Nenhum pedido encontrado</p>
               </div>
             )}
           </motion.div>
