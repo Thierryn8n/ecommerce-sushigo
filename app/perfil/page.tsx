@@ -151,85 +151,85 @@ export default function PerfilPage() {
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
-            Olá, {profile?.full_name?.split(' ')[0] || 'Cliente'}! 👋
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">
+            Ola, {profile?.full_name?.split(' ')[0] || 'Cliente'}!
           </h1>
-          <p className="text-slate-500 dark:text-slate-400">Bem-vindo à sua área exclusiva</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">Bem-vindo a sua area exclusiva</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-r from-violet-100 to-purple-50 dark:from-violet-500/20 dark:to-purple-500/10 border border-violet-200 dark:border-violet-500/20 rounded-xl px-4 py-2 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-violet-600 dark:text-violet-400" />
-            <span className="text-sm font-medium text-violet-700 dark:text-violet-300">Cliente VIP</span>
+          <div className="bg-gradient-to-r from-violet-100 to-purple-50 dark:from-violet-500/20 dark:to-purple-500/10 border border-violet-200 dark:border-violet-500/20 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
+            <span className="text-xs sm:text-sm font-medium text-violet-700 dark:text-violet-300">Cliente VIP</span>
           </div>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
         >
-          <div className="flex items-center justify-between mb-2">
-            <Package className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-            <span className="text-xs text-green-500 bg-green-500/10 px-2 py-0.5 rounded-full">
+          <div className="flex items-center justify-between mb-1 sm:mb-2">
+            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 dark:text-violet-400" />
+            <span className="text-[10px] sm:text-xs text-green-500 bg-green-500/10 px-1.5 sm:px-2 py-0.5 rounded-full">
               {activeOrders.length} ativos
             </span>
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{orders.length}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Total de Pedidos</p>
+          <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{orders.length}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Pedidos</p>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
         >
-          <div className="flex items-center justify-between mb-2">
-            <TrendingUp className="w-5 h-5 text-green-500" />
+          <div className="flex items-center justify-between mb-1 sm:mb-2">
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">
-            R$ {totalSpent.toFixed(2).replace('.', ',')}
+          <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+            R$ {totalSpent.toFixed(0)}
           </p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Total em Compras</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Total</p>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
         >
-          <div className="flex items-center justify-between mb-2">
-            <MapPin className="w-5 h-5 text-blue-500" />
+          <div className="flex items-center justify-between mb-1 sm:mb-2">
+            <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">{addresses.length}</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Endereços</p>
+          <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{addresses.length}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Enderecos</p>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
         >
-          <div className="flex items-center justify-between mb-2">
-            <Star className="w-5 h-5 text-purple-500" />
+          <div className="flex items-center justify-between mb-1 sm:mb-2">
+            <Star className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
           </div>
-          <p className="text-2xl font-bold text-slate-900 dark:text-white">Fidelidade</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Programa VIP</p>
+          <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">VIP</p>
+          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Fidelidade</p>
         </motion.div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Acesso Rápido</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Acesso Rapido</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {quickLinks.map((link, index) => {
             const Icon = link.icon
             return (
@@ -241,23 +241,23 @@ export default function PerfilPage() {
               >
                 <Link
                   href={link.href}
-                  className="flex items-center gap-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/10 transition-all group"
+                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/10 transition-all group"
                 >
-                  <div className={`p-3 rounded-lg ${link.color}`}>
-                    <Icon className="w-5 h-5" />
+                  <div className={`p-2 sm:p-3 rounded-lg ${link.color}`}>
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-slate-900 dark:text-white font-medium">{link.label}</p>
+                      <p className="text-slate-900 dark:text-white font-medium text-sm sm:text-base truncate">{link.label}</p>
                       {link.count > 0 && (
-                        <span className="bg-violet-500 text-white text-xs px-2 py-0.5 rounded-full">
+                        <span className="bg-violet-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0">
                           {link.count}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">{link.description}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">{link.description}</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-violet-500 group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:text-violet-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
                 </Link>
               </motion.div>
             )

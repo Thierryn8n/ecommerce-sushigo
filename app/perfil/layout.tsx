@@ -209,7 +209,7 @@ export default function PerfilLayout({
 
         {/* Main Content */}
         <main className="flex-1 lg:ml-0">
-          <div className="p-4 lg:p-8 max-w-6xl mx-auto">
+          <div className="p-4 lg:p-8 max-w-6xl mx-auto pt-16 lg:pt-4 pb-6">
             {children}
           </div>
         </main>

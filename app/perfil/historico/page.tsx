@@ -20,11 +20,20 @@ interface OrderItem {
   quantity: number
   unit_price: number
   product_image?: string
-  toppings?: { name: string; image?: string }[]
-  sauces?: { name: string; image?: string }[]
+  toppings?: string[] | { name: string; image?: string }[]
+  sauces?: string[] | { name: string; image?: string }[]
   bowl_type?: string
   bowl_image?: string
   size?: string
+}
+
+// Helper para normalizar toppings/sauces
+function normalizeItems(items?: string[] | { name: string; image?: string }[]): { name: string; image?: string }[] {
+  if (!items || items.length === 0) return []
+  if (typeof items[0] === 'string') {
+    return (items as string[]).map(name => ({ name }))
+  }
+  return items as { name: string; image?: string }[]
 }
 
 interface Order {
@@ -132,18 +141,18 @@ export default function HistoricoPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Histórico de Compras</h1>
-          <p className="text-slate-500 dark:text-slate-400">Veja todas as suas compras e estatísticas</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">Historico de Compras</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">Veja todas as suas compras e estatisticas</p>
         </div>
         
         {/* Period Filter */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {[
             { value: 'all', label: 'Tudo' },
-            { value: 'week', label: '7 dias' },
-            { value: 'month', label: '30 dias' },
+            { value: 'week', label: '7d' },
+            { value: 'month', label: '30d' },
             { value: 'year', label: 'Ano' }
           ].map(period => (
             <Button
@@ -152,8 +161,8 @@ export default function HistoricoPage() {
               size="sm"
               onClick={() => setSelectedPeriod(period.value)}
               className={selectedPeriod === period.value 
-                ? 'bg-violet-500 text-white' 
-                : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
+                ? 'bg-violet-500 text-white text-xs sm:text-sm' 
+                : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs sm:text-sm'
               }
             >
               {period.label}
@@ -163,53 +172,53 @@ export default function HistoricoPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-violet-200 dark:border-violet-500/30">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-violet-100 dark:bg-violet-500/20 rounded-lg">
-              <ShoppingBag className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-violet-200 dark:border-violet-500/30">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-violet-100 dark:bg-violet-500/20 rounded-lg">
+              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 dark:text-violet-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{filteredOrders.length}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Total de Pedidos</p>
+              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">{filteredOrders.length}</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Pedidos</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-green-500/20">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/20 rounded-lg">
-              <TrendingUp className="w-5 h-5 text-green-500" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-green-500/20">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg">
+              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                R$ {totalSpent.toFixed(2).replace('.', ',')}
+              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">
+                R$ {totalSpent.toFixed(0)}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Total Gasto</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Total</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-purple-500/20">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/20 rounded-lg">
-              <Package className="w-5 h-5 text-purple-500" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-purple-500/20">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
+              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{completedOrders}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Pedidos Entregues</p>
+              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">{completedOrders}</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Entregues</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-blue-500/20">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/20 rounded-lg">
-              <Star className="w-5 h-5 text-blue-500" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-blue-500/20">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg">
+              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalItems}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Itens Comprados</p>
+              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">{totalItems}</p>
+              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Itens</p>
             </div>
           </div>
         </div>
@@ -314,13 +323,14 @@ export default function HistoricoPage() {
                                     {/* Toppings/Condimentos */}
                                     {item.toppings && item.toppings.length > 0 && (
                                       <div className="mt-2 flex flex-wrap gap-1">
-                                        {item.toppings.map((topping, idx) => (
+                                        {normalizeItems(item.toppings).map((topping, idx) => (
                                           <div key={idx} className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700 rounded-full px-2 py-1">
                                             {topping.image && (
                                               <img 
                                                 src={topping.image} 
                                                 alt={topping.name}
                                                 className="w-4 h-4 object-cover rounded-full"
+                                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                                               />
                                             )}
                                             <span className="text-xs text-slate-600 dark:text-slate-300">{topping.name}</span>
@@ -333,13 +343,14 @@ export default function HistoricoPage() {
                                     {item.sauces && item.sauces.length > 0 && (
                                       <div className="mt-2 flex flex-wrap gap-1">
                                         <span className="text-xs text-slate-500 dark:text-slate-400 mr-1">Molhos:</span>
-                                        {item.sauces.map((sauce, idx) => (
+                                        {normalizeItems(item.sauces).map((sauce, idx) => (
                                           <div key={idx} className="flex items-center gap-1 bg-orange-50 dark:bg-orange-900/20 rounded-full px-2 py-1">
                                             {sauce.image && (
                                               <img 
                                                 src={sauce.image} 
                                                 alt={sauce.name}
                                                 className="w-4 h-4 object-cover rounded-full"
+                                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                                               />
                                             )}
                                             <span className="text-xs text-orange-600 dark:text-orange-400">{sauce.name}</span>
