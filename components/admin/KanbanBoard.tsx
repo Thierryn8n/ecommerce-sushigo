@@ -320,7 +320,7 @@ export function KanbanBoard() {
     const activeColumn = columns[activeColumnIndex]
     
     return (
-      <div className="min-h-[calc(100vh-7rem)] flex flex-col">
+      <div className="min-h-[calc(100vh-7rem)] flex flex-col overflow-x-auto">
         {/* Header com navegação */}
         <div className="px-4 py-3 bg-card border-b border-border flex items-center justify-between">
           <Button
