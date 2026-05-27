@@ -8,13 +8,11 @@ import {
   Calendar,
   TrendingUp,
   ShoppingBag,
-  ChevronDown,
-  ChevronUp,
   Star,
   Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 interface OrderItem {
   id: string
@@ -74,28 +72,7 @@ export default function HistoricoPage() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (error) {
-        console.error('DEBUG - Erro na query:', error)
-        throw error
-      }
-      console.log('DEBUG - Pedidos encontrados:', data)
-      console.log('DEBUG - User ID:', user.id)
-      console.log('DEBUG - Quantidade:', data?.length || 0)
-      // Debug detalhado dos itens
-      data?.forEach((order, idx) => {
-        console.log(`DEBUG - Pedido ${idx + 1}:`, {
-          id: order.id,
-          status: order.status,
-          items_count: order.order_items?.length || 0,
-          items: order.order_items?.map((item: OrderItem) => ({
-            name: item.product_name,
-            has_image: !!item.product_image,
-            toppings: item.toppings?.length || 0,
-            sauces: item.sauces?.length || 0,
-            bowl: item.bowl_type
-          }))
-        })
-      })
+      if (error) throw error
       setOrders(data || [])
     } catch (error) {
       console.error('Erro ao buscar histórico:', error)
@@ -144,22 +121,6 @@ export default function HistoricoPage() {
     return groups
   }, {} as Record<string, Order[]>)
 
-  // Debug info
-  console.log('DEBUG - orders.length:', orders.length)
-  console.log('DEBUG - filteredOrders.length:', filteredOrders.length)
-  console.log('DEBUG - groupedOrders keys:', Object.keys(groupedOrders))
-  console.log('DEBUG - selectedPeriod:', selectedPeriod)
-  
-  // Debug visual - remover após teste
-  const debugVisual = (
-    <div className="bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 dark:border-yellow-600 rounded-lg p-3 mb-4 text-sm">
-      <p className="font-semibold text-yellow-800 dark:text-yellow-200">Debug:</p>
-      <p className="text-yellow-700 dark:text-yellow-300">Total orders: {orders.length}</p>
-      <p className="text-yellow-700 dark:text-yellow-300">Filtered: {filteredOrders.length}</p>
-      <p className="text-yellow-700 dark:text-yellow-300">Grouped keys: {Object.keys(groupedOrders).length}</p>
-    </div>
-  )
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -170,7 +131,6 @@ export default function HistoricoPage() {
 
   return (
     <div className="space-y-6">
-      {debugVisual}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
@@ -306,15 +266,21 @@ export default function HistoricoPage() {
                       <div className="border-t border-slate-200 dark:border-slate-800">
                         <div className="p-4 space-y-4">
                               {order.order_items?.map((item) => (
-                                <div key={item.id} className="flex gap-3 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div key={item.id} className="flex gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                                   {/* Imagem do Produto */}
-                                  <div className="relative w-20 h-20 flex-shrink-0">
-                                    <img 
-                                      src={item.product_image || '/placeholder-product.png'} 
-                                      alt={item.product_name}
-                                      className="w-full h-full object-cover rounded-lg"
-                                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-product.png' }}
-                                    />
+                                  <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden">
+                                    {item.product_image ? (
+                                      <img 
+                                        src={item.product_image} 
+                                        alt={item.product_name}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full flex items-center justify-center">
+                                        <Package className="w-8 h-8 text-slate-400" />
+                                      </div>
+                                    )}
                                   </div>
                                   
                                   {/* Informações do Item */}

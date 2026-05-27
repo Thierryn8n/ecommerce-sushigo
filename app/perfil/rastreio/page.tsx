@@ -244,7 +244,7 @@ export default function RastreioPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8C00]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
       </div>
     )
   }
@@ -259,7 +259,7 @@ export default function RastreioPage() {
             initial={{ opacity: 0, y: -50, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: -50 }}
-            className="fixed top-20 left-1/2 z-50 bg-primary text-primary-foreground px-6 py-3 rounded-full shadow-lg flex items-center gap-2"
+            className="fixed top-20 left-1/2 z-50 bg-violet-500 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-2"
           >
             <Bell className="w-4 h-4" />
             <span className="font-medium">{notif.message}</span>
@@ -269,27 +269,27 @@ export default function RastreioPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Rastrear Pedidos</h1>
-        <p className="text-muted-foreground">Acompanhe o status dos seus pedidos em tempo real</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">Rastrear Pedidos</h1>
+        <p className="text-slate-500 dark:text-slate-400">Acompanhe o status dos seus pedidos em tempo real</p>
       </div>
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
         <Input
           type="text"
           placeholder="Buscar por numero do pedido..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 bg-muted border-border text-foreground placeholder:text-muted-foreground"
+          className="pl-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400"
         />
       </div>
 
       {/* Active Orders */}
       {activeOrders.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
-            <Clock className="w-5 h-5 text-primary" />
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-violet-500" />
             Pedidos em Andamento ({activeOrders.length})
           </h2>
           
@@ -302,36 +302,36 @@ export default function RastreioPage() {
               <motion.div
                 key={order.id}
                 layout
-                className="bg-card rounded-2xl border border-border overflow-hidden"
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
               >
                 {/* Order Header */}
                 <div 
-                  className="p-5 cursor-pointer"
+                  className="p-4 sm:p-5 cursor-pointer"
                   onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-xl ${status.bgColor}`}>
-                        <StatusIcon className={`w-6 h-6 ${status.color}`} />
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                      <div className={`p-2 sm:p-3 rounded-xl ${status.bgColor}`}>
+                        <StatusIcon className={`w-5 h-5 sm:w-6 sm:h-6 ${status.color}`} />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Pedido #{order.id.slice(-6).toUpperCase()}</p>
-                        <p className="text-foreground font-semibold">{status.label}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{status.description}</p>
+                        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Pedido #{order.id.slice(-6).toUpperCase()}</p>
+                        <p className="text-slate-900 dark:text-white font-semibold">{status.label}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 hidden sm:block">{status.description}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-primary font-bold text-lg">
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-violet-600 dark:text-violet-400 font-bold text-base sm:text-lg">
                         R$ {order.total_amount?.toFixed(2).replace('.', ',')}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {new Date(order.created_at).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
                   </div>
 
                   {/* Status Flow */}
-                  <div className="mt-6">
+                  <div className="mt-4 sm:mt-6">
                     <div className="flex items-center justify-between relative">
                       {statusFlow.map((flowStatus, index) => {
                         const flowConfig = statusConfig[flowStatus]
@@ -344,25 +344,25 @@ export default function RastreioPage() {
                               animate={isCurrent ? { scale: [1, 1.1, 1] } : {}}
                               transition={{ duration: 1, repeat: isCurrent ? Infinity : 0 }}
                               className={`
-                                w-10 h-10 rounded-full flex items-center justify-center
+                                w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center
                                 transition-all duration-300
                                 ${isActive 
                                   ? isCurrent 
-                                    ? 'bg-primary text-primary-foreground scale-110' 
+                                    ? 'bg-violet-500 text-white scale-105 sm:scale-110' 
                                     : 'bg-green-500/20 text-green-500'
-                                  : 'bg-muted text-muted-foreground'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
                                 }
                               `}
                             >
                               {isActive && !isCurrent ? (
-                                <CheckCircle className="w-5 h-5" />
+                                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
                               ) : (
-                                <flowConfig.icon className="w-5 h-5" />
+                                <flowConfig.icon className="w-4 h-4 sm:w-5 sm:h-5" />
                               )}
                             </motion.div>
                             <span className={`
-                              text-xs mt-2 text-center w-20
-                              ${isActive ? 'text-foreground' : 'text-muted-foreground'}
+                              text-[10px] sm:text-xs mt-1 sm:mt-2 text-center w-14 sm:w-20 leading-tight
+                              ${isActive ? 'text-slate-700 dark:text-slate-300' : 'text-slate-400 dark:text-slate-500'}
                             `}>
                               {flowConfig.label}
                             </span>
@@ -371,9 +371,9 @@ export default function RastreioPage() {
                       })}
                       
                       {/* Progress Line */}
-                      <div className="absolute top-5 left-0 right-0 h-0.5 bg-muted -z-0">
+                      <div className="absolute top-4 sm:top-5 left-0 right-0 h-0.5 bg-slate-200 dark:bg-slate-700 -z-0">
                         <motion.div 
-                          className="h-full bg-gradient-to-r from-primary to-green-500"
+                          className="h-full bg-gradient-to-r from-violet-500 to-green-500"
                           initial={{ width: 0 }}
                           animate={{ width: `${(getStatusIndex(order.status) / (statusFlow.length - 1)) * 100}%` }}
                           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -390,25 +390,25 @@ export default function RastreioPage() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-border"
+                      className="border-t border-slate-200 dark:border-slate-800"
                     >
-                      <div className="p-5 space-y-4">
+                      <div className="p-4 sm:p-5 space-y-4">
                         {/* Items */}
                         <div>
-                          <h4 className="text-foreground font-medium mb-3">Itens do Pedido</h4>
+                          <h4 className="text-slate-900 dark:text-white font-medium mb-3">Itens do Pedido</h4>
                           <div className="space-y-2">
                             {order.order_items?.map((item) => (
-                              <div key={item.id} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
+                              <div key={item.id} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800 last:border-0">
                                 <div>
-                                  <p className="text-foreground/80">{item.product_name}</p>
+                                  <p className="text-slate-700 dark:text-slate-300">{item.product_name}</p>
                                   {item.toppings?.length > 0 && (
-                                    <p className="text-xs text-muted-foreground">
+                                    <p className="text-xs text-slate-500">
                                       + {item.toppings.join(', ')}
                                     </p>
                                   )}
-                                  <p className="text-xs text-muted-foreground">Qtd: {item.quantity}</p>
+                                  <p className="text-xs text-slate-500">Qtd: {item.quantity}</p>
                                 </div>
-                                <p className="text-primary">
+                                <p className="text-violet-600 dark:text-violet-400">
                                   R$ {(item.unit_price * item.quantity).toFixed(2).replace('.', ',')}
                                 </p>
                               </div>
@@ -417,33 +417,33 @@ export default function RastreioPage() {
                         </div>
 
                         {/* Delivery Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-border">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-slate-200 dark:border-slate-800">
                           <div className="flex items-center gap-3">
-                            <MapPin className="w-5 h-5 text-primary" />
+                            <MapPin className="w-5 h-5 text-violet-500 flex-shrink-0" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Endereco</p>
-                              <p className="text-foreground/80 text-sm">{order.delivery_address || 'Retirada'}</p>
+                              <p className="text-xs text-slate-500">Endereco</p>
+                              <p className="text-slate-700 dark:text-slate-300 text-sm">{order.delivery_address || 'Retirada'}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Phone className="w-5 h-5 text-primary" />
+                            <Phone className="w-5 h-5 text-violet-500 flex-shrink-0" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Telefone</p>
-                              <p className="text-foreground/80 text-sm">{order.phone || '-'}</p>
+                              <p className="text-xs text-slate-500">Telefone</p>
+                              <p className="text-slate-700 dark:text-slate-300 text-sm">{order.phone || '-'}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <CreditCard className="w-5 h-5 text-primary" />
+                            <CreditCard className="w-5 h-5 text-violet-500 flex-shrink-0" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Pagamento</p>
-                              <p className="text-foreground/80 text-sm">{order.payment_method || 'Dinheiro'}</p>
+                              <p className="text-xs text-slate-500">Pagamento</p>
+                              <p className="text-slate-700 dark:text-slate-300 text-sm">{order.payment_method || 'Dinheiro'}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <Calendar className="w-5 h-5 text-primary" />
+                            <Calendar className="w-5 h-5 text-violet-500 flex-shrink-0" />
                             <div>
-                              <p className="text-xs text-muted-foreground">Data</p>
-                              <p className="text-foreground/80 text-sm">
+                              <p className="text-xs text-slate-500">Data</p>
+                              <p className="text-slate-700 dark:text-slate-300 text-sm">
                                 {new Date(order.created_at).toLocaleString('pt-BR')}
                               </p>
                             </div>
@@ -457,7 +457,7 @@ export default function RastreioPage() {
                 {/* Expand Button */}
                 <button
                   onClick={() => setExpandedOrder(isExpanded ? null : order.id)}
-                  className="w-full py-3 bg-muted/50 border-t border-border text-muted-foreground hover:text-foreground transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 dark:hover:text-white transition-colors flex items-center justify-center gap-2"
                 >
                   {isExpanded ? (
                     <>Ver menos <ChevronUp className="w-4 h-4" /></>
@@ -474,7 +474,7 @@ export default function RastreioPage() {
       {/* Completed Orders */}
       {completedOrders.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
             <CheckCircle className="w-5 h-5 text-green-500" />
             Pedidos Finalizados ({completedOrders.length})
           </h2>
@@ -487,7 +487,7 @@ export default function RastreioPage() {
               return (
                 <div
                   key={order.id}
-                  className="bg-card rounded-xl border border-border p-4 opacity-75 hover:opacity-100 transition-opacity"
+                  className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 opacity-75 hover:opacity-100 transition-opacity"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -495,15 +495,15 @@ export default function RastreioPage() {
                         <StatusIcon className={`w-4 h-4 ${status.color}`} />
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">#{order.id.slice(-6).toUpperCase()}</p>
-                        <p className="text-foreground/80 font-medium">{status.label}</p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">#{order.id.slice(-6).toUpperCase()}</p>
+                        <p className="text-slate-700 dark:text-slate-300 font-medium">{status.label}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-foreground font-semibold">
+                      <p className="text-slate-900 dark:text-white font-semibold">
                         R$ {order.total_amount?.toFixed(2).replace('.', ',')}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
                         {new Date(order.created_at).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
@@ -517,24 +517,24 @@ export default function RastreioPage() {
 
       {/* No Orders */}
       {orders.length === 0 && (
-        <div className="text-center py-16">
-          <Package className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-foreground mb-2">Nenhum pedido encontrado</h3>
-          <p className="text-muted-foreground mb-6">Voce ainda nao fez nenhum pedido</p>
+        <div className="text-center py-12 sm:py-16 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+          <Package className="w-12 sm:w-16 h-12 sm:h-16 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+          <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-white mb-2">Nenhum pedido encontrado</h3>
+          <p className="text-slate-500 dark:text-slate-400 mb-6 px-4">Voce ainda nao fez nenhum pedido</p>
           <Button 
-            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            className="bg-violet-500 hover:bg-violet-600 text-white"
             onClick={() => window.location.href = '/cardapio'}
           >
-            Fazer Pedido
+            Fazer Primeiro Pedido
           </Button>
         </div>
       )}
 
       {/* Search No Results */}
       {orders.length > 0 && filteredOrders.length === 0 && (
-        <div className="text-center py-8">
-          <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <p className="text-muted-foreground">Nenhum pedido encontrado com este termo</p>
+        <div className="text-center py-8 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+          <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+          <p className="text-slate-500 dark:text-slate-400">Nenhum pedido encontrado com este termo</p>
         </div>
       )}
     </div>
