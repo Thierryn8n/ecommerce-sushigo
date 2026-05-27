@@ -22,17 +22,18 @@ interface HeroSettings {
 
 export function HeroSection() {
   const [settings, setSettings] = useState<HeroSettings>({
-    background_image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/ChatGPT%20Image%2022%20de%20mai.%20de%202026%2C%2015_51_22-dvKmc1aW0cRuBs5VMhIvEMoxEz9pD0.png',
-    title_line1: 'Açaí',
-    title_line2: 'da Praia',
-    subtitle: 'O melhor açaí, com o sabor',
-    highlight_text: 'do paraíso!',
-    description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!',
-    cta_primary: 'PEÇA AGORA',
-    cta_secondary: 'VER CARDÁPIO',
-    location_line1: 'CANOA',
-    location_line2: 'QUEBRADA',
+    background_image: '',
+    title_line1: '',
+    title_line2: '',
+    subtitle: '',
+    highlight_text: '',
+    description: '',
+    cta_primary: '',
+    cta_secondary: '',
+    location_line1: '',
+    location_line2: '',
   })
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     async function fetchSettings() {
@@ -61,20 +62,30 @@ export function HeroSection() {
         })
         setSettings(prev => ({ ...prev, ...settingsObj }))
       }
+      setLoaded(true)
     }
 
     fetchSettings()
   }, [])
 
+  // Enquanto carrega, não mostra nada
+  if (!loaded) return null
+
+  // Se não tiver nenhum campo preenchido, não mostra a seção
+  const hasContent = settings.title_line1 || settings.title_line2 || settings.subtitle ||
+    settings.highlight_text || settings.description || settings.background_image
+
+  if (!hasContent) return null
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('${settings.background_image}')`,
-        }}
-      />
+      {settings.background_image && (
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url('${settings.background_image}')` }}
+        />
+      )}
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -105,89 +116,111 @@ export function HeroSection() {
             transition={{ duration: 0.8 }}
           >
             {/* Main Title */}
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4">
-              <span className="text-primary-foreground drop-shadow-2xl" style={{
-                textShadow: '0 0 40px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--primary) / 0.3)'
-              }}>
-                {settings.title_line1}
-              </span>
-              <br />
-              <span className="text-secondary italic" style={{
-                textShadow: '0 0 40px hsl(var(--secondary) / 0.5)'
-              }}>
-                {settings.title_line2}
-              </span>
-            </h1>
+            {(settings.title_line1 || settings.title_line2) && (
+              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4">
+                {settings.title_line1 && (
+                  <>
+                    <span className="text-primary-foreground drop-shadow-2xl" style={{
+                      textShadow: '0 0 40px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--primary) / 0.3)'
+                    }}>
+                      {settings.title_line1}
+                    </span>
+                    {settings.title_line2 && <br />}
+                  </>
+                )}
+                {settings.title_line2 && (
+                  <span className="text-secondary italic" style={{
+                    textShadow: '0 0 40px hsl(var(--secondary) / 0.5)'
+                  }}>
+                    {settings.title_line2}
+                  </span>
+                )}
+              </h1>
+            )}
 
             {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-2 font-light"
-            >
-              {settings.subtitle}
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="text-xl sm:text-2xl md:text-3xl text-secondary font-semibold mb-6"
-            >
-              {settings.highlight_text}
-            </motion.p>
+            {settings.subtitle && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-2 font-light"
+              >
+                {settings.subtitle}
+              </motion.p>
+            )}
+            {settings.highlight_text && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="text-xl sm:text-2xl md:text-3xl text-secondary font-semibold mb-6"
+              >
+                {settings.highlight_text}
+              </motion.p>
+            )}
 
             {/* Description */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
-              className="text-base sm:text-lg text-primary-foreground/70 mb-8 max-w-xl mx-auto leading-relaxed px-4 sm:px-0"
-            >
-              {settings.description}
-            </motion.p>
+            {settings.description && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.8 }}
+                className="text-base sm:text-lg text-primary-foreground/70 mb-8 max-w-xl mx-auto leading-relaxed px-4 sm:px-0"
+              >
+                {settings.description}
+              </motion.p>
+            )}
 
             {/* CTA Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <Link href="/cardapio">
-                <Button 
-                  size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
-                >
-                  {settings.cta_primary}
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link href="/cardapio">
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
-                >
-                  <UtensilsCrossed className="mr-2 w-5 h-5" />
-                  {settings.cta_secondary}
-                </Button>
-              </Link>
-            </motion.div>
+            {(settings.cta_primary || settings.cta_secondary) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.9, duration: 0.8 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+              >
+                {settings.cta_primary && (
+                  <Link href="/cardapio">
+                    <Button 
+                      size="lg" 
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
+                    >
+                      {settings.cta_primary}
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </Link>
+                )}
+                {settings.cta_secondary && (
+                  <Link href="/cardapio">
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      className="border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
+                    >
+                      <UtensilsCrossed className="mr-2 w-5 h-5" />
+                      {settings.cta_secondary}
+                    </Button>
+                  </Link>
+                )}
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Location Tag */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            className="absolute bottom-8 right-8 hidden md:block"
-          >
-            <div className="text-right">
-              <p className="text-primary-foreground/40 text-sm tracking-widest">{settings.location_line1}</p>
-              <p className="text-primary-foreground/40 text-sm tracking-widest">{settings.location_line2}</p>
-            </div>
-          </motion.div>
+          {(settings.location_line1 || settings.location_line2) && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="absolute bottom-8 right-8 hidden md:block"
+            >
+              <div className="text-right">
+                {settings.location_line1 && <p className="text-primary-foreground/40 text-sm tracking-widest">{settings.location_line1}</p>}
+                {settings.location_line2 && <p className="text-primary-foreground/40 text-sm tracking-widest">{settings.location_line2}</p>}
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
 
