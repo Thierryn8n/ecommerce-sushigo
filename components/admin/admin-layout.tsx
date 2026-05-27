@@ -291,13 +291,13 @@ export function AdminHeader() {
       .limit(10)
     
     if (notifs) {
-      setNotifications(notifs)
-      setUnreadCount(notifs.filter(n => !n.read).length)
+      setNotifications(notifs.map(n => ({ ...n, read: n.is_read })))
+      setUnreadCount(notifs.filter(n => !n.is_read).length)
     }
   }
 
   async function markAsRead(id: string) {
-    await supabase.from('notifications').update({ read: true }).eq('id', id)
+    await supabase.from('notifications').update({ is_read: true }).eq('id', id)
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
     setUnreadCount(prev => Math.max(0, prev - 1))
   }
@@ -306,7 +306,7 @@ export function AdminHeader() {
     const unreadIds = notifications.filter(n => !n.read).map(n => n.id)
     if (unreadIds.length === 0) return
 
-    await supabase.from('notifications').update({ read: true }).in('id', unreadIds)
+    await supabase.from('notifications').update({ is_read: true }).in('id', unreadIds)
     setNotifications(prev => prev.map(n => ({ ...n, read: true })))
     setUnreadCount(0)
   }
