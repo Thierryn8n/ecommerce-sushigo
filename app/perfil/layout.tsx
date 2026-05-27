@@ -1,9 +1,8 @@
-'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Header from '@/components/header'
 import { 
   User, 
   MapPin, 
@@ -22,7 +21,6 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import Header from '@/components/header'
 
 const menuItems = [
   { 
@@ -106,98 +104,12 @@ export default function PerfilLayout({
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background">
       {/* Header da Loja */}
       <Header />
 
-      <div className="flex flex-1 pt-20 lg:pt-0">
-        {/* Sidebar Desktop + Mobile Menu */}
-        <AnimatePresence>
-          <motion.div
-            initial={false}
-            animate={isMobileMenuOpen ? { x: 0 } : { x: -320 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className={`fixed lg:static top-20 lg:top-0 left-0 z-40 lg:z-0 w-72 h-[calc(100vh-80px)] lg:h-screen bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 overflow-y-auto lg:overflow-auto
-              ${isMobileMenuOpen ? 'shadow-2xl' : ''}
-            `}
-          >
-            <div className="p-4 lg:p-6 space-y-2">
-              {/* Header da barra lateral */}
-              <div className="hidden lg:block mb-6">
-                <h2 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider">Menu</h2>
-              </div>
-
-              {/* Menu Items */}
-              {menuItems.map((item) => {
-                const isActive = pathname === item.href
-                const Icon = item.icon
-                
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`
-                      flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-                      ${isActive 
-                        ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/30' 
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
-                      }
-                    `}
-                  >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm">{item.label}</p>
-                      <p className={`text-xs ${isActive ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}`}>
-                        {item.description}
-                      </p>
-                    </div>
-                    {isActive && <ChevronRight className="w-4 h-4 flex-shrink-0" />}
-                  </Link>
-                )
-              })}
-
-              {/* Divider */}
-              <div className="border-t border-slate-200 dark:border-slate-800 my-4" />
-
-              {/* CTA Button */}
-              <Link href="/cardapio" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button 
-                  className="w-full bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white font-semibold shadow-lg"
-                >
-                  <UtensilsCrossed className="w-4 h-4 mr-2" />
-                  Fazer Novo Pedido
-                </Button>
-              </Link>
-
-              {/* Logout Button */}
-              <Button 
-                onClick={handleLogout}
-                variant="ghost"
-                className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sair
-              </Button>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Mobile Overlay */}
-        {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-30 lg:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
-
-        {/* Main Content */}
-        <main className="flex-1 w-full overflow-auto">
-          <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto pb-24 lg:pb-8">
-            {/* Mobile Header */}
+      <div className="flex">
+        {/* Mobile Header */}
             <div className="lg:hidden fixed top-20 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 px-4 py-3">
               <div className="flex items-center justify-between">
                 <Button
