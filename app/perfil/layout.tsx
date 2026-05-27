@@ -68,7 +68,7 @@ export default function PerfilLayout({ children }: { children: React.ReactNode }
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="flex pt-4">
+      <div className="flex pt-20">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:block w-64 fixed left-0 top-20 bottom-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 overflow-y-auto">
           <nav className="space-y-1">
