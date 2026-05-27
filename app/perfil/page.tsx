@@ -181,15 +181,15 @@ export default function PerfilPage() {
       {/* Welcome Header */}
       <div className="flex flex-col gap-3">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">
             Ola, {profile?.full_name?.split(' ')[0] || 'Cliente'}!
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">Bem-vindo a sua area exclusiva</p>
+          <p className="text-slate-500 text-sm sm:text-base">Bem-vindo a sua area exclusiva</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="bg-gradient-to-r from-violet-100 to-purple-50 dark:from-violet-500/20 dark:to-purple-500/10 border border-violet-200 dark:border-violet-500/20 rounded-xl px-3 py-1.5 flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-violet-600 dark:text-violet-400" />
-            <span className="text-xs sm:text-sm font-medium text-violet-700 dark:text-violet-300">Cliente VIP</span>
+          <div className="bg-gradient-to-r from-violet-100 to-purple-50 border border-violet-200 rounded-xl px-3 py-1.5 flex items-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-violet-600" />
+            <span className="text-xs sm:text-sm font-medium text-violet-700">Cliente VIP</span>
           </div>
         </div>
       </div>
@@ -200,63 +200,63 @@ export default function PerfilPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200"
         >
           <div className="flex items-center justify-between mb-1 sm:mb-2">
-            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 dark:text-violet-400" />
+            <Package className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600" />
             <span className="text-[10px] sm:text-xs text-green-500 bg-green-500/10 px-1.5 sm:px-2 py-0.5 rounded-full">
               {activeOrders.length} ativos
             </span>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{orders.length}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Pedidos</p>
+          <p className="text-xl sm:text-2xl font-bold text-slate-900">{orders.length}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500">Pedidos</p>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200"
         >
           <div className="flex items-center justify-between mb-1 sm:mb-2">
             <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+          <p className="text-xl sm:text-2xl font-bold text-slate-900">
             R$ {totalSpent.toFixed(0)}
           </p>
-          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Total</p>
+          <p className="text-[10px] sm:text-xs text-slate-500">Total</p>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200"
         >
           <div className="flex items-center justify-between mb-1 sm:mb-2">
             <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{addresses.length}</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Enderecos</p>
+          <p className="text-xl sm:text-2xl font-bold text-slate-900">{addresses.length}</p>
+          <p className="text-[10px] sm:text-xs text-slate-500">Enderecos</p>
         </motion.div>
 
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-slate-200 dark:border-slate-800"
+          className="bg-white rounded-xl p-3 sm:p-4 border border-slate-200"
         >
           <div className="flex items-center justify-between mb-1 sm:mb-2">
             <Star className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
           </div>
-          <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">VIP</p>
-          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Fidelidade</p>
+          <p className="text-lg sm:text-2xl font-bold text-slate-900">VIP</p>
+          <p className="text-[10px] sm:text-xs text-slate-500">Fidelidade</p>
         </motion.div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-white mb-3 sm:mb-4">Acesso Rapido</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-slate-900 mb-3 sm:mb-4">Acesso Rapido</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {quickLinks.map((link, index) => {
             const Icon = link.icon
@@ -269,21 +269,21 @@ export default function PerfilPage() {
               >
                 <Link
                   href={link.href}
-                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-500/50 hover:shadow-lg hover:shadow-violet-500/10 transition-all group"
+                  className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-xl border border-slate-200 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-500/10 transition-all group"
                 >
                   <div className={`p-2 sm:p-3 rounded-lg ${link.color}`}>
                     <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-slate-900 dark:text-white font-medium text-sm sm:text-base truncate">{link.label}</p>
+                      <p className="text-slate-900 font-medium text-sm sm:text-base truncate">{link.label}</p>
                       {link.count > 0 && (
                         <span className="bg-violet-500 text-white text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0">
                           {link.count}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 truncate">{link.description}</p>
+                    <p className="text-xs sm:text-sm text-slate-500 truncate">{link.description}</p>
                   </div>
                   <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 group-hover:text-violet-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
                 </Link>
@@ -297,8 +297,8 @@ export default function PerfilPage() {
       {orders.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Pedidos Recentes</h2>
-            <Link href="/perfil/historico" className="text-sm text-violet-600 dark:text-violet-400 hover:underline">
+            <h2 className="text-lg font-semibold text-slate-900">Pedidos Recentes</h2>
+            <Link href="/perfil/historico" className="text-sm text-violet-600 hover:underline">
               Ver todos
             </Link>
           </div>
@@ -306,27 +306,27 @@ export default function PerfilPage() {
             {orders.slice(0, 3).map((order) => (
               <div
                 key={order.id}
-                className="flex items-center justify-between p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800"
+                className="flex items-center justify-between p-4 bg-white rounded-xl border border-slate-200"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-violet-100 dark:bg-violet-500/20 rounded-xl flex items-center justify-center">
-                    <Package className="w-5 h-5 text-violet-600 dark:text-violet-400" />
+                  <div className="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center">
+                    <Package className="w-5 h-5 text-violet-600" />
                   </div>
                   <div>
-                    <p className="text-slate-900 dark:text-white font-medium">Pedido #{order.id.slice(-6).toUpperCase()}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-slate-900 font-medium">Pedido #{order.id.slice(-6).toUpperCase()}</p>
+                    <p className="text-sm text-slate-500">
                       {new Date(order.created_at).toLocaleDateString('pt-BR')}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-violet-600 dark:text-violet-400 font-semibold">
+                  <p className="text-violet-600 font-semibold">
                     R$ {order.total_amount?.toFixed(2).replace('.', ',')}
                   </p>
                   <span className={`text-xs px-2 py-1 rounded-full ${
                     order.status === 'entregue' ? 'bg-green-500/20 text-green-500' :
                     order.status === 'cancelado' ? 'bg-red-500/20 text-red-500' :
-                    'bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400'
+                    'bg-violet-100 text-violet-700 dark:text-violet-400'
                   }`}>
                     {order.status === 'entregue' ? 'Entregue' :
                      order.status === 'cancelado' ? 'Cancelado' : 'Em andamento'}
@@ -340,24 +340,24 @@ export default function PerfilPage() {
 
       {/* Default Address */}
       {defaultAddress && (
-        <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-500/10 dark:to-transparent border border-violet-200 dark:border-violet-500/20 rounded-xl p-5">
+        <div className="bg-gradient-to-r from-violet-50 to-purple-50 border border-violet-200 rounded-xl p-5">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-violet-100 dark:bg-violet-500/20 rounded-lg">
+              <div className="p-2 bg-violet-100 rounded-lg">
                 <MapPin className="w-5 h-5 text-violet-500" />
               </div>
               <div>
-                <p className="text-slate-900 dark:text-white font-medium">Endereço Principal</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-slate-900 font-medium">Endereço Principal</p>
+                <p className="text-sm text-slate-500">
                   {defaultAddress.street}, {defaultAddress.number}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500">
                   {defaultAddress.neighborhood}, {defaultAddress.city}
                 </p>
               </div>
             </div>
             <Link href="/perfil/enderecos">
-              <Button variant="outline" size="sm" className="border-violet-200 dark:border-violet-500/30 text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-500/10">
+              <Button variant="outline" size="sm" className="border-violet-200 text-violet-600 hover:bg-violet-50">
                 Gerenciar
               </Button>
             </Link>
@@ -366,15 +366,15 @@ export default function PerfilPage() {
       )}
 
       {/* Security Link */}
-      <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800">
+      <div className="bg-white rounded-xl p-4 border border-slate-200">
         <Link href="/perfil/conta" className="flex items-center justify-between group">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-green-500/20 rounded-lg">
               <Shield className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <p className="text-slate-900 dark:text-white font-medium">Segurança da Conta</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Altere sua senha e dados de login</p>
+              <p className="text-slate-900 font-medium">Segurança da Conta</p>
+              <p className="text-sm text-slate-500">Altere sua senha e dados de login</p>
             </div>
           </div>
           <ArrowUpRight className="w-5 h-5 text-slate-400 group-hover:text-green-500 transition-colors" />
