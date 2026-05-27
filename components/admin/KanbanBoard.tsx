@@ -738,8 +738,8 @@ export function KanbanBoard() {
 
           {/* Container das Colunas */}
           <motion.div 
-            className="flex gap-4 p-4 h-full"
-            animate={{ x: -carouselIndex * (260 + 16) }} // 260px (w-64) + 16px (gap)
+            className="flex gap-2 p-4 h-full"
+            animate={{ x: -carouselIndex * (260 + 8) }} // 260px (w-64) + 8px (gap)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             {columns.map((column, colIdx) => (
