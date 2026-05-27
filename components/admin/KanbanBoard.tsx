@@ -320,7 +320,7 @@ export function KanbanBoard() {
     const activeColumn = columns[activeColumnIndex]
     
     return (
-      <div className="h-[calc(100vh-7rem)] flex flex-col">
+      <div className="min-h-[calc(100vh-7rem)] flex flex-col">
         {/* Header com navegação */}
         <div className="px-4 py-3 bg-card border-b border-border flex items-center justify-between">
           <Button
@@ -788,7 +788,7 @@ export function KanbanBoard() {
                 </div>
                 
                 {/* Área de pedidos */}
-                <div className="bg-card rounded-b-xl border-x border-b border-border p-3 space-y-3 flex-1 overflow-y-auto">
+                <div className="bg-card rounded-b-xl border-x border-b border-border p-3 space-y-3 flex-1">
                   <AnimatePresence>
                     {column.orders.map(order => (
                       <motion.div
