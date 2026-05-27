@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   LayoutDashboard, 
   Package, 
@@ -21,11 +22,16 @@ import {
   Ticket,
   Columns2,
   User,
-  ExternalLink
+  ExternalLink,
+  Volume2,
+  VolumeX,
+  Check
 } from 'lucide-react'
 import { useStore } from '@/lib/store-context'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { createClient } from '@/lib/supabase/client'
+import { getNotificationSoundGenerator, type SoundType } from '@/lib/notification-sounds'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -136,9 +142,26 @@ interface Notification {
   id: string
   title: string
   message: string
-  type: 'order' | 'system' | 'alert'
+  type: 'order' | 'system' | 'alert' | 'status_update'
+  order_id?: string
   read: boolean
   created_at: string
+}
+
+interface NotificationSettings {
+  sound_enabled: boolean
+  sound_type: SoundType
+  sound_volume: number
+  browser_notifications: boolean
+  vibrate: boolean
+}
+
+const DEFAULT_SETTINGS: NotificationSettings = {
+  sound_enabled: true,
+  sound_type: 'default',
+  sound_volume: 0.7,
+  browser_notifications: true,
+  vibrate: true,
 }
 
 export function AdminHeader() {
@@ -147,21 +170,125 @@ export function AdminHeader() {
   const [showProfile, setShowProfile] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
+  const [settings, setSettings] = useState<NotificationSettings>(DEFAULT_SETTINGS)
+  const [hasNewNotification, setHasNewNotification] = useState(false)
+  const [isAnimating, setIsAnimating] = useState(false)
   const supabase = createClient()
+  const channelRef = useRef<RealtimeChannel | null>(null)
+  const soundGenerator = typeof window !== 'undefined' ? getNotificationSoundGenerator() : null
+
+  // Buscar configurações do usuário
+  const fetchSettings = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data } = await supabase
+      .from('admin_notification_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+
+    if (data) {
+      setSettings({
+        sound_enabled: data.sound_enabled,
+        sound_type: data.sound_type,
+        sound_volume: Number(data.sound_volume),
+        browser_notifications: data.browser_notifications,
+        vibrate: data.vibrate,
+      })
+    }
+  }, [supabase])
+
+  // Tocar som de notificação
+  const playNotificationSound = useCallback(() => {
+    if (!settings.sound_enabled || !soundGenerator) return
+    soundGenerator.play(settings.sound_type, settings.sound_volume)
+  }, [settings.sound_enabled, settings.sound_type, settings.sound_volume, soundGenerator])
+
+  // Vibrar dispositivo
+  const vibrateDevice = useCallback(() => {
+    if (!settings.vibrate || typeof navigator === 'undefined' || !navigator.vibrate) return
+    navigator.vibrate([200, 100, 200])
+  }, [settings.vibrate])
+
+  // Mostrar notificação do navegador
+  const showBrowserNotification = useCallback((notification: Notification) => {
+    if (!settings.browser_notifications || typeof window === 'undefined') return
+
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new window.Notification(notification.title, {
+        body: notification.message,
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: notification.id,
+        requireInteraction: notification.type === 'order',
+      })
+    }
+  }, [settings.browser_notifications])
+
+  // Handler para nova notificação
+  const handleNewNotification = useCallback((notification: Notification) => {
+    setNotifications(prev => [notification, ...prev.slice(0, 19)])
+    setUnreadCount(prev => prev + 1)
+    setHasNewNotification(true)
+    setIsAnimating(true)
+    
+    playNotificationSound()
+    vibrateDevice()
+    showBrowserNotification(notification)
+
+    // Reset animação após 3 segundos
+    setTimeout(() => {
+      setHasNewNotification(false)
+      setIsAnimating(false)
+    }, 3000)
+  }, [playNotificationSound, vibrateDevice, showBrowserNotification])
 
   useEffect(() => {
+    fetchSettings()
     fetchNotifications()
-    // Atualiza a cada 30 segundos
-    const interval = setInterval(fetchNotifications, 30000)
-    return () => clearInterval(interval)
-  }, [])
+
+    // Solicitar permissão para notificações do navegador
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    // Configurar Realtime
+    const channel = supabase
+      .channel('admin-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+        },
+        (payload) => {
+          const newNotification = payload.new as Notification
+          // Admins recebem notificações sem user_id (são para toda a loja)
+          if (!newNotification.user_id) {
+            handleNewNotification(newNotification)
+          }
+        }
+      )
+      .subscribe()
+
+    channelRef.current = channel
+
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current)
+      }
+    }
+  }, [supabase, fetchSettings, handleNewNotification])
 
   async function fetchNotifications() {
     const { data: notifs } = await supabase
       .from('notifications')
       .select('*')
+      .is('user_id', null) // Notificações de admin não têm user_id
       .order('created_at', { ascending: false })
-      .limit(5)
+      .limit(10)
     
     if (notifs) {
       setNotifications(notifs)
@@ -171,7 +298,17 @@ export function AdminHeader() {
 
   async function markAsRead(id: string) {
     await supabase.from('notifications').update({ read: true }).eq('id', id)
-    fetchNotifications()
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+    setUnreadCount(prev => Math.max(0, prev - 1))
+  }
+
+  async function markAllAsRead() {
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id)
+    if (unreadIds.length === 0) return
+
+    await supabase.from('notifications').update({ read: true }).in('id', unreadIds)
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+    setUnreadCount(0)
   }
 
   async function handleLogout() {
@@ -205,44 +342,103 @@ export function AdminHeader() {
         
         {/* Notifications Button */}
         <div className="relative">
-          <button 
+          <motion.button 
             onClick={() => setShowNotifications(!showNotifications)}
             className="notifications-btn relative w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+            animate={isAnimating ? {
+              scale: [1, 1.2, 1, 1.1, 1],
+              rotate: [0, -10, 10, -10, 0],
+            } : {}}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
           >
-            <Bell className="w-5 h-5" />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full animate-pulse" />
-            )}
-          </button>
+            <motion.div
+              animate={isAnimating ? {
+                y: [0, -3, 0, -2, 0],
+              } : {}}
+              transition={{ duration: 0.3, repeat: isAnimating ? 2 : 0 }}
+            >
+              <Bell className="w-5 h-5" />
+            </motion.div>
+            
+            <AnimatePresence>
+              {unreadCount > 0 && (
+                <motion.span 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0 }}
+                  className={`absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white rounded-full ${
+                    hasNewNotification ? 'bg-red-500' : 'bg-primary'
+                  }`}
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </motion.span>
+              )}
+            </AnimatePresence>
+
+            {/* Pulse animation for new notifications */}
+            <AnimatePresence>
+              {hasNewNotification && (
+                <motion.span
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ scale: 2, opacity: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1, repeat: 2 }}
+                  className="absolute inset-0 rounded-lg bg-primary"
+                />
+              )}
+            </AnimatePresence>
+          </motion.button>
           
           {/* Notifications Dropdown */}
+          <AnimatePresence>
           {showNotifications && (
-            <div className="notifications-dropdown absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="notifications-dropdown absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden"
+            >
               <div className="p-4 border-b border-border flex items-center justify-between">
-                <h3 className="font-semibold text-foreground">Notificações</h3>
-                {unreadCount > 0 && (
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                    {unreadCount} nova{unreadCount > 1 ? 's' : ''}
-                  </span>
-                )}
+                <h3 className="font-semibold text-foreground">Notificacoes</h3>
+                <div className="flex items-center gap-2">
+                  {unreadCount > 0 && (
+                    <>
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                        {unreadCount} nova{unreadCount > 1 ? 's' : ''}
+                      </span>
+                      <button 
+                        onClick={markAllAsRead}
+                        className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                      >
+                        <Check className="w-3 h-3" />
+                        Ler todas
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="max-h-80 overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="p-8 text-center">
                     <Bell className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">Nenhuma notificação</p>
+                    <p className="text-muted-foreground text-sm">Nenhuma notificacao</p>
                   </div>
                 ) : (
-                  notifications.map((notif) => (
-                    <div 
+                  notifications.map((notif, index) => (
+                    <motion.div 
                       key={notif.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
                       onClick={() => markAsRead(notif.id)}
                       className={`p-4 border-b border-border cursor-pointer hover:bg-muted/50 transition-colors ${!notif.read ? 'bg-primary/5' : ''}`}
                     >
                       <div className="flex items-start gap-3">
                         <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${
                           notif.type === 'order' ? 'bg-blue-500' : 
-                          notif.type === 'alert' ? 'bg-red-500' : 'bg-green-500'
+                          notif.type === 'alert' ? 'bg-red-500' : 
+                          notif.type === 'status_update' ? 'bg-purple-500' : 'bg-green-500'
                         }`} />
                         <div className="flex-1">
                           <p className="text-sm font-medium text-foreground">{notif.title}</p>
@@ -253,15 +449,22 @@ export function AdminHeader() {
                         </div>
                         {!notif.read && <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />}
                       </div>
-                    </div>
+                    </motion.div>
                   ))
                 )}
               </div>
-              <Link href="/admin/notificacoes" className="block p-3 text-center text-sm text-primary hover:bg-muted/50 border-t border-border">
-                Ver todas
-              </Link>
-            </div>
+              <div className="p-3 border-t border-border flex items-center justify-between">
+                <Link href="/admin/notificacoes" className="text-sm text-primary hover:underline">
+                  Ver todas
+                </Link>
+                <Link href="/admin/configuracoes/notificacoes" className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
+                  <Settings className="w-3 h-3" />
+                  Configurar
+                </Link>
+              </div>
+            </motion.div>
           )}
+          </AnimatePresence>
         </div>
 
         {/* Profile Button */}
