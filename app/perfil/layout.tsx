@@ -22,6 +22,8 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import Header from '@/components/header'
+import { useStore } from '@/lib/store-context'
 
 const menuItems = [
   { 
@@ -70,6 +72,7 @@ export default function PerfilLayout({
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const { store } = useStore()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -105,9 +108,12 @@ export default function PerfilLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-50/50 to-slate-50">
-      {/* Mobile Header - Estilo da loja */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200">
+    <div className="light min-h-screen bg-gradient-to-b from-violet-50/50 to-slate-50">
+      {/* Header da loja - fixo no topo */}
+      <Header />
+
+      {/* Mobile sub-header com titulo da pagina */}
+      <div className="lg:hidden fixed top-20 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
         <div className="flex items-center justify-between px-4 py-3">
           <Button
             variant="ghost"
@@ -117,36 +123,20 @@ export default function PerfilLayout({
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          
-          {/* Logo central */}
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <UtensilsCrossed className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-900">Acai da Praia</span>
-          </Link>
-          
-          {/* Botao voltar para loja */}
-          <Link href="/cardapio">
-            <Button variant="ghost" size="icon" className="text-violet-600 h-10 w-10">
-              <Home className="h-5 w-5" />
-            </Button>
-          </Link>
-        </div>
-        
-        {/* Titulo da pagina atual */}
-        <div className="px-4 pb-3">
-          <p className="text-xs text-slate-500">Minha Conta</p>
-          <h1 className="text-lg font-semibold text-slate-900">
-            {menuItems.find(item => pathname === item.href || pathname?.startsWith(item.href + '/'))?.label || 'Perfil'}
-          </h1>
+          <div>
+            <p className="text-xs text-slate-500 text-center">Minha Conta</p>
+            <h1 className="text-base font-semibold text-slate-900 text-center">
+              {menuItems.find(item => pathname === item.href || pathname?.startsWith(item.href + '/'))?.label || 'Perfil'}
+            </h1>
+          </div>
+          <div className="w-10" />
         </div>
       </div>
 
       <div className="flex min-h-screen">
         {/* Sidebar Desktop */}
         <aside className={`
-          fixed lg:sticky lg:top-0 lg:h-screen inset-y-0 left-0 z-40
+          fixed lg:top-20 lg:h-[calc(100vh-80px)] inset-y-0 left-0 z-40
           w-[280px] bg-white
           border-r border-slate-200
           flex flex-col shadow-xl lg:shadow-none
@@ -156,11 +146,21 @@ export default function PerfilLayout({
           {/* Logo/Header - Estilo da loja */}
           <div className="p-5 border-b border-slate-100 bg-gradient-to-r from-violet-500/5 to-purple-500/5">
             <Link href="/" className="flex items-center gap-3 group mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
-                <UtensilsCrossed className="w-6 h-6 text-white" />
-              </div>
+              {store?.logo_url ? (
+                <Image
+                  src={store.logo_url}
+                  alt={store.name || 'Logo'}
+                  width={48}
+                  height={48}
+                  className="object-contain rounded-xl group-hover:scale-105 transition-transform"
+                />
+              ) : (
+                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
+                  <UtensilsCrossed className="w-6 h-6 text-white" />
+                </div>
+              )}
               <div>
-                <h1 className="text-slate-900 font-bold text-lg tracking-tight">Acai da Praia</h1>
+                <h1 className="text-slate-900 font-bold text-lg tracking-tight">{store?.name || 'Loja'}</h1>
                 <p className="text-violet-600 text-xs font-medium">Minha Conta</p>
               </div>
             </Link>
@@ -252,7 +252,7 @@ export default function PerfilLayout({
 
         {/* Main Content */}
         <main className="flex-1 w-full">
-          <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto pt-28 lg:pt-6 pb-24 lg:pb-8">
+          <div className="p-4 sm:p-6 lg:p-8 max-w-5xl mx-auto pt-36 lg:pt-6 pb-24 lg:pb-8">
             {children}
           </div>
           
