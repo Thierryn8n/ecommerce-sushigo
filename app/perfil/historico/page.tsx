@@ -72,19 +72,38 @@ export default function HistoricoPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
+      // Buscar pedidos com items
       const { data, error } = await supabase
         .from('orders')
         .select(`
           *,
-          order_items (*)
+          order_items (
+            *,
+            product:products (
+              id,
+              name,
+              image_url
+            )
+          )
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setOrders(data || [])
+      
+      // Processar dados para adicionar imagem do produto se nao existir no item
+      const processedOrders = (data || []).map(order => ({
+        ...order,
+        order_items: order.order_items?.map((item: OrderItem & { product?: { image_url?: string } }) => ({
+          ...item,
+          // Se nao tem product_image, usa a imagem do produto relacionado
+          product_image: item.product_image || item.product?.image_url || null
+        }))
+      }))
+      
+      setOrders(processedOrders)
     } catch (error) {
-      console.error('Erro ao buscar histórico:', error)
+      console.error('Erro ao buscar historico:', error)
     } finally {
       setLoading(false)
     }

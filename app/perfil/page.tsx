@@ -19,7 +19,9 @@ import {
   TrendingUp,
   Clock,
   ArrowUpRight,
-  Sparkles
+  Sparkles,
+  UtensilsCrossed,
+  Gift
 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -149,7 +151,33 @@ export default function PerfilPage() {
   ]
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Promo Banner - Estilo Loja */}
+      <motion.div 
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-violet-700 rounded-2xl p-4 sm:p-6"
+      >
+        <div className="absolute inset-0 bg-[url('/pattern-dots.svg')] opacity-10" />
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+              <Gift className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+            </div>
+            <div>
+              <p className="text-white/80 text-xs sm:text-sm">Cliente desde {new Date().getFullYear()}</p>
+              <h2 className="text-white font-bold text-lg sm:text-xl">Ganhe 10% no proximo pedido!</h2>
+            </div>
+          </div>
+          <Link href="/cardapio">
+            <Button className="bg-white text-violet-600 hover:bg-white/90 font-semibold shadow-lg w-full sm:w-auto">
+              <UtensilsCrossed className="w-4 h-4 mr-2" />
+              Pedir Agora
+            </Button>
+          </Link>
+        </div>
+      </motion.div>
+
       {/* Welcome Header */}
       <div className="flex flex-col gap-3">
         <div>
