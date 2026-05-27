@@ -92,21 +92,21 @@ export function CategoriesSection() {
   }
 
   return (
-    <section className="py-16 bg-gradient-to-b from-background to-muted">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row gap-12 items-center">
+    <section className="py-10 sm:py-16 bg-gradient-to-b from-background to-muted">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
           {/* Left Content */}
-          <div className="lg:w-1/3">
+          <div className="lg:w-1/3 text-center lg:text-left">
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <p className="text-secondary text-sm font-semibold tracking-wider mb-2">
+              <p className="text-secondary text-xs sm:text-sm font-semibold tracking-wider mb-1 sm:mb-2">
                 {settings.categories_subtitle || 'MONTE DO SEU JEITO'}
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-4">
                 {settings.categories_title ? (
                   <>
                     {settings.categories_title.split(' ').slice(0, 3).join(' ')}<br />
@@ -119,14 +119,14 @@ export function CategoriesSection() {
                   </>
                 )}
               </h2>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-muted-foreground mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base max-w-md mx-auto lg:mx-0">
                 {settings.categories_description || 'Monte do seu jeito com os melhores acompanhamentos e crie a combinacao perfeita para voce!'}
               </p>
               <Link href="/cardapio">
                 <Button 
-                  className="bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold px-6 py-3 rounded-full transition-all"
+                  className="bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-full transition-all text-sm sm:text-base"
                 >
-                  <UtensilsCrossed className="mr-2 w-5 h-5" />
+                  <UtensilsCrossed className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                   MONTAR AGORA
                 </Button>
               </Link>
@@ -134,8 +134,8 @@ export function CategoriesSection() {
           </div>
 
           {/* Categories Grid */}
-          <div className="lg:w-2/3">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          <div className="lg:w-2/3 w-full">
+            <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-4">
               {categories.map((category, index) => (
                 <motion.div
                   key={category.id}
@@ -146,14 +146,14 @@ export function CategoriesSection() {
                 >
                   <Link href={`/cardapio?categoria=${category.slug}`}>
                     <div className="group cursor-pointer">
-                      <div className="relative w-full aspect-square rounded-2xl overflow-hidden mb-3 bg-card border border-border hover:border-primary transition-all hover:scale-105">
-                        <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="relative w-full aspect-square rounded-xl sm:rounded-2xl overflow-hidden mb-1.5 sm:mb-3 bg-card border border-border hover:border-primary transition-all hover:scale-105">
+                        <div className="absolute inset-0 flex items-center justify-center p-2">
                           <Image
                             src={category.image_url || 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png'}
                             alt={category.name}
                             width={80}
                             height={80}
-                            className="object-contain group-hover:scale-110 transition-transform"
+                            className="object-contain w-12 h-12 sm:w-20 sm:h-20 group-hover:scale-110 transition-transform"
                           />
                         </div>
                         <div 
@@ -162,11 +162,11 @@ export function CategoriesSection() {
                         />
                       </div>
                       <div className="text-center">
-                        <p className="text-foreground font-bold text-sm">
+                        <p className="text-foreground font-bold text-[10px] sm:text-sm leading-tight">
                           {category.name.includes(' ') ? category.name.split(' ')[0] : category.name}
                         </p>
                         <p 
-                          className="text-xs font-semibold"
+                          className="text-[8px] sm:text-xs font-semibold"
                           style={{ color: category.color || 'hsl(var(--primary))' }}
                         >
                           {category.name.includes(' ') ? category.name.split(' ').slice(1).join(' ') : category.slug.toUpperCase()}

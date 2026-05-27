@@ -36,6 +36,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/produtos', label: 'Produtos', icon: Package },
+  { href: '/admin/categorias', label: 'Categorias', icon: Tag },
   { href: '/admin/vasilhas', label: 'Vasilhas', icon: Utensils },
   { href: '/admin/condimentos', label: 'Condimentos', icon: Palette },
   { href: '/admin/coberturas', label: 'Coberturas', icon: Tag },

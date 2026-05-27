@@ -146,19 +146,19 @@ export function ProductsSection() {
   }
 
   return (
-    <section className="py-16 bg-muted">
-      <div className="container mx-auto px-4">
+    <section className="py-10 sm:py-16 bg-muted">
+      <div className="container mx-auto px-3 sm:px-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
-            <p className="text-secondary text-sm font-semibold tracking-wider mb-1">
+            <p className="text-secondary text-xs sm:text-sm font-semibold tracking-wider mb-1">
               {settings.products_subtitle || 'OS MAIS PEDIDOS'}
             </p>
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
               {settings.products_title || 'Sucessos da Praia'}
             </h2>
           </div>
-          <Link href="/cardapio">
+          <Link href="/cardapio" className="hidden sm:block">
             <Button 
               variant="outline" 
               className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 rounded-full"
@@ -169,9 +169,9 @@ export function ProductsSection() {
           </Link>
         </div>
 
-        {/* Carousel Navigation */}
+        {/* Carousel Navigation - Desktop */}
         {products.length > itemsPerView && (
-          <div className="flex items-center justify-center gap-2 mt-6 mb-4">
+          <div className="hidden sm:flex items-center justify-center gap-2 mt-6 mb-4">
             <button
               onClick={handlePrev}
               className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center hover:bg-muted transition-colors"
@@ -216,49 +216,49 @@ export function ProductsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="flex-shrink-0 w-[280px] sm:w-[300px] snap-start"
+                className="flex-shrink-0 w-[200px] sm:w-[280px] md:w-[300px] snap-start"
               >
                 <Link href={`/produto/${product.slug}`}>
-                  <div className="group bg-card rounded-2xl overflow-hidden border border-border hover:border-primary transition-all hover:scale-[1.02]">
+                  <div className="group bg-card rounded-xl sm:rounded-2xl overflow-hidden border border-border hover:border-primary transition-all hover:scale-[1.02]">
                     {/* Product Image */}
-                    <div className="relative aspect-square p-4 bg-gradient-to-br from-muted to-muted/50">
+                    <div className="relative aspect-square p-2 sm:p-4 bg-gradient-to-br from-muted to-muted/50">
                       <Image
                         src={product.image_url || 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png'}
                         alt={product.name}
                         fill
-                        className="object-contain p-4 group-hover:scale-110 transition-transform duration-300"
+                        className="object-contain p-2 sm:p-4 group-hover:scale-110 transition-transform duration-300"
                       />
                       {product.promotion_price && (
-                        <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                           PROMO
                         </div>
                       )}
                     </div>
 
                     {/* Product Info */}
-                    <div className="p-4">
-                      <h3 className="text-foreground font-bold text-lg mb-1">{product.name}</h3>
-                      <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{product.description}</p>
+                    <div className="p-3 sm:p-4">
+                      <h3 className="text-foreground font-bold text-sm sm:text-lg mb-0.5 sm:mb-1 truncate">{product.name}</h3>
+                      <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{product.description}</p>
                       
                       <div className="flex items-center justify-between">
                         <div>
                           {product.promotion_price ? (
                             <>
-                              <span className="text-muted-foreground text-sm line-through">
+                              <span className="text-muted-foreground text-[10px] sm:text-sm line-through">
                                 R$ {Number(product.base_price).toFixed(2).replace('.', ',')}
                               </span>
-                              <p className="text-primary font-bold text-xl">
+                              <p className="text-primary font-bold text-base sm:text-xl">
                                 R$ {Number(product.promotion_price).toFixed(2).replace('.', ',')}
                               </p>
                             </>
                           ) : (
-                            <p className="text-primary font-bold text-xl">
+                            <p className="text-primary font-bold text-base sm:text-xl">
                               R$ {Number(product.base_price).toFixed(2).replace('.', ',')}
                             </p>
                           )}
                         </div>
-                        <button className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-primary-foreground transition-colors">
-                          <Plus className="w-5 h-5" />
+                        <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-primary-foreground transition-colors">
+                          <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>
                       </div>
                     </div>
@@ -267,6 +267,19 @@ export function ProductsSection() {
               </motion.div>
             ))}
           </div>
+        </div>
+
+        {/* Mobile Ver Todos Button */}
+        <div className="sm:hidden mt-4 text-center">
+          <Link href="/cardapio">
+            <Button 
+              variant="outline" 
+              className="border-primary text-primary hover:bg-primary/10 rounded-full text-sm px-6"
+            >
+              VER TODOS
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
