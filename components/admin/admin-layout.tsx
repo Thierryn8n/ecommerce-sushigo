@@ -25,7 +25,8 @@ import {
   ExternalLink,
   Volume2,
   VolumeX,
-  Check
+  Check,
+  Monitor
 } from 'lucide-react'
 import { useStore } from '@/lib/store-context'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -46,6 +47,7 @@ const menuItems = [
   { href: '/admin/cupons', label: 'Cupons', icon: Ticket },
   { href: '/admin/entrega', label: 'Entrega', icon: ChevronDown },
   { href: '/admin/aprovar-admins', label: 'Admins', icon: Users },
+  { href: '/admin/aplicativo', label: 'App Desktop', icon: Monitor },
   { href: '/admin/configuracoes', label: 'Config', icon: Settings },
 ]
 

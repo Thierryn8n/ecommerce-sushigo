@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acai Printer - Sistema de Impressao</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0f051a;
+      --bg-secondary: #1a0a25;
+      --bg-card: #241432;
+      --bg-card-hover: #2d1a3d;
+      --accent-purple: #8b2fc9;
+      --accent-orange: #f97316;
+      --accent-green: #22c55e;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255,255,255,0.7);
+      --text-muted: rgba(255,255,255,0.4);
+      --border: rgba(139, 47, 201, 0.3);
+      --glass: rgba(36, 20, 50, 0.8);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Barra de titulo customizada */
+    .titlebar {
+      height: 40px;
+      background: rgba(15, 5, 26, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      -webkit-app-region: drag;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .titlebar-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .titlebar-logo {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+    }
+
+    .titlebar-buttons {
+      display: flex;
+      gap: 8px;
+      -webkit-app-region: no-drag;
+    }
+
+    .titlebar-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .titlebar-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--text-primary);
+    }
+
+    .titlebar-btn.close:hover {
+      background: var(--accent-red);
+      color: white;
+    }
+
+    /* Layout principal */
+    .app-container {
+      display: flex;
+      height: calc(100vh - 40px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .store-info {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .store-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      object-fit: cover;
+      margin-bottom: 12px;
+      border: 2px solid var(--accent-purple);
+    }
+
+    .store-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .store-status {
+      font-size: 12px;
+      color: var(--accent-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Configuracoes */
+    .config-section {
+      flex: 1;
+    }
+
+    .config-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .config-group {
+      margin-bottom: 16px;
+    }
+
+    .config-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .config-input, .config-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .config-input:focus, .config-select:focus {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 0 3px rgba(139, 47, 201, 0.2);
+    }
+
+    .config-select option {
+      background: var(--bg-secondary);
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+
+    .toggle {
+      width: 48px;
+      height: 26px;
+      background: var(--bg-card);
+      border-radius: 13px;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .toggle.active {
+      background: var(--accent-purple);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      transition: all 0.3s;
+    }
+
+    .toggle.active::after {
+      left: 25px;
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: auto;
+    }
+
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(139, 47, 201, 0.4);
+    }
+
+    /* Area principal */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .header {
+      padding: 20px 24px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 24px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    /* Lista de pedidos */
+    .orders-container {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+    }
+
+    .orders-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .orders-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .orders-filter {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent-purple);
+      border-color: var(--accent-purple);
+      color: white;
+    }
+
+    .orders-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .order-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.2s;
+    }
+
+    .order-card:hover {
+      background: var(--bg-card-hover);
+      transform: translateX(4px);
+    }
+
+    .order-number {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .order-info {
+      flex: 1;
+    }
+
+    .order-customer {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .order-details {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .order-total {
+      text-align: right;
+    }
+
+    .order-price {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-green);
+    }
+
+    .order-time {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .action-btn.print {
+      background: var(--accent-purple);
+      color: white;
+    }
+
+    .action-btn.print:hover {
+      background: #a03ed9;
+      transform: scale(1.1);
+    }
+
+    .action-btn.status {
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .action-btn.status.printed {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--accent-green);
+      border-color: var(--accent-green);
+    }
+
+    .order-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-new {
+      background: rgba(249, 115, 22, 0.2);
+      color: var(--accent-orange);
+    }
+
+    .badge-printed {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--accent-green);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent-purple);
+      border-radius: 4px;
+    }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 60px;
+      right: 20px;
+      padding: 16px 24px;
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--accent-green);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: slideIn 0.3s ease-out;
+      z-index: 1000;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.error {
+      border-color: var(--accent-red);
+    }
+
+    /* Connection status */
+    .connection-status {
+      padding: 8px 16px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .connection-status.connected {
+      color: var(--accent-green);
+    }
+
+    .connection-status.disconnected {
+      color: var(--accent-red);
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra de titulo -->
+  <div class="titlebar">
+    <div class="titlebar-title">
+      <img src="" id="titlebar-logo" class="titlebar-logo" style="display:none" />
+      <span>Acai Printer</span>
+    </div>
+    <div class="titlebar-buttons">
+      <button class="titlebar-btn" onclick="minimizeWindow()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+          <rect y="5" width="12" height="2"/>
+        </svg>
+      </button>
+      <button class="titlebar-btn" onclick="maximizeWindow()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+          <rect x="1" y="1" width="10" height="10"/>
+        </svg>
+      </button>
+      <button class="titlebar-btn close" onclick="closeWindow()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+          <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="store-info">
+        <img src="" alt="Logo" class="store-logo" id="store-logo" style="display:none" />
+        <div class="store-name" id="store-name">Carregando...</div>
+        <div class="store-status">
+          <span class="status-dot"></span>
+          <span id="connection-text">Conectado</span>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-title">Configuracoes</div>
+        
+        <div class="config-group">
+          <label class="config-label">ID do Admin</label>
+          <input type="text" class="config-input" id="admin-id" placeholder="Digite o ID do admin...">
+        </div>
+
+        <div class="config-group">
+          <label class="config-label">Impressora</label>
+          <select class="config-select" id="printer-select">
+            <option value="">Selecione uma impressora...</option>
+          </select>
+        </div>
+
+        <div class="toggle-container">
+          <span class="config-label" style="margin:0">Impressao Automatica</span>
+          <div class="toggle active" id="auto-print-toggle"></div>
+        </div>
+
+        <div class="toggle-container">
+          <span class="config-label" style="margin:0">Notificacoes Sonoras</span>
+          <div class="toggle active" id="sound-toggle"></div>
+        </div>
+      </div>
+
+      <button class="save-btn" onclick="saveConfig()">Salvar Configuracoes</button>
+    </aside>
+
+    <!-- Conteudo principal -->
+    <main class="main-content">
+      <div class="header">
+        <div>
+          <h1 class="header-title">Pedidos</h1>
+          <div class="connection-status connected" id="realtime-status">
+            <span class="status-dot"></span>
+            Tempo real ativo
+          </div>
+        </div>
+        <div class="header-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Hoje</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-pending">0</div>
+            <div class="stat-label">Pendentes</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="stat-printed">0</div>
+            <div class="stat-label">Impressos</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="orders-container">
+        <div class="orders-header">
+          <div class="orders-title">Lista de Pedidos</div>
+          <div class="orders-filter">
+            <button class="filter-btn active" data-filter="all">Todos</button>
+            <button class="filter-btn" data-filter="pending">Pendentes</button>
+            <button class="filter-btn" data-filter="printed">Impressos</button>
+          </div>
+        </div>
+
+        <div class="orders-list" id="orders-list">
+          <div class="empty-state">
+            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            <div class="empty-title">Nenhum pedido ainda</div>
+            <p>Os pedidos aparecerao aqui em tempo real</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
