@@ -18,6 +18,8 @@ interface HeroSettings {
   description: string
   cta_primary: string
   cta_secondary: string
+  cta_primary_link: string
+  cta_secondary_link: string
   location_line1: string
   location_line2: string
 }
@@ -33,6 +35,8 @@ export function HeroSection() {
     description: '',
     cta_primary: '',
     cta_secondary: '',
+    cta_primary_link: '',
+    cta_secondary_link: '',
     location_line1: '',
     location_line2: '',
   })
@@ -201,7 +205,7 @@ export function HeroSection() {
                 className="flex flex-col sm:flex-row gap-4 justify-center"
               >
                 {settings.cta_primary && (
-                  <Link href="/cardapio">
+                  <Link href={settings.cta_primary_link || '/cardapio'}>
                     <Button 
                       size="lg" 
                       className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
@@ -212,7 +216,7 @@ export function HeroSection() {
                   </Link>
                 )}
                 {settings.cta_secondary && (
-                  <Link href="/cardapio">
+                  <Link href={settings.cta_secondary_link || '/cardapio'}>
                     <Button 
                       size="lg" 
                       variant="outline"

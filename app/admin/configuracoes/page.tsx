@@ -54,6 +54,8 @@ export default function AdminConfiguracoes() {
     heroDescription: '',
     heroCtaPrimary: '',
     heroCtaSecondary: '',
+    heroCtaPrimaryLink: '',
+    heroCtaSecondaryLink: '',
   })
 
   useEffect(() => {
@@ -109,6 +111,8 @@ export default function AdminConfiguracoes() {
           heroDescription: heroObj.description || '',
           heroCtaPrimary: heroObj.cta_primary || '',
           heroCtaSecondary: heroObj.cta_secondary || '',
+          heroCtaPrimaryLink: heroObj.cta_primary_link || '',
+          heroCtaSecondaryLink: heroObj.cta_secondary_link || '',
         })
       } catch (error) {
         console.error('Erro ao buscar configurações:', error)
@@ -173,6 +177,8 @@ export default function AdminConfiguracoes() {
         { key: 'description', value: settings.heroDescription },
         { key: 'cta_primary', value: settings.heroCtaPrimary },
         { key: 'cta_secondary', value: settings.heroCtaSecondary },
+        { key: 'cta_primary_link', value: settings.heroCtaPrimaryLink },
+        { key: 'cta_secondary_link', value: settings.heroCtaSecondaryLink },
       ]
       for (const field of heroFields) {
         await supabase.from('app_settings').upsert({
@@ -779,25 +785,95 @@ export default function AdminConfiguracoes() {
                       className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">Botao Principal</label>
-                    <input
-                      type="text"
-                      value={settings.heroCtaPrimary}
-                      onChange={e => setSettings(prev => ({ ...prev, heroCtaPrimary: e.target.value }))}
-                      placeholder="PEÇA AGORA"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">Botao Secundario</label>
-                    <input
-                      type="text"
-                      value={settings.heroCtaSecondary}
-                      onChange={e => setSettings(prev => ({ ...prev, heroCtaSecondary: e.target.value }))}
-                      placeholder="VER CARDÁPIO"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
+                  <div className="sm:col-span-2 border-t border-border pt-4">
+                    <p className="text-sm font-semibold text-foreground mb-3">Botoes de Acao (CTA)</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Botao Principal */}
+                      <div className="bg-muted/40 rounded-xl p-4 flex flex-col gap-3 border border-border">
+                        <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider">Botao Principal</p>
+                        <div>
+                          <label className="block text-xs font-medium text-foreground mb-1">Texto do botao</label>
+                          <input
+                            type="text"
+                            value={settings.heroCtaPrimary}
+                            onChange={e => setSettings(prev => ({ ...prev, heroCtaPrimary: e.target.value }))}
+                            placeholder="PEÇA AGORA"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-foreground mb-1">Link / Pagina de destino</label>
+                          <select
+                            value={settings.heroCtaPrimaryLink}
+                            onChange={e => setSettings(prev => ({ ...prev, heroCtaPrimaryLink: e.target.value }))}
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          >
+                            <option value="">-- Selecionar pagina --</option>
+                            <optgroup label="Loja">
+                              <option value="/">Pagina Inicial</option>
+                              <option value="/cardapio">Cardapio</option>
+                              <option value="/combos">Combos</option>
+                              <option value="/promocoes">Promocoes</option>
+                              <option value="/sobre-nos">Sobre Nos</option>
+                              <option value="/contato">Contato</option>
+                              <option value="/blog">Blog</option>
+                            </optgroup>
+                            <optgroup label="Conta">
+                              <option value="/login">Login</option>
+                              <option value="/perfil">Meu Perfil</option>
+                              <option value="/meus-pedidos">Meus Pedidos</option>
+                              <option value="/checkout">Checkout</option>
+                            </optgroup>
+                          </select>
+                          {settings.heroCtaPrimaryLink && (
+                            <p className="text-xs text-muted-foreground mt-1">Destino: <span className="text-primary font-mono">{settings.heroCtaPrimaryLink}</span></p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Botao Secundario */}
+                      <div className="bg-muted/40 rounded-xl p-4 flex flex-col gap-3 border border-border">
+                        <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider">Botao Secundario</p>
+                        <div>
+                          <label className="block text-xs font-medium text-foreground mb-1">Texto do botao</label>
+                          <input
+                            type="text"
+                            value={settings.heroCtaSecondary}
+                            onChange={e => setSettings(prev => ({ ...prev, heroCtaSecondary: e.target.value }))}
+                            placeholder="VER CARDÁPIO"
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-foreground mb-1">Link / Pagina de destino</label>
+                          <select
+                            value={settings.heroCtaSecondaryLink}
+                            onChange={e => setSettings(prev => ({ ...prev, heroCtaSecondaryLink: e.target.value }))}
+                            className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                          >
+                            <option value="">-- Selecionar pagina --</option>
+                            <optgroup label="Loja">
+                              <option value="/">Pagina Inicial</option>
+                              <option value="/cardapio">Cardapio</option>
+                              <option value="/combos">Combos</option>
+                              <option value="/promocoes">Promocoes</option>
+                              <option value="/sobre-nos">Sobre Nos</option>
+                              <option value="/contato">Contato</option>
+                              <option value="/blog">Blog</option>
+                            </optgroup>
+                            <optgroup label="Conta">
+                              <option value="/login">Login</option>
+                              <option value="/perfil">Meu Perfil</option>
+                              <option value="/meus-pedidos">Meus Pedidos</option>
+                              <option value="/checkout">Checkout</option>
+                            </optgroup>
+                          </select>
+                          {settings.heroCtaSecondaryLink && (
+                            <p className="text-xs text-muted-foreground mt-1">Destino: <span className="text-primary font-mono">{settings.heroCtaSecondaryLink}</span></p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
