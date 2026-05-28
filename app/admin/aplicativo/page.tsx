@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Download, Monitor, Printer, Bell, Settings, CheckCircle, Copy, ExternalLink } from 'lucide-react'
+import { Download, Monitor, Printer, Bell, Settings, CheckCircle, Copy } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AplicativoPage() {
@@ -112,21 +112,16 @@ export default function AplicativoPage() {
                   size="lg" 
                   className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
                   onClick={() => {
-                    // Link para download - em producao, seria um link para o .exe hospedado
-                    window.open('/downloads/AcaiPrinter-Setup.exe', '_blank')
+                    window.location.href = '/api/download-desktop-app'
                   }}
                 >
                   <Download className="w-5 h-5" />
-                  Baixar para Windows
-                </Button>
-                <Button variant="outline" size="lg" className="gap-2">
-                  <ExternalLink className="w-5 h-5" />
-                  Ver Documentacao
+                  Baixar Codigo Fonte (.zip)
                 </Button>
               </div>
               
               <p className="text-xs text-muted-foreground mt-4">
-                Windows 10/11 64-bit | Versao 1.0.0 | ~80MB
+                Baixe o codigo fonte e execute <code className="bg-muted px-1 py-0.5 rounded">npm install && npm run build</code> para gerar o .exe
               </p>
             </div>
             
