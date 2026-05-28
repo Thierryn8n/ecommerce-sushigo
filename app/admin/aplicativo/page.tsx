@@ -15,22 +15,44 @@ export default function AplicativoPage() {
   useEffect(() => {
     async function loadStore() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      console.log("[v0] User:", user)
+      if (!user) {
+        console.log("[v0] No user found")
+        setLoading(false)
+        return
+      }
 
-      const { data: admin } = await supabase
+      // Primeiro tenta buscar pelo admins
+      const { data: admin, error: adminError } = await supabase
         .from('admins')
         .select('store_id')
         .eq('user_id', user.id)
         .single()
 
+      console.log("[v0] Admin data:", admin, "Error:", adminError)
+
       if (admin?.store_id) {
-        const { data: storeData } = await supabase
+        const { data: storeData, error: storeError } = await supabase
           .from('stores')
           .select('*')
           .eq('id', admin.store_id)
           .single()
 
+        console.log("[v0] Store data:", storeData, "Error:", storeError)
         setStore(storeData)
+      } else {
+        // Fallback: busca direto na stores pelo owner_id
+        console.log("[v0] Trying fallback with owner_id")
+        const { data: storeByOwner, error: ownerError } = await supabase
+          .from('stores')
+          .select('*')
+          .eq('owner_id', user.id)
+          .single()
+
+        console.log("[v0] Store by owner:", storeByOwner, "Error:", ownerError)
+        if (storeByOwner) {
+          setStore(storeByOwner)
+        }
       }
       setLoading(false)
     }
