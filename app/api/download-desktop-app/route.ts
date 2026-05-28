@@ -125,7 +125,7 @@ const { createClient } = require('@supabase/supabase-js')
 
 // Configuracao Supabase
 const SUPABASE_URL = 'https://vqgryimcbgjcxyguabdj.supabase.co'
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ3J5aW1jYmdqY3h5Z3VhYmRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczMzI3NzksImV4cCI6MjA2MjkwODc3OX0.Ij1w0ZBKNyt63tIjLQ9v2l3MpPF_NFSP8bmzykW3Ys0'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ3J5aW1jYmdqY3h5Z3VhYmRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzgxMjQsImV4cCI6MjA5NTA1NDEyNH0.VMW_C7oDRhWOI4LWwq5wfDjkyp23_es_yGPic1hXiBo'
 
 let supabase
 let storeId = null
