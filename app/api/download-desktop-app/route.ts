@@ -172,31 +172,53 @@ async function loadPrinters() {
 }
 
 async function connectToStore() {
-  if (!storeId) return
-  
-  // Buscar dados da loja
-  const { data: store } = await supabase
-    .from('stores')
-    .select('*')
-    .eq('id', storeId)
-    .single()
-  
-  if (store) {
-    storeLogo = store.logo_url
-    document.getElementById('store-name').textContent = store.name || 'Loja Conectada'
-    if (storeLogo) {
-      document.getElementById('store-logo').src = storeLogo
-      document.getElementById('store-logo').style.display = 'block'
-    }
-    document.getElementById('connection-status').textContent = 'Conectado'
-    document.getElementById('connection-status').className = 'status connected'
+  if (!storeId) {
+    document.getElementById('connection-status').textContent = 'ID nao informado'
+    document.getElementById('connection-status').className = 'status disconnected'
+    return
   }
   
-  // Buscar pedidos existentes
-  await loadOrders()
-  
-  // Configurar realtime
-  setupRealtime()
+  try {
+    // Buscar dados da loja
+    const { data: store, error } = await supabase
+      .from('stores')
+      .select('*')
+      .eq('id', storeId)
+      .single()
+    
+    if (error) {
+      console.error('Erro ao buscar loja:', error)
+      document.getElementById('connection-status').textContent = 'Loja nao encontrada'
+      document.getElementById('connection-status').className = 'status disconnected'
+      alert('Erro: ' + error.message)
+      return
+    }
+    
+    if (store) {
+      storeLogo = store.logo_url
+      document.getElementById('store-name').textContent = store.name || 'Loja Conectada'
+      if (storeLogo) {
+        document.getElementById('store-logo').src = storeLogo
+        document.getElementById('store-logo').style.display = 'block'
+      }
+      document.getElementById('connection-status').textContent = 'Conectado'
+      document.getElementById('connection-status').className = 'status connected'
+      
+      // Buscar pedidos existentes
+      await loadOrders()
+      
+      // Configurar realtime
+      setupRealtime()
+    } else {
+      document.getElementById('connection-status').textContent = 'Loja nao encontrada'
+      document.getElementById('connection-status').className = 'status disconnected'
+    }
+  } catch (err) {
+    console.error('Erro na conexao:', err)
+    document.getElementById('connection-status').textContent = 'Erro de conexao'
+    document.getElementById('connection-status').className = 'status disconnected'
+    alert('Erro ao conectar: ' + err.message)
+  }
 }
 
 async function loadOrders() {
@@ -368,9 +390,25 @@ async function togglePrinted(orderId, printed) {
 function setupEventListeners() {
   // Salvar ID da loja
   document.getElementById('save-store-id').addEventListener('click', async () => {
-    storeId = document.getElementById('store-id-input').value.trim()
-    await ipcRenderer.invoke('set-store', 'storeId', storeId)
-    await connectToStore()
+    const input = document.getElementById('store-id-input')
+    storeId = input.value.trim()
+    
+    if (!storeId) {
+      alert('Por favor, insira o ID da loja!')
+      return
+    }
+    
+    document.getElementById('connection-status').textContent = 'Conectando...'
+    document.getElementById('connection-status').className = 'status connecting'
+    
+    try {
+      await ipcRenderer.invoke('set-store', 'storeId', storeId)
+      await connectToStore()
+    } catch (error) {
+      alert('Erro ao conectar: ' + error.message)
+      document.getElementById('connection-status').textContent = 'Erro'
+      document.getElementById('connection-status').className = 'status disconnected'
+    }
   })
   
   // Selecionar impressora
@@ -511,6 +549,12 @@ window.togglePrinted = togglePrinted`,
     
     .status.connected { background: var(--success); color: white; }
     .status.disconnected { background: var(--danger); color: white; }
+    .status.connecting { background: var(--warning); color: white; animation: pulse 1s infinite; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
     
     /* Form */
     .form-group {
