@@ -235,9 +235,16 @@ async function loadOrders() {
   }
 }
 
+let realtimeChannel = null
+
 function setupRealtime() {
-  supabase
-    .channel('orders-realtime')
+  // Remove subscription anterior se existir
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel)
+  }
+  
+  realtimeChannel = supabase
+    .channel('orders-realtime-' + Date.now())
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
@@ -269,7 +276,13 @@ function setupRealtime() {
         }
       }
     })
-    .subscribe()
+  
+  realtimeChannel.subscribe((status) => {
+    console.log('Realtime status:', status)
+    if (status === 'SUBSCRIBED') {
+      console.log('Conectado ao realtime!')
+    }
+  })
 }
 
 function renderOrders() {
