@@ -144,7 +144,7 @@ export default function AdminConfiguracoes() {
         { key: 'facebook', value: settings.facebook, description: 'Facebook' },
       ]
 
-      // Salvar cada configuração - usando upsert sem onConflict
+      // Salvar cada configuração - usando upsert com onConflict
       for (const setting of settingsToSave) {
         console.log(`💾 Salvando: ${setting.key} = ${setting.value}`)
         
@@ -156,7 +156,7 @@ export default function AdminConfiguracoes() {
             value: setting.value,
             description: setting.description,
             updated_at: new Date().toISOString(),
-          })
+          }, { onConflict: 'store_id,key' })
 
         if (error) {
           console.error(`❌ Erro ao salvar ${setting.key}:`, error)
@@ -181,13 +181,19 @@ export default function AdminConfiguracoes() {
         { key: 'cta_secondary_link', value: settings.heroCtaSecondaryLink },
       ]
       for (const field of heroFields) {
-        await supabase.from('app_settings').upsert({
+        console.log(`[v0] Salvando hero field: ${field.key} = ${field.value}`)
+        const { error: heroError } = await supabase.from('app_settings').upsert({
           store_id: store.id,
           section: 'hero',
           key: field.key,
           value: field.value || null,
           updated_at: new Date().toISOString(),
-        })
+        }, { onConflict: 'store_id,section,key' })
+        if (heroError) {
+          console.error(`[v0] Erro ao salvar hero ${field.key}:`, heroError)
+        } else {
+          console.log(`[v0] Hero ${field.key} salvo com sucesso`)
+        }
       }
 
       // Atualizar tabela stores com logo e descrição
@@ -289,8 +295,13 @@ export default function AdminConfiguracoes() {
   }
 
   const handleHeroBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0] || !store?.id) return
+    console.log("[v0] handleHeroBgUpload chamado")
+    if (!e.target.files || !e.target.files[0] || !store?.id) {
+      console.log("[v0] Condição falhou - files:", e.target.files, "store:", store?.id)
+      return
+    }
     const file = e.target.files[0]
+    console.log("[v0] Arquivo selecionado:", file.name, "tamanho:", file.size)
     setUploadingHero(true)
     setHeroUploadError(null)
     setHeroUploadSuccess(false)
@@ -298,15 +309,19 @@ export default function AdminConfiguracoes() {
       const fileExt = file.name.split('.').pop()
       const fileName = `hero-bg-${Date.now()}.${fileExt}`
       const filePath = `${store.id}/${fileName}`
-      const { error: uploadError } = await supabase.storage
+      console.log("[v0] Tentando upload para:", filePath)
+      const { error: uploadError, data: uploadData } = await supabase.storage
         .from('logos')
         .upload(filePath, file, { upsert: true, cacheControl: '3600' })
+      console.log("[v0] Resultado upload:", { uploadError, uploadData })
       if (uploadError) throw new Error(uploadError.message)
       const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(filePath)
+      console.log("[v0] URL pública:", publicUrl)
       setSettings(prev => ({ ...prev, heroBgUrl: publicUrl }))
       setHeroUploadSuccess(true)
       setTimeout(() => setHeroUploadSuccess(false), 3000)
     } catch (error: any) {
+      console.log("[v0] Erro no upload:", error)
       setHeroUploadError(error.message || 'Erro ao fazer upload.')
     } finally {
       setUploadingHero(false)
