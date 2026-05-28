@@ -10,8 +10,8 @@ const files = {
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win",
-    "build:all": "electron-builder --win --mac --linux"
+    "build": "electron-builder --win --x64",
+    "build:portable": "electron-builder --win portable"
   },
   "author": "Acai da Praia",
   "license": "MIT",
@@ -30,15 +30,22 @@ const files = {
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true
-    }
+    },
+    "forceCodeSigning": false
   }
 }`,
 
