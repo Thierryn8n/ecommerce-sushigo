@@ -188,7 +188,7 @@ export default function AdminConfiguracoes() {
           key: field.key,
           value: field.value || null,
           updated_at: new Date().toISOString(),
-        })
+        }, { onConflict: 'store_id,section,key' })
         if (heroError) {
           console.error(`[v0] Erro ao salvar hero ${field.key}:`, heroError)
         } else {
