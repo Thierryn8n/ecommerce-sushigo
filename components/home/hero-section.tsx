@@ -4,11 +4,13 @@ import { motion } from 'framer-motion'
 import { ArrowRight, UtensilsCrossed } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface HeroSettings {
   background_image: string
+  logo_image: string
   title_line1: string
   title_line2: string
   subtitle: string
@@ -23,6 +25,7 @@ interface HeroSettings {
 export function HeroSection() {
   const [settings, setSettings] = useState<HeroSettings>({
     background_image: '',
+    logo_image: '',
     title_line1: '',
     title_line2: '',
     subtitle: '',
@@ -72,7 +75,7 @@ export function HeroSection() {
   if (!loaded) return null
 
   // Se não tiver nenhum campo preenchido, não mostra a seção
-  const hasContent = settings.title_line1 || settings.title_line2 || settings.subtitle ||
+  const hasContent = settings.logo_image || settings.title_line1 || settings.title_line2 || settings.subtitle ||
     settings.highlight_text || settings.description || settings.background_image
 
   if (!hasContent) return null
@@ -115,27 +118,44 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Main Title */}
-            {(settings.title_line1 || settings.title_line2) && (
-              <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4">
-                {settings.title_line1 && (
-                  <>
-                    <span className="text-primary-foreground drop-shadow-2xl" style={{
-                      textShadow: '0 0 40px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--primary) / 0.3)'
+            {/* Logo Image or Main Title */}
+            {settings.logo_image ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="relative w-full max-w-sm h-64 mb-6 mx-auto"
+              >
+                <Image
+                  src={settings.logo_image}
+                  alt="Logo Hero"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </motion.div>
+            ) : (
+              (settings.title_line1 || settings.title_line2) && (
+                <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4">
+                  {settings.title_line1 && (
+                    <>
+                      <span className="text-primary-foreground drop-shadow-2xl" style={{
+                        textShadow: '0 0 40px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--primary) / 0.3)'
+                      }}>
+                        {settings.title_line1}
+                      </span>
+                      {settings.title_line2 && <br />}
+                    </>
+                  )}
+                  {settings.title_line2 && (
+                    <span className="text-secondary italic" style={{
+                      textShadow: '0 0 40px hsl(var(--secondary) / 0.5)'
                     }}>
-                      {settings.title_line1}
+                      {settings.title_line2}
                     </span>
-                    {settings.title_line2 && <br />}
-                  </>
-                )}
-                {settings.title_line2 && (
-                  <span className="text-secondary italic" style={{
-                    textShadow: '0 0 40px hsl(var(--secondary) / 0.5)'
-                  }}>
-                    {settings.title_line2}
-                  </span>
-                )}
-              </h1>
+                  )}
+                </h1>
+              )
             )}
 
             {/* Subtitle */}

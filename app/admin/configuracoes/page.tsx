@@ -31,6 +31,7 @@ export default function AdminConfiguracoes() {
   const [heroUploadSuccess, setHeroUploadSuccess] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const heroFileInputRef = useRef<HTMLInputElement>(null)
+  const heroLogoFileInputRef = useRef<HTMLInputElement>(null)
   const [settings, setSettings] = useState({
     storeName: '',
     whatsapp: '',
@@ -45,6 +46,7 @@ export default function AdminConfiguracoes() {
     logoUrl: '',
     description: '',
     heroBgUrl: '',
+    heroLogoUrl: '',
     heroTitleLine1: '',
     heroTitleLine2: '',
     heroSubtitle: '',
@@ -99,6 +101,7 @@ export default function AdminConfiguracoes() {
           logoUrl: store.logo_url || '',
           description: store.description || '',
           heroBgUrl: heroObj.background_image || '',
+          heroLogoUrl: heroObj.logo_image || '',
           heroTitleLine1: heroObj.title_line1 || '',
           heroTitleLine2: heroObj.title_line2 || '',
           heroSubtitle: heroObj.subtitle || '',
@@ -162,6 +165,7 @@ export default function AdminConfiguracoes() {
       // Salvar todos os campos hero em app_settings
       const heroFields = [
         { key: 'background_image', value: settings.heroBgUrl },
+        { key: 'logo_image', value: settings.heroLogoUrl },
         { key: 'title_line1', value: settings.heroTitleLine1 },
         { key: 'title_line2', value: settings.heroTitleLine2 },
         { key: 'subtitle', value: settings.heroSubtitle },
@@ -294,6 +298,32 @@ export default function AdminConfiguracoes() {
       if (uploadError) throw new Error(uploadError.message)
       const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(filePath)
       setSettings(prev => ({ ...prev, heroBgUrl: publicUrl }))
+      setHeroUploadSuccess(true)
+      setTimeout(() => setHeroUploadSuccess(false), 3000)
+    } catch (error: any) {
+      setHeroUploadError(error.message || 'Erro ao fazer upload.')
+    } finally {
+      setUploadingHero(false)
+      if (heroFileInputRef.current) heroFileInputRef.current.value = ''
+    }
+  }
+
+  const handleHeroLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !store?.id) return
+    const file = e.target.files[0]
+    setUploadingHero(true)
+    setHeroUploadError(null)
+    setHeroUploadSuccess(false)
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `hero-logo-${Date.now()}.${fileExt}`
+      const filePath = `${store.id}/${fileName}`
+      const { error: uploadError } = await supabase.storage
+        .from('logos')
+        .upload(filePath, file, { upsert: true, cacheControl: '3600' })
+      if (uploadError) throw new Error(uploadError.message)
+      const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(filePath)
+      setSettings(prev => ({ ...prev, heroLogoUrl: publicUrl }))
       setHeroUploadSuccess(true)
       setTimeout(() => setHeroUploadSuccess(false), 3000)
     } catch (error: any) {
@@ -667,6 +697,76 @@ export default function AdminConfiguracoes() {
                       placeholder="do paraíso!"
                       className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <label className="block text-sm font-medium text-foreground mb-1">Logo/Imagem do Hero (Grande e Responsiva)</label>
+                    <p className="text-xs text-muted-foreground mb-2">Aparece no lugar dos títulos. Use PNG ou SVG com fundo transparente. Recomendado: 300x300px ou maior.</p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      {/* Preview */}
+                      <div className="relative w-full sm:w-40 h-40 rounded-xl overflow-hidden border border-border bg-muted flex-shrink-0 flex items-center justify-center">
+                        {settings.heroLogoUrl ? (
+                          <>
+                            <Image src={settings.heroLogoUrl} alt="Logo Hero" fill className="object-contain p-2" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                              <button
+                                type="button"
+                                onClick={() => setSettings(prev => ({ ...prev, heroLogoUrl: '' }))}
+                                className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-3 py-1.5 text-xs flex items-center gap-1"
+                              >
+                                <X className="w-3 h-3" /> Remover
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground gap-2">
+                            <ImageIcon className="w-8 h-8" />
+                            <span className="text-xs">Sem logo</span>
+                          </div>
+                        )}
+                        {uploadingHero && (
+                          <div className="absolute inset-0 bg-card/80 flex flex-col items-center justify-center gap-2">
+                            <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                            <span className="text-xs text-muted-foreground">Enviando...</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Acoes */}
+                      <div className="flex flex-col gap-2 justify-center">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleHeroLogoUpload}
+                          className="hidden"
+                          ref={heroLogoFileInputRef}
+                          disabled={uploadingHero}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          disabled={uploadingHero}
+                          onClick={() => heroLogoFileInputRef.current?.click()}
+                          className="border-border text-foreground/70 hover:bg-muted w-fit"
+                        >
+                          {uploadingHero ? (
+                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Enviando...</>
+                          ) : (
+                            <><Upload className="w-4 h-4 mr-2" />{settings.heroLogoUrl ? 'Trocar Logo' : 'Enviar Logo'}</>
+                          )}
+                        </Button>
+                        {heroUploadError && (
+                          <div className="flex items-center gap-1 text-red-400 text-xs">
+                            <AlertCircle className="w-3 h-3" /><span>{heroUploadError}</span>
+                          </div>
+                        )}
+                        {heroUploadSuccess && (
+                          <div className="flex items-center gap-1 text-green-400 text-xs">
+                            <Check className="w-3 h-3" /><span>Logo enviada! Clique em Salvar.</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-sm font-medium text-foreground mb-1">Descricao</label>
