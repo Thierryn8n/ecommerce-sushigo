@@ -8,6 +8,22 @@ export async function uploadImage(
   try {
     const supabase = createClient()
     
+    // Verificar se o bucket existe, criar se não existir
+    const { data: buckets } = await supabase.storage.listBuckets()
+    const bucketExists = buckets?.some(b => b.name === bucket)
+    
+    if (!bucketExists) {
+      console.log("[v0] Bucket not found, creating:", bucket)
+      const { error: createError } = await supabase.storage.createBucket(bucket, {
+        public: true,
+        fileSizeLimit: 5242880, // 5MB
+      })
+      if (createError) {
+        console.error("[v0] Error creating bucket:", createError)
+        throw createError
+      }
+    }
+    
     const fileExt = file.name.split('.').pop()
     const fileName = `${Date.now()}.${fileExt}`
     const filePath = `${path}/${fileName}`
