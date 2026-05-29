@@ -140,9 +140,15 @@ export default function AdminCategorias() {
 
     // Upload de imagem se houver
     if (imageFile) {
+      console.log("[v0] Uploading category image:", imageFile.name)
       const result = await uploadImage(imageFile, 'categories', 'categories')
+      console.log("[v0] Upload result:", result)
       if (result.url) {
         imageUrl = result.url
+      } else if (result.error) {
+        alert('Erro ao fazer upload da imagem: ' + result.error)
+        setSaving(false)
+        return
       }
     }
 
@@ -156,6 +162,8 @@ export default function AdminCategorias() {
       is_active: formData.is_active,
     }
 
+    console.log("[v0] Saving category:", categoryData)
+
     if (editingCategory) {
       const { data, error } = await supabase
         .from('categories')
@@ -164,8 +172,11 @@ export default function AdminCategorias() {
         .select()
         .single()
 
+      console.log("[v0] Update result:", { data, error })
       if (!error && data) {
         setCategories(prev => prev.map(c => c.id === data.id ? data : c))
+      } else if (error) {
+        alert('Erro ao atualizar categoria: ' + error.message)
       }
     } else {
       const { data, error } = await supabase
@@ -174,8 +185,11 @@ export default function AdminCategorias() {
         .select()
         .single()
 
+      console.log("[v0] Insert result:", { data, error })
       if (!error && data) {
         setCategories(prev => [...prev, data])
+      } else if (error) {
+        alert('Erro ao criar categoria: ' + error.message)
       }
     }
 
