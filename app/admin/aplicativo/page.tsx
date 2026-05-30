@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
-import { Download, Monitor, Printer, Bell, Settings, CheckCircle, Copy } from 'lucide-react'
+import { Download, Monitor, Printer, Bell, Settings, CheckCircle, Copy, Smartphone, Home } from 'lucide-react'
 import Link from 'next/link'
+import { usePwaInstall } from '@/hooks/use-pwa-install'
 
 export default function AplicativoPage() {
   const [store, setStore] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
   const supabase = createClient()
+  const { isInstallable, isInstalled, install } = usePwaInstall()
 
   useEffect(() => {
     async function loadStore() {
@@ -46,24 +48,24 @@ export default function AplicativoPage() {
 
   const features = [
     {
+      icon: Home,
+      title: 'Pagina Inicial',
+      description: 'Acesse o cardapio e faca pedidos diretamente pelo app'
+    },
+    {
       icon: Bell,
       title: 'Alertas em Tempo Real',
-      description: 'Receba notificacoes instantaneas quando novos pedidos chegarem'
+      description: 'Receba notificacoes de status do pedido no seu celular'
     },
     {
-      icon: Printer,
-      title: 'Impressao Automatica',
-      description: 'Imprima pedidos automaticamente em impressoras termicas 80mm'
-    },
-    {
-      icon: Monitor,
-      title: 'Painel de Pedidos',
-      description: 'Visualize todos os pedidos em uma interface moderna e intuitiva'
+      icon: Smartphone,
+      title: 'Experiencia Nativa',
+      description: 'Interface otimizada para mobile, funciona como app nativo'
     },
     {
       icon: Settings,
-      title: 'Configuravel',
-      description: 'Escolha a impressora, ative/desative impressao automatica'
+      title: 'Sem Download',
+      description: 'Instale direto pelo navegador, sem ir a Play Store ou App Store'
     }
   ]
 
@@ -82,8 +84,8 @@ export default function AplicativoPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Aplicativo Desktop</h1>
-              <p className="text-muted-foreground text-sm">Sistema de impressao automatica de pedidos</p>
+              <h1 className="text-2xl font-bold text-foreground">Aplicativo</h1>
+              <p className="text-muted-foreground text-sm">Instale o app PWA no celular dos seus clientes</p>
             </div>
             <Link href="/admin">
               <Button variant="outline">Voltar ao Painel</Button>
@@ -98,28 +100,48 @@ export default function AplicativoPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Acai Printer
+                Acaí da Praia App
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Aplicativo desktop para Windows que conecta sua loja com impressao automatica de pedidos em tempo real. 
-                Nunca mais perca um pedido!
+                Seus clientes podem instalar o app diretamente no celular pelo navegador.
+                Rápido, prático e sem precisar de loja de aplicativos!
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
-                  onClick={() => {
-                    window.location.href = '/api/download-desktop-app'
-                  }}
-                >
-                  <Download className="w-5 h-5" />
-                  Baixar para Windows (.exe)
-                </Button>
+                {isInstalled ? (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    disabled
+                    className="gap-2 border-green-500/50 text-green-400"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    App já instalado
+                  </Button>
+                ) : isInstallable ? (
+                  <Button
+                    size="lg"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2"
+                    onClick={install}
+                  >
+                    <Download className="w-5 h-5" />
+                    Instalar Aplicativo
+                  </Button>
+                ) : (
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    disabled
+                    className="gap-2"
+                  >
+                    <Smartphone className="w-5 h-5" />
+                    Abra no celular para instalar
+                  </Button>
+                )}
               </div>
 
               <p className="text-xs text-muted-foreground mt-4">
-                Instalador pronto para Windows. Execute e siga as instrucoes na tela.
+                Compatível com Android e iOS. Basta abrir o site no navegador e tocar em "Adicionar à Tela Inicial".
               </p>
             </div>
             
@@ -127,8 +149,8 @@ export default function AplicativoPage() {
               <div className="bg-card rounded-2xl border border-border p-4 shadow-2xl">
                 <div className="bg-[#1a0a25] rounded-xl p-4 aspect-video flex items-center justify-center">
                   <div className="text-center">
-                    <Monitor className="w-16 h-16 text-primary mx-auto mb-4" />
-                    <p className="text-white/60 text-sm">Preview do Aplicativo</p>
+                    <Smartphone className="w-16 h-16 text-primary mx-auto mb-4" />
+                    <p className="text-white/60 text-sm">Preview do App Mobile</p>
                   </div>
                 </div>
               </div>
@@ -138,9 +160,9 @@ export default function AplicativoPage() {
 
         {/* ID da Loja */}
         <div className="bg-card rounded-2xl border border-border p-6 mb-8">
-          <h3 className="text-lg font-semibold text-foreground mb-2">Seu ID da Loja</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">ID da Loja (Desktop)</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            Use este ID no aplicativo para conectar sua loja e receber os pedidos
+            Use este ID no aplicativo desktop de impressao para conectar sua loja
           </p>
           
           <div className="flex items-center gap-3">
@@ -193,29 +215,29 @@ export default function AplicativoPage() {
             <li className="flex gap-4">
               <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold shrink-0">1</span>
               <div>
-                <p className="font-medium text-foreground">Baixe e instale o aplicativo</p>
-                <p className="text-sm text-muted-foreground">Clique no botao "Baixar para Windows" e execute o instalador</p>
+                <p className="font-medium text-foreground">Abra o site no celular</p>
+                <p className="text-sm text-muted-foreground">Compartilhe o link do site com seus clientes</p>
               </div>
             </li>
             <li className="flex gap-4">
               <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold shrink-0">2</span>
               <div>
-                <p className="font-medium text-foreground">Configure o ID da Loja</p>
-                <p className="text-sm text-muted-foreground">Copie o ID acima e cole no campo "ID do Admin" no aplicativo</p>
+                <p className="font-medium text-foreground">Toque em "Instalar"</p>
+                <p className="text-sm text-muted-foreground">Aparecera um banner ou opcao no menu para adicionar a tela inicial</p>
               </div>
             </li>
             <li className="flex gap-4">
               <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold shrink-0">3</span>
               <div>
-                <p className="font-medium text-foreground">Selecione sua impressora</p>
-                <p className="text-sm text-muted-foreground">Escolha a impressora termica 80mm conectada ao seu computador</p>
+                <p className="font-medium text-foreground">Confirme a instalacao</p>
+                <p className="text-sm text-muted-foreground">O app sera adicionado automaticamente na tela inicial do celular</p>
               </div>
             </li>
             <li className="flex gap-4">
               <span className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold shrink-0">4</span>
               <div>
                 <p className="font-medium text-foreground">Pronto!</p>
-                <p className="text-sm text-muted-foreground">Os pedidos serao impressos automaticamente conforme chegarem</p>
+                <p className="text-sm text-muted-foreground">O cliente abre o app direto da tela inicial, como um app nativo</p>
               </div>
             </li>
           </ol>

@@ -26,14 +26,21 @@ export const metadata: Metadata = {
     title: 'Açaí da Praia | O Melhor Açaí com o Sabor do Paraíso',
     description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!',
     siteName: 'Açaí da Praia',
+    images: [{
+      url: '/apple-icon.png',
+      width: 512,
+      height: 512,
+      alt: 'Açaí da Praia Logo',
+    }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Açaí da Praia | O Melhor Açaí com o Sabor do Paraíso',
     description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!',
+    images: ['/apple-icon.png'],
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/apple-icon.png',
     apple: '/apple-icon.png',
   },
 }
