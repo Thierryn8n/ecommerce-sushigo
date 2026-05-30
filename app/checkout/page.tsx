@@ -49,6 +49,7 @@ export default function CheckoutPage() {
       let text = `*${item.name}* (${item.quantity}x)\n`
       if (item.size) text += `  Tamanho: ${item.size}\n`
       if (item.acaiType) text += `  Tipo: ${item.acaiType}\n`
+      if (item.weightGrams && item.weightGrams > 0) text += `  Peso: ${item.weightGrams}g ($((item.weightGrams / 1000).toFixed(3).replace('.', ','))kg)\n`
       if (item.toppings.length > 0) {
         text += `  Adicionais: ${item.toppings.map(t => t.name).join(', ')}\n`
       }
@@ -138,6 +139,7 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
+        weight_grams: item.weightGrams || 0,
         toppings: item.toppings,
         sauces: item.sauces
       }))
@@ -231,6 +233,7 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
+        weight_grams: item.weightGrams || 0,
         toppings: item.toppings,
         sauces: item.sauces
       }))

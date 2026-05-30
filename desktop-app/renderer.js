@@ -638,6 +638,7 @@ function printOrder(order) {
         total_price: item.total_price || item.unit_price * item.quantity || 0,
         size_name: item.size_name || '',
         notes: item.notes || '',
+        weight_grams: item.weight_grams || 0,
         toppings: allToppings,
         sauces: sauces
       };

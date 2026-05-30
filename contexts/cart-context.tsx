@@ -16,6 +16,7 @@ export interface CartItem {
   toppings: Array<{ name: string; price: number }>
   sauces: Array<{ name: string; price: number }>
   notes?: string
+  weightGrams?: number
 }
 
 interface CartContextType {

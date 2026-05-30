@@ -122,6 +122,7 @@ function generateReceiptHtml(order) {
       <td style="text-align:left;vertical-align:top;padding-top:6px;">
         <strong style="font-size:13px;">${item.quantity}x ${item.name}</strong>
         ${item.size_name ? `<br><span style="font-size:11px;color:#333;"><strong>Vasilha:</strong> ${item.size_name}</span>` : ''}
+        ${item.weight_grams ? `<br><span style="font-size:11px;color:#333;"><strong>Peso:</strong> ${item.weight_grams}g (${(item.weight_grams / 1000).toFixed(3)}kg)</span>` : ''}
       </td>
       <td style="text-align:right;vertical-align:top;padding-top:6px;">
         <strong>R$ ${(item.total_price || item.price * item.quantity || 0).toFixed(2)}</strong>

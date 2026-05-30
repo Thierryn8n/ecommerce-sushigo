@@ -378,6 +378,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       toppings: selectedToppingsList,
       sauces: selectedSaucesList,
       notes,
+      weightGrams: totalWeight,
     })
 
     // Reset form

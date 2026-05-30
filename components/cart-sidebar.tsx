@@ -113,6 +113,11 @@ export function CartSidebar() {
                               + {item.toppings.map(t => t.name).join(', ')}
                             </p>
                           )}
+                          {item.weightGrams && item.weightGrams > 0 && (
+                            <p className="text-muted-foreground/70 text-xs">
+                              {item.weightGrams}g ({(item.weightGrams / 1000).toFixed(3).replace('.', ',')}kg)
+                            </p>
+                          )}
                           <p className="text-[#00BFFF] font-bold mt-1">
                             R$ {formatPrice(item.totalPrice)}
                           </p>
