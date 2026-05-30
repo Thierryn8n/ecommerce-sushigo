@@ -31,6 +31,7 @@ export default function BannersPage() {
     start_date: '',
     end_date: '',
     background_color: '#8B5CF6',
+    floating_image_url: '',
   })
 
   const [uploadingDesktop, setUploadingDesktop] = useState(false)
@@ -39,10 +40,14 @@ export default function BannersPage() {
   const [uploadMobileError, setUploadMobileError] = useState<string | null>(null)
   const [uploadDesktopSuccess, setUploadDesktopSuccess] = useState(false)
   const [uploadMobileSuccess, setUploadMobileSuccess] = useState(false)
+  const [uploadingFloating, setUploadingFloating] = useState(false)
+  const [uploadFloatingError, setUploadFloatingError] = useState<string | null>(null)
+  const [uploadFloatingSuccess, setUploadFloatingSuccess] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const desktopFileRef = useRef<HTMLInputElement>(null)
   const mobileFileRef = useRef<HTMLInputElement>(null)
+  const floatingFileRef = useRef<HTMLInputElement>(null)
 
   const supabase = createClient()
 
@@ -112,6 +117,25 @@ export default function BannersPage() {
     }
   }
 
+  const handleFloatingUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return
+    const file = e.target.files[0]
+    setUploadingFloating(true)
+    setUploadFloatingError(null)
+    setUploadFloatingSuccess(false)
+    try {
+      const url = await uploadImageToStorage(file, 'floating')
+      setFormData(prev => ({ ...prev, floating_image_url: url }))
+      setUploadFloatingSuccess(true)
+      setTimeout(() => setUploadFloatingSuccess(false), 3000)
+    } catch (err: any) {
+      setUploadFloatingError(err.message || 'Erro ao enviar imagem.')
+    } finally {
+      setUploadingFloating(false)
+      if (floatingFileRef.current) floatingFileRef.current.value = ''
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -129,6 +153,7 @@ export default function BannersPage() {
       start_date: formData.start_date || null,
       end_date: formData.end_date || null,
       background_color: formData.background_color || null,
+      floating_image_url: formData.floating_image_url || null,
     }
 
     if (editingBanner) {
@@ -168,6 +193,7 @@ export default function BannersPage() {
       start_date: banner.start_date ? banner.start_date.split('T')[0] : '',
       end_date: banner.end_date ? banner.end_date.split('T')[0] : '',
       background_color: banner.background_color || '#8B5CF6',
+      floating_image_url: banner.floating_image_url || '',
     })
     setDialogOpen(true)
   }
@@ -187,9 +213,11 @@ export default function BannersPage() {
       start_date: '',
       end_date: '',
       background_color: '#8B5CF6',
+      floating_image_url: '',
     })
     setUploadDesktopError(null)
     setUploadMobileError(null)
+    setUploadFloatingError(null)
   }
 
   if (loading) {
@@ -338,6 +366,62 @@ export default function BannersPage() {
                         {uploadMobileSuccess && <p className="text-xs text-green-400 flex items-center gap-1"><Check className="w-3 h-3" />Imagem Celular enviada!</p>}
                       </div>
 
+                    </div>
+                  </div>
+
+                  {/* Imagem Flutuante */}
+                  <div className="border border-border rounded-xl overflow-hidden">
+                    <div className="bg-muted/50 px-4 py-3 border-b border-border">
+                      <p className="text-sm font-semibold text-foreground">Imagem Flutuante</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Produto/personagem que flutua na lateral direita do banner (PNG com fundo transparente ideal)</p>
+                    </div>
+                    <div className="p-4 flex flex-col gap-3">
+                      <div className="flex items-center gap-2 text-foreground">
+                        <ImageIcon className="w-4 h-4 text-secondary" />
+                        <span className="text-sm font-medium">Imagem Lateral</span>
+                        <span className="text-xs text-muted-foreground ml-auto">Recomendado: 400x400px, PNG</span>
+                      </div>
+
+                      <div className="relative w-full h-36 rounded-lg overflow-hidden border border-border bg-muted flex items-center justify-center">
+                        {formData.floating_image_url ? (
+                          <>
+                            <img src={formData.floating_image_url} alt="Preview Flutuante" className="w-full h-full object-contain" />
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, floating_image_url: '' }))}
+                                className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-3 py-1.5 text-xs flex items-center gap-1"
+                              >
+                                <X className="w-3 h-3" /> Remover
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                            <ImageIcon className="w-8 h-8" />
+                            <span className="text-xs">Sem imagem flutuante</span>
+                          </div>
+                        )}
+                        {uploadingFloating && (
+                          <div className="absolute inset-0 bg-card/80 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                          </div>
+                        )}
+                      </div>
+
+                      <input type="file" accept="image/*" ref={floatingFileRef} onChange={handleFloatingUpload} className="hidden" disabled={uploadingFloating} />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        disabled={uploadingFloating}
+                        onClick={() => floatingFileRef.current?.click()}
+                        className="border-border text-foreground/70 hover:bg-muted w-full"
+                      >
+                        {uploadingFloating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Enviando...</> : <><Upload className="w-4 h-4 mr-2" />{formData.floating_image_url ? 'Trocar Imagem Flutuante' : 'Enviar Imagem Flutuante'}</>}
+                      </Button>
+                      {uploadFloatingError && <p className="text-xs text-red-400 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{uploadFloatingError}</p>}
+                      {uploadFloatingSuccess && <p className="text-xs text-green-400 flex items-center gap-1"><Check className="w-3 h-3" />Imagem flutuante enviada!</p>}
                     </div>
                   </div>
 
@@ -513,6 +597,11 @@ export default function BannersPage() {
                           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${banner.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                             {banner.is_active ? 'Ativo' : 'Inativo'}
                           </span>
+                          {banner.floating_image_url && (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-secondary/20 text-secondary flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3" /> Flutuante
+                            </span>
+                          )}
                           <span className="text-xs text-muted-foreground">Ordem: {banner.display_order}</span>
                         </div>
                         {banner.title && <h3 className="font-semibold text-foreground truncate">{banner.title}</h3>}

@@ -85,6 +85,30 @@ export function BannersSection() {
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
+              {/* Floating Image */}
+              {currentBanner.floating_image_url && (
+                <motion.div
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="absolute right-2 sm:right-6 md:right-10 lg:right-16 bottom-0 top-0 flex items-center justify-center pointer-events-none z-20 hidden sm:flex"
+                >
+                  <motion.div
+                    animate={{ y: [0, -12, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 lg:w-64 lg:h-64"
+                  >
+                    <Image
+                      src={currentBanner.floating_image_url}
+                      alt=""
+                      fill
+                      className="object-contain drop-shadow-2xl"
+                      priority
+                    />
+                  </motion.div>
+                </motion.div>
+              )}
+
               {/* Content */}
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full max-w-2xl px-4 sm:px-6 md:px-12 py-4 sm:py-6">
