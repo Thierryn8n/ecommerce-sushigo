@@ -27,6 +27,7 @@ export default function CoberturasPage() {
     is_active: true,
     display_order: '0',
     max_quantity: '2',
+    weight_grams: '0',
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -72,6 +73,7 @@ export default function CoberturasPage() {
       is_active: formData.is_active,
       display_order: parseInt(formData.display_order),
       max_quantity: parseInt(formData.max_quantity),
+      weight_grams: parseInt(formData.weight_grams) || 0,
     }
 
     if (editingSauce) {
@@ -117,6 +119,7 @@ export default function CoberturasPage() {
       is_active: sauce.is_active,
       display_order: sauce.display_order.toString(),
       max_quantity: sauce.max_quantity?.toString() || '2',
+      weight_grams: sauce.weight_grams?.toString() || '0',
     })
     setDialogOpen(true)
   }
@@ -131,6 +134,7 @@ export default function CoberturasPage() {
       is_active: true,
       display_order: '0',
       max_quantity: '2',
+      weight_grams: '0',
     })
     setImageFile(null)
   }
@@ -203,6 +207,19 @@ export default function CoberturasPage() {
                   className="bg-muted border-border"
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="weight_grams">Peso (gramas)</Label>
+                  <Input
+                    id="weight_grams"
+                    type="number"
+                    value={formData.weight_grams}
+                    onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                    className="bg-muted border-border"
+                    placeholder="Ex: 10"
+                  />
+                </div>
+              </div>
               <div>
                 <Label htmlFor="image">Imagem</Label>
                 <Input
@@ -265,7 +282,7 @@ export default function CoberturasPage() {
             <h3 className="text-xl font-bold text-foreground mb-2">{sauce.name}</h3>
             <div className="flex justify-between items-center text-sm mb-2">
               <span className="text-[#FFC300] font-semibold">R$ {sauce.price.toFixed(2)}</span>
-              <span className="text-foreground/70">Max: {sauce.max_quantity}x</span>
+              <span className="text-foreground/70">Max: {sauce.max_quantity}x | {sauce.weight_grams}g</span>
             </div>
             <div className="mt-2">
               <span className={`px-2 py-1 rounded text-xs ${sauce.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>

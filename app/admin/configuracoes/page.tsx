@@ -39,6 +39,7 @@ export default function AdminConfiguracoes() {
     address: '',
     deliveryFee: '',
     minOrder: '',
+    pricePerKg: '',
     openTime: '',
     closeTime: '',
     instagram: '',
@@ -96,6 +97,7 @@ export default function AdminConfiguracoes() {
           address: settingsObj.address || store.address || '',
           deliveryFee: settingsObj.delivery_fee || '5.00',
           minOrder: settingsObj.min_order || '15.00',
+          pricePerKg: settingsObj.price_per_kg || '',
           openTime: settingsObj.open_time || '10:00',
           closeTime: settingsObj.close_time || '22:00',
           instagram: settingsObj.instagram || store.instagram_url || '',
@@ -138,6 +140,7 @@ export default function AdminConfiguracoes() {
         { key: 'address', value: settings.address, description: 'Endereço da loja' },
         { key: 'delivery_fee', value: settings.deliveryFee, description: 'Taxa de entrega' },
         { key: 'min_order', value: settings.minOrder, description: 'Pedido mínimo' },
+        { key: 'price_per_kg', value: settings.pricePerKg, description: 'Preço por quilo do açaí' },
         { key: 'open_time', value: settings.openTime, description: 'Horário de abertura' },
         { key: 'close_time', value: settings.closeTime, description: 'Horário de fechamento' },
         { key: 'instagram', value: settings.instagram, description: 'Instagram' },
@@ -571,6 +574,18 @@ export default function AdminConfiguracoes() {
                         onChange={(e) => setSettings({ ...settings, minOrder: e.target.value })}
                         className="bg-muted border-border text-foreground"
                       />
+                    </div>
+                    <div>
+                      <label className="text-foreground/70 text-sm mb-2 block">Preço por Quilo (R$)</label>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={settings.pricePerKg}
+                        onChange={(e) => setSettings({ ...settings, pricePerKg: e.target.value })}
+                        className="bg-muted border-border text-foreground"
+                        placeholder="Ex: 45.00"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Se preenchido, o preço do produto será calculado por peso automaticamente.</p>
                     </div>
                   </div>
                 </div>

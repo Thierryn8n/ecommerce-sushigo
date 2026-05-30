@@ -34,6 +34,7 @@ interface Product {
   promotion_price: number | null
   image_url: string | null
   category: { name: string; slug: string; color: string | null } | null
+  base_weight_grams: number
 }
 
 interface Bowl {
@@ -61,12 +62,14 @@ interface Topping {
   price: number
   max_quantity: number
   image_url?: string
+  weight_grams: number
 }
 
 interface Sauce {
   id: string
   name: string
   price: number
+  weight_grams: number
 }
 
 const STEPS = [
@@ -87,6 +90,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [acaiTypes, setAcaiTypes] = useState<AcaiType[]>([])
   const [toppings, setToppings] = useState<Topping[]>([])
   const [sauces, setSauces] = useState<Sauce[]>([])
+  const [pricePerKg, setPricePerKg] = useState<number>(0)
   const [loading, setLoading] = useState(true)
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -168,6 +172,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         setProduct(productData)
       }
 
+      // Buscar preco por kg
+      const { data: priceData } = await supabase
+        .from('store_settings')
+        .select('value')
+        .eq('key', 'price_per_kg')
+        .limit(1)
+        .single()
+      if (priceData?.value) {
+        setPricePerKg(parseFloat(priceData.value))
+      }
+
       // Buscar vasilhas
       const { data: bowlsData } = await supabase
         .from('bowls')
@@ -215,10 +230,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         .order('display_order')
 
       if (saucesData) {
-        setSauces(saucesData.map(s => ({
+        setSauces(saucesData.map((s: any) => ({
           id: s.id,
           name: s.name,
-          price: Number(s.price)
+          price: Number(s.price),
+          weight_grams: Number(s.weight_grams) || 0,
         })))
       }
 
@@ -279,23 +295,46 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const bowl = bowls.find(b => b.id === selectedBowl)
   const acaiType = acaiTypes.find(t => t.id === selectedType)
 
-  // Calculate total price - apenas cobra toppings extras além do automático
+  // Calculate total weight in grams
+  const calculateWeight = () => {
+    let weight = product?.base_weight_grams || 0
+    if (bowl) weight += bowl.ml || 0
+    if (acaiType) weight += acaiType.weight_addition || 0
+    
+    Object.entries(selectedToppings).forEach(([toppingId, qty]) => {
+      const topping = toppings.find(t => t.id === toppingId)
+      if (topping) weight += (topping.weight_grams || 0) * qty
+    })
+    
+    selectedSauces.forEach(sauceId => {
+      const sauce = sauces.find(s => s.id === sauceId)
+      if (sauce) weight += sauce.weight_grams || 0
+    })
+    
+    return weight
+  }
+
+  // Calculate total price
   const calculateTotal = () => {
+    // Se preco por kg estiver configurado, calcula por peso
+    if (pricePerKg > 0) {
+      const weight = calculateWeight()
+      return (weight / 1000) * pricePerKg
+    }
+    
+    // Sistema antigo: preco fixo + adicionais
     let total = product.promotion_price ? Number(product.promotion_price) : Number(product.base_price)
     
     if (bowl) total += Number(bowl.price_addition)
     if (acaiType) total += Number(acaiType.price_addition)
     
-    // Cobrar apenas toppings extras (além dos automáticos)
     Object.entries(selectedToppings).forEach(([toppingId, qty]) => {
       const topping = toppings.find(t => t.id === toppingId)
       if (topping) {
         if (autoToppings.has(toppingId)) {
-          // É automático: cobra apenas quantidades extras além do 1 incluído
           const extraQty = Math.max(0, qty - 1)
           total += Number(topping.price) * extraQty
         } else {
-          // É adicional manual: cobra tudo
           total += Number(topping.price) * qty
         }
       }
@@ -310,6 +349,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   }
 
   const totalPrice = calculateTotal()
+  const totalWeight = calculateWeight()
 
   const handleAddToCart = () => {
     const selectedToppingsList = Object.entries(selectedToppings)
@@ -440,7 +480,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 {/* Price Display */}
                 <div className="bg-muted rounded-xl p-3 sm:p-4 mb-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-sm sm:text-base">Total do Pedido</span>
+                    <div>
+                      <span className="text-muted-foreground text-sm sm:text-base">Total do Pedido</span>
+                      {pricePerKg > 0 && (
+                        <p className="text-xs text-muted-foreground/70">{totalWeight}g = {(totalWeight / 1000).toFixed(3).replace('.', ',')}kg</p>
+                      )}
+                    </div>
                     <div className="text-right">
                       <p className="text-[#00BFFF] font-bold text-xl sm:text-2xl">
                         R$ {(totalPrice * quantity).toFixed(2).replace('.', ',')}
@@ -450,12 +495,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           {quantity}x R$ {totalPrice.toFixed(2).replace('.', ',')}
                         </p>
                       )}
+                      {pricePerKg > 0 && (
+                        <p className="text-[10px] text-muted-foreground/60">R$ {pricePerKg}/kg</p>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* Summary */}
                 <div className="space-y-2 text-sm">
+                  {pricePerKg > 0 && (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Peso Total:</span>
+                      <span className="text-foreground font-semibold">{totalWeight}g ({(totalWeight / 1000).toFixed(3).replace('.', ',')}kg)</span>
+                    </div>
+                  )}
                   {bowl && (
                     <div className="flex justify-between text-muted-foreground">
                       <span>Tamanho:</span>

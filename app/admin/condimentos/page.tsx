@@ -28,6 +28,7 @@ export default function CondimentosPage() {
     is_active: true,
     display_order: '0',
     max_quantity: '5',
+    weight_grams: '0',
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -73,6 +74,7 @@ export default function CondimentosPage() {
       is_active: formData.is_active,
       display_order: parseInt(formData.display_order),
       max_quantity: parseInt(formData.max_quantity),
+      weight_grams: parseInt(formData.weight_grams) || 0,
     }
 
     if (editingTopping) {
@@ -118,6 +120,7 @@ export default function CondimentosPage() {
       is_active: topping.is_active,
       display_order: topping.display_order.toString(),
       max_quantity: topping.max_quantity?.toString() || '5',
+      weight_grams: topping.weight_grams?.toString() || '0',
     })
     setDialogOpen(true)
   }
@@ -132,6 +135,7 @@ export default function CondimentosPage() {
       is_active: true,
       display_order: '0',
       max_quantity: '5',
+      weight_grams: '0',
     })
     setImageFile(null)
   }
@@ -224,6 +228,19 @@ export default function CondimentosPage() {
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="weight_grams">Peso (gramas)</Label>
+                  <Input
+                    id="weight_grams"
+                    type="number"
+                    value={formData.weight_grams}
+                    onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                    className="bg-muted border-border"
+                    placeholder="Ex: 15"
+                  />
+                </div>
+              </div>
               <div>
                 <Label htmlFor="image">Imagem</Label>
                 <Input
@@ -286,7 +303,7 @@ export default function CondimentosPage() {
             <h3 className="text-xl font-bold text-foreground mb-2">{topping.name}</h3>
             <div className="flex justify-between items-center text-sm mb-2">
               <span className="text-[#FFC300] font-semibold">R$ {topping.price.toFixed(2)}</span>
-              <span className="text-foreground/70">Max: {topping.max_quantity}x</span>
+              <span className="text-foreground/70">Max: {topping.max_quantity}x | {topping.weight_grams}g</span>
             </div>
             <div className="mt-2 flex items-center gap-2">
               <span className={`px-2 py-1 rounded text-xs ${topping.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>

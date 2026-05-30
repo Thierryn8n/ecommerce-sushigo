@@ -30,6 +30,7 @@ export interface Product {
   created_at: string
   updated_at: string
   promotion_price: number | null
+  base_weight_grams: number
   category?: Category
 }
 
@@ -52,6 +53,7 @@ export interface Topping {
   is_active: boolean
   display_order: number
   max_quantity: number | null
+  weight_grams: number
   created_at: string
 }
 
