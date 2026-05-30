@@ -39,10 +39,7 @@ export const metadata: Metadata = {
     description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!',
     images: ['/apple-icon.png'],
   },
-  icons: {
-    icon: '/apple-icon.png',
-    apple: '/apple-icon.png',
-  },
+  // favicon.ico e icon.png na pasta app/ são detectados automaticamente pelo Next.js
 }
 
 export const viewport: Viewport = {
