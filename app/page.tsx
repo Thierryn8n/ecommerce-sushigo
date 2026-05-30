@@ -7,6 +7,7 @@ import { BenefitsSection } from '@/components/home/benefits-section'
 import { CategoriesSection } from '@/components/home/categories-section'
 import { ProductsSection } from '@/components/home/products-section'
 import { CombosSection } from '@/components/home/combos-section'
+import { PwaInstallBanner } from '@/components/pwa-install-banner'
 
 export default function HomePage() {
   return (
@@ -20,6 +21,7 @@ export default function HomePage() {
       <CombosSection />
       <Footer />
       <CartSidebar />
+      <PwaInstallBanner />
     </main>
   )
 }
