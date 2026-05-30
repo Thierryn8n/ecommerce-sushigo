@@ -69,10 +69,10 @@ export default function RootLayout({
               <div className="lg:pb-0 pb-20">
                 {children}
               </div>
+              <RouteAwareNav />
             </CartProvider>
           </ThemeProvider>
         </StoreProvider>
-        <RouteAwareNav />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
