@@ -3,7 +3,23 @@ const { createClient } = require('@supabase/supabase-js');
 
 // Configuracao Supabase - sera preenchido com as credenciais da loja
 const SUPABASE_URL = 'https://vqgryimcbgjcxyguabdj.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ3J5aW1jYmdqY3h5Z3VhYmRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc2OTI3ODYsImV4cCI6MjA2MzI2ODc4Nn0.xAPuMM7elZR5-cDLNWC2b1T4hPSXXn8NZcLCz1X6kKk';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZ3J5aW1jYmdqY3h5Z3VhYmRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0NzgxMjQsImV4cCI6MjA5NTA1NDEyNH0.VMW_C7oDRhWOI4LWwq5wfDjkyp23_es_yGPic1hXiBo';
+
+// Redirecionar console.log para o painel de debug na UI
+const originalLog = console.log;
+const originalError = console.error;
+function logToPanel(type, args) {
+  const panel = document.getElementById('debug-panel');
+  if (!panel) return;
+  const line = document.createElement('div');
+  line.textContent = (type === 'ERR' ? '[E] ' : '') + Array.from(args).map(a => typeof a === 'object' ? JSON.stringify(a).slice(0,200) : String(a)).join(' ');
+  line.style.color = type === 'ERR' ? '#ff6b6b' : '#a0ffa0';
+  panel.appendChild(line);
+  panel.scrollTop = panel.scrollHeight;
+  if (panel.children.length > 50) panel.removeChild(panel.firstChild);
+}
+console.log = function(...args) { originalLog.apply(console, args); logToPanel('LOG', args); };
+console.error = function(...args) { originalError.apply(console, args); logToPanel('ERR', args); };
 
 let supabase = null;
 let realtimeChannel = null;
@@ -15,6 +31,7 @@ let config = {
   soundEnabled: true
 };
 let storeInfo = null;
+let currentUser = null;
 
 // Elementos do DOM
 const elements = {
@@ -30,7 +47,14 @@ const elements = {
   statPending: document.getElementById('stat-pending'),
   statPrinted: document.getElementById('stat-printed'),
   realtimeStatus: document.getElementById('realtime-status'),
-  connectionText: document.getElementById('connection-text')
+  connectionText: document.getElementById('connection-text'),
+  loginOverlay: document.getElementById('login-overlay'),
+  appContainer: document.getElementById('app-container'),
+  loginEmail: document.getElementById('login-email'),
+  loginPassword: document.getElementById('login-password'),
+  loginError: document.getElementById('login-error'),
+  userInfo: document.getElementById('user-info'),
+  userEmail: document.getElementById('user-email')
 };
 
 // Inicializacao
@@ -41,17 +65,99 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function initializeApp() {
-  // Carregar configuracoes salvas
-  ipcRenderer.send('load-config');
+  // Carregar configuracoes salvas (electron-store + localStorage fallback)
+  const localAdminId = localStorage.getItem('adminId');
+  if (localAdminId) {
+    config.adminId = localAdminId;
+  }
   
+  // Criar client Supabase anonimo para login
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { persistSession: true, storage: window.localStorage }
+  });
+  
+  // Verificar se ja tem session
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (sessionData?.session) {
+    currentUser = sessionData.session.user;
+    showApp();
+    ipcRenderer.send('load-config');
+    ipcRenderer.on('config-loaded', (event, savedConfig) => {
+      config = { ...config, ...savedConfig };
+      const localAdminId = localStorage.getItem('adminId');
+      if (localAdminId) config.adminId = localAdminId;
+      applyConfig();
+      connectToSupabase();
+    });
+    return;
+  }
+  
+  // Nao logado: mostrar tela de login
+  showLogin();
+  
+  ipcRenderer.send('load-config');
   ipcRenderer.on('config-loaded', (event, savedConfig) => {
     config = { ...config, ...savedConfig };
+    const localAdminId = localStorage.getItem('adminId');
+    if (localAdminId) config.adminId = localAdminId;
     applyConfig();
+  });
+}
+
+function showLogin() {
+  elements.loginOverlay.style.display = 'flex';
+  elements.appContainer.style.display = 'none';
+}
+
+function showApp() {
+  elements.loginOverlay.style.display = 'none';
+  elements.appContainer.style.display = 'flex';
+  if (currentUser) {
+    elements.userEmail.textContent = currentUser.email;
+    elements.userInfo.style.display = 'block';
+  }
+}
+
+async function loginAdmin() {
+  const email = elements.loginEmail.value.trim();
+  const password = elements.loginPassword.value;
+  elements.loginError.textContent = '';
+  
+  if (!email || !password) {
+    elements.loginError.textContent = 'Preencha email e senha';
+    return;
+  }
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
     
+    currentUser = data.user;
+    showApp();
+    
+    // Continuar com configuracoes e conexao
+    applyConfig();
     if (config.adminId) {
       connectToSupabase();
+    } else {
+      showNotification('Informe o ID do Admin nas configuracoes', 'warning');
     }
-  });
+  } catch (error) {
+    console.error('Erro no login:', error);
+    elements.loginError.textContent = error.message || 'Erro ao fazer login';
+  }
+}
+
+async function logoutAdmin() {
+  await supabase.auth.signOut();
+  currentUser = null;
+  orders = [];
+  renderOrders('all');
+  if (realtimeChannel) {
+    supabase.removeChannel(realtimeChannel);
+    realtimeChannel = null;
+  }
+  showLogin();
 }
 
 function applyConfig() {
@@ -92,6 +198,10 @@ function setupEventListeners() {
     });
   });
   
+  // Login: Enter nos campos
+  elements.loginEmail?.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginAdmin(); });
+  elements.loginPassword?.addEventListener('keypress', (e) => { if (e.key === 'Enter') loginAdmin(); });
+
   // IPC listeners
   ipcRenderer.on('print-result', (event, result) => {
     if (result.success) {
@@ -137,16 +247,51 @@ async function connectToSupabase() {
     return;
   }
   
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
-  // Buscar informacoes da loja pelo admin
-  await loadStoreInfo();
-  
-  // Carregar pedidos existentes
-  await loadOrders();
-  
-  // Configurar realtime
-  setupRealtime();
+  try {
+    console.log('[Desktop] Conectando ao Supabase... URL:', SUPABASE_URL);
+    // Ja temos o client com session autenticada do login
+    if (!supabase) {
+      supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: { persistSession: true, storage: window.localStorage }
+      });
+    }
+    
+    // Testar conexao com uma query simples primeiro
+    const { data: testData, error: testError } = await supabase
+      .from('orders')
+      .select('id', { count: 'exact', head: true })
+      .limit(0);
+    
+    if (testError) {
+      console.error('[Desktop] Erro no teste de conexao:', testError);
+      throw new Error(testError.message || 'Erro ao conectar ao Supabase');
+    }
+    
+    console.log('[Desktop] Conexao OK. Teste:', testData);
+    
+    // Buscar informacoes da loja pelo admin
+    await loadStoreInfo();
+    
+    // Carregar pedidos existentes
+    await loadOrders();
+    
+    // Configurar realtime
+    setupRealtime();
+    
+    updateConnectionStatus(true);
+  } catch (error) {
+    console.error('[Desktop] Erro de conexao:', error);
+    showNotification('Erro de conexao: ' + error.message, 'error');
+    updateConnectionStatus(false);
+    
+    // Retry automatico em 10 segundos
+    setTimeout(() => {
+      if (config.adminId) {
+        console.log('[Desktop] Tentando reconectar...');
+        connectToSupabase();
+      }
+    }, 10000);
+  }
 }
 
 async function loadStoreInfo() {
@@ -196,45 +341,78 @@ async function loadStoreInfo() {
 
 async function loadOrders() {
   try {
-    const storeId = storeInfo?.id || config.adminId;
-    
-    // Buscar pedidos de hoje
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const { data, error } = await supabase
+    // Buscar pedidos
+    const { data: ordersData, error: ordersError } = await supabase
       .from('orders')
-      .select(`
-        *,
-        order_items (
-          *,
-          products (name, price),
-          order_item_additions (
-            *,
-            additions (name, price)
-          )
-        )
-      `)
-      .eq('store_id', storeId)
-      .gte('created_at', today.toISOString())
-      .order('created_at', { ascending: false });
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
     
-    if (error) throw error;
+    if (ordersError) {
+      console.error('[Desktop] Erro ao buscar pedidos:', ordersError);
+      throw ordersError;
+    }
     
-    orders = data || [];
+    if (!ordersData || ordersData.length === 0) {
+      showNotification('Nenhum pedido encontrado', 'warning');
+      orders = [];
+      renderOrders('all');
+      updateStats();
+      return;
+    }
+    
+    // Buscar order_items de todos os pedidos
+    const orderIds = ordersData.map(o => o.id);
+    console.log('[Desktop] Buscando itens para pedidos:', orderIds);
+    
+    const { data: itemsData, error: itemsError } = await supabase
+      .from('order_items')
+      .select('*')
+      .in('order_id', orderIds);
+    
+    console.log('[Desktop] Itens retornados:', itemsData?.length || 0, itemsData);
+    if (itemsError) {
+      console.error('[Desktop] Erro ao buscar itens:', itemsError);
+    }
+    
+    // Buscar order_item_toppings
+    const itemIds = (itemsData || []).map(i => i.id);
+    console.log('[Desktop] Item IDs:', itemIds);
+    let toppingsData = [];
+    if (itemIds.length > 0) {
+      const { data: tops, error: topsError } = await supabase
+        .from('order_item_toppings')
+        .select('*')
+        .in('order_item_id', itemIds);
+      toppingsData = tops || [];
+      console.log('[Desktop] Toppings retornados:', toppingsData.length, topsError);
+    }
+    
+    // Juntar tudo
+    orders = ordersData.map(order => {
+      const orderItems = (itemsData || []).filter(i => i.order_id === order.id);
+      return {
+        ...order,
+        order_items: orderItems.map(item => ({
+          ...item,
+          order_item_toppings: toppingsData.filter(t => t.order_item_id === item.id)
+        }))
+      };
+    });
+    
+    console.log('[Desktop] Pedidos carregados:', orders.length);
+    console.log('[Desktop] Primeiro pedido itens:', orders[0]?.order_items?.length, orders[0]?.order_items);
     renderOrders('all');
     updateStats();
-    
     updateConnectionStatus(true);
   } catch (error) {
     console.error('Erro ao carregar pedidos:', error);
+    showNotification('Erro ao carregar pedidos: ' + error.message, 'error');
     updateConnectionStatus(false);
   }
 }
 
 function setupRealtime() {
-  const storeId = storeInfo?.id || config.adminId;
-  
   // Cancelar canal anterior se existir
   if (realtimeChannel) {
     supabase.removeChannel(realtimeChannel);
@@ -247,49 +425,63 @@ function setupRealtime() {
       {
         event: 'INSERT',
         schema: 'public',
-        table: 'orders',
-        filter: `store_id=eq.${storeId}`
+        table: 'orders'
       },
       async (payload) => {
         console.log('Novo pedido recebido:', payload);
         
-        // Buscar pedido completo com itens
-        const { data: fullOrder } = await supabase
+        // Buscar pedido
+        const { data: orderData } = await supabase
           .from('orders')
-          .select(`
-            *,
-            order_items (
-              *,
-              products (name, price),
-              order_item_additions (
-                *,
-                additions (name, price)
-              )
-            )
-          `)
+          .select('*')
           .eq('id', payload.new.id)
           .single();
         
-        if (fullOrder) {
-          orders.unshift(fullOrder);
-          renderOrders(getCurrentFilter());
-          updateStats();
-          
-          // Notificacao
-          ipcRenderer.send('new-order-notification', {
-            order_number: fullOrder.order_number || fullOrder.id.slice(-6),
-            customer_name: fullOrder.customer_name || 'Cliente'
-          });
-          
-          // Som de notificacao
-          if (config.soundEnabled) {
-            playNotificationSound();
-          }
-          
-          // Impressao automatica
-          if (config.autoPrint && config.printerName) {
-            printOrder(fullOrder);
-          }
+        if (!orderData) return;
+        
+        // Buscar itens do pedido
+        const { data: itemsData } = await supabase
+          .from('order_items')
+          .select('*')
+          .eq('order_id', orderData.id);
+        
+        // Buscar toppings
+        const itemIds = (itemsData || []).map(i => i.id);
+        let toppingsData = [];
+        if (itemIds.length > 0) {
+          const { data: tops } = await supabase
+            .from('order_item_toppings')
+            .select('*')
+            .in('order_item_id', itemIds);
+          toppingsData = tops || [];
+        }
+        
+        const fullOrder = {
+          ...orderData,
+          order_items: (itemsData || []).map(item => ({
+            ...item,
+            order_item_toppings: toppingsData.filter(t => t.order_item_id === item.id)
+          }))
+        };
+        
+        orders.unshift(fullOrder);
+        renderOrders(getCurrentFilter());
+        updateStats();
+        
+        // Notificacao
+        ipcRenderer.send('new-order-notification', {
+          order_number: fullOrder.order_number || fullOrder.id.slice(-6),
+          customer_name: fullOrder.customer_name || 'Cliente'
+        });
+        
+        // Som de notificacao
+        if (config.soundEnabled) {
+          playNotificationSound();
+        }
+        
+        // Impressao automatica
+        if (config.autoPrint && config.printerName) {
+          printOrder(fullOrder);
         }
       }
     )
@@ -298,8 +490,7 @@ function setupRealtime() {
       {
         event: 'UPDATE',
         schema: 'public',
-        table: 'orders',
-        filter: `store_id=eq.${storeId}`
+        table: 'orders'
       },
       (payload) => {
         const index = orders.findIndex(o => o.id === payload.new.id);
@@ -356,7 +547,7 @@ function renderOrders(filter = 'all') {
           <div class="order-customer">${order.customer_name || 'Cliente'}</div>
           <div class="order-details">
             ${itemsCount} ${itemsCount === 1 ? 'item' : 'itens'} | 
-            ${order.order_type === 'delivery' ? 'Entrega' : 'Retirada'}
+            ${order.delivery_address && order.delivery_address !== 'Retirada na loja' ? 'Entrega' : 'Retirada'}
             ${order.payment_method ? ' | ' + order.payment_method : ''}
           </div>
         </div>
@@ -420,14 +611,37 @@ function printOrder(order) {
     ...order,
     store_name: storeInfo?.name || 'Acai da Praia',
     store_logo: storeInfo?.logo_url || '',
-    items: (order.order_items || []).map(item => ({
-      name: item.products?.name || item.product_name || 'Item',
-      quantity: item.quantity || 1,
-      price: item.unit_price || item.products?.price || 0,
-      additions: (item.order_item_additions || []).map(add => ({
-        name: add.additions?.name || add.addition_name || ''
-      }))
-    }))
+    items: (order.order_items || []).map(item => {
+      // Toppings podem vir da tabela relacional (order_item_toppings) ou do JSONB (toppings)
+      const relToppings = (item.order_item_toppings || []).map(top => ({
+        name: top.topping_name || '',
+        price: top.price || 0,
+        quantity: top.quantity || 1
+      }));
+      const jsonToppings = (item.toppings || []).map(top => ({
+        name: top.name || '',
+        price: top.price || 0,
+        quantity: top.quantity || 1
+      }));
+      const allToppings = relToppings.length > 0 ? relToppings : jsonToppings;
+
+      // Sauces vêm do JSONB
+      const sauces = (item.sauces || []).map(s => ({
+        name: s.name || '',
+        price: s.price || 0
+      }));
+
+      return {
+        name: item.product_name || 'Item',
+        quantity: item.quantity || 1,
+        unit_price: item.unit_price || 0,
+        total_price: item.total_price || item.unit_price * item.quantity || 0,
+        size_name: item.size_name || '',
+        notes: item.notes || '',
+        toppings: allToppings,
+        sauces: sauces
+      };
+    })
   };
   
   ipcRenderer.send('print-order', {
@@ -483,6 +697,13 @@ function saveConfig() {
   config.printerName = elements.printerSelect.value;
   config.autoPrint = elements.autoPrintToggle.classList.contains('active');
   config.soundEnabled = elements.soundToggle.classList.contains('active');
+  
+  // Salvar adminId no localStorage tambem
+  if (config.adminId) {
+    localStorage.setItem('adminId', config.adminId);
+  } else {
+    localStorage.removeItem('adminId');
+  }
   
   ipcRenderer.send('save-config', config);
   

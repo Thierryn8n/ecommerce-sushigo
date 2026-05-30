@@ -544,12 +544,124 @@
       gap: 8px;
     }
 
+    /* Debug panel */
+    .debug-panel {
+      margin-top: 12px;
+      padding: 10px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 8px;
+      font-family: 'Consolas', monospace;
+      font-size: 10px;
+      color: #a0ffa0;
+      max-height: 200px;
+      overflow-y: auto;
+      word-break: break-all;
+    }
+    .debug-panel div {
+      margin-bottom: 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding-bottom: 2px;
+    }
+
     .connection-status.connected {
       color: var(--accent-green);
     }
 
     .connection-status.disconnected {
       color: var(--accent-red);
+    }
+
+    /* Login overlay */
+    .login-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .login-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      width: 360px;
+      text-align: center;
+    }
+    .login-logo {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent-purple);
+      margin-bottom: 8px;
+    }
+    .login-title {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .login-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 14px;
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .login-input:focus {
+      border-color: var(--accent-purple);
+    }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--accent-purple), #6b21a8);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .login-btn:hover {
+      opacity: 0.9;
+    }
+    .login-error {
+      color: var(--accent-red);
+      font-size: 12px;
+      margin-top: 10px;
+      min-height: 16px;
+    }
+
+    /* User info sidebar */
+    .user-info {
+      padding: 12px;
+      background: rgba(139, 47, 201, 0.15);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .user-email {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+    .logout-btn {
+      padding: 6px 16px;
+      background: transparent;
+      border: 1px solid var(--accent-red);
+      border-radius: 6px;
+      color: var(--accent-red);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      background: var(--accent-red);
+      color: white;
     }
   </style>
 </head>
@@ -579,7 +691,21 @@
     </div>
   </div>
 
-  <div class="app-container">
+  <!-- Tela de Login -->
+  <div class="login-overlay" id="login-overlay">
+    <div class="login-box">
+      <div class="login-logo">Açaí da Praia</div>
+      <div class="login-title">Login do Administrador</div>
+      <div class="login-form">
+        <input type="email" class="login-input" id="login-email" placeholder="Email" value="">
+        <input type="password" class="login-input" id="login-password" placeholder="Senha">
+        <button class="login-btn" onclick="loginAdmin()">Entrar</button>
+        <div class="login-error" id="login-error"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container" id="app-container" style="display:none">
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="store-info">
@@ -589,6 +715,11 @@
           <span class="status-dot"></span>
           <span id="connection-text">Conectado</span>
         </div>
+      </div>
+
+      <div class="user-info" id="user-info" style="display:none">
+        <div class="user-email" id="user-email"></div>
+        <button class="logout-btn" onclick="logoutAdmin()">Sair</button>
       </div>
 
       <div class="config-section">
@@ -618,6 +749,9 @@
       </div>
 
       <button class="save-btn" onclick="saveConfig()">Salvar Configuracoes</button>
+
+      <div class="config-title" style="margin-top:16px;font-size:10px;opacity:0.6">Debug Log</div>
+      <div class="debug-panel" id="debug-panel"></div>
     </aside>
 
     <!-- Conteudo principal -->
