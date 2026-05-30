@@ -114,12 +114,12 @@ export default function AplicativoPage() {
                   }}
                 >
                   <Download className="w-5 h-5" />
-                  Baixar Codigo Fonte (.zip)
+                  Baixar para Windows (.exe)
                 </Button>
               </div>
-              
+
               <p className="text-xs text-muted-foreground mt-4">
-                Baixe o codigo fonte e execute <code className="bg-muted px-1 py-0.5 rounded">npm install && npm run build</code> para gerar o .exe
+                Instalador pronto para Windows. Execute e siga as instrucoes na tela.
               </p>
             </div>
             
