@@ -5,6 +5,7 @@ import './globals.css'
 import { CartProvider } from '@/contexts/cart-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { StoreProvider } from '@/lib/store-context'
+import { RouteAwareNav } from '@/components/route-aware-nav'
 
 const poppins = Poppins({ 
   subsets: ["latin"],
@@ -65,10 +66,13 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <CartProvider>
-              {children}
+              <div className="lg:pb-0 pb-20">
+                {children}
+              </div>
             </CartProvider>
           </ThemeProvider>
         </StoreProvider>
+        <RouteAwareNav />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

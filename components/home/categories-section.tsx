@@ -151,9 +151,9 @@ export function CategoriesSection() {
                           <Image
                             src={category.image_url || 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png'}
                             alt={category.name}
-                            width={80}
-                            height={80}
-                            className="object-contain w-12 h-12 sm:w-20 sm:h-20 group-hover:scale-110 transition-transform"
+                            width={120}
+                            height={120}
+                            className="object-contain w-16 h-16 sm:w-24 sm:h-24 group-hover:scale-110 transition-transform"
                           />
                         </div>
                         <div 

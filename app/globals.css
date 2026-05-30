@@ -127,8 +127,13 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
