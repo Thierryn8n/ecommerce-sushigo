@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Edit, Trash2, Image as ImageIcon, Monitor, Smartphone, Upload, X, Check, Loader2, AlertCircle } from 'lucide-react'
+import { Plus, Edit, Trash2, Image as ImageIcon, Monitor, Smartphone, Upload, X, Check, Loader2, AlertCircle, Palette } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,6 +26,7 @@ export default function BannersPage() {
     mobile_image_url: '',
     link_url: '',
     button_text: '',
+    color: '#8B5CF6',
     display_order: '0',
     is_active: true,
     start_date: '',
@@ -123,6 +124,7 @@ export default function BannersPage() {
       mobile_image_url: formData.mobile_image_url || null,
       link_url: formData.link_url || null,
       button_text: formData.button_text || null,
+      color: formData.color,
       display_order: parseInt(formData.display_order),
       is_active: formData.is_active,
       start_date: formData.start_date || null,
@@ -161,6 +163,7 @@ export default function BannersPage() {
       mobile_image_url: banner.mobile_image_url || '',
       link_url: banner.link_url || '',
       button_text: banner.button_text || '',
+      color: banner.color || '#8B5CF6',
       display_order: banner.display_order.toString(),
       is_active: banner.is_active,
       start_date: banner.start_date ? banner.start_date.split('T')[0] : '',
@@ -179,6 +182,7 @@ export default function BannersPage() {
       mobile_image_url: '',
       link_url: '',
       button_text: '',
+      color: '#8B5CF6',
       display_order: '0',
       is_active: true,
       start_date: '',
@@ -365,6 +369,39 @@ export default function BannersPage() {
                     </div>
                   </div>
 
+                  {/* Cor de Fundo */}
+                  <div>
+                    <Label className="flex items-center gap-2">
+                      <Palette className="w-4 h-4" />
+                      Cor de Fundo
+                    </Label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {[
+                        '#8B5CF6', '#EC4899', '#F59E0B', '#10B981',
+                        '#3B82F6', '#EF4444', '#6366F1', '#14B8A6',
+                        '#F97316', '#84CC16', '#000000', '#1a0a25',
+                      ].map((color) => (
+                        <button
+                          key={color}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, color })}
+                          className={`w-8 h-8 rounded-full transition-all border border-border ${
+                            formData.color === color
+                              ? 'ring-2 ring-offset-2 ring-offset-card ring-primary scale-110'
+                              : 'hover:scale-110'
+                          }`}
+                          style={{ backgroundColor: color }}
+                        />
+                      ))}
+                      <Input
+                        type="color"
+                        value={formData.color}
+                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                        className="w-8 h-8 p-0 border-0 cursor-pointer rounded-full overflow-hidden"
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor="display_order">Ordem</Label>
@@ -417,6 +454,11 @@ export default function BannersPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-card border border-border rounded-2xl overflow-hidden"
                 >
+                  {/* Color Bar */}
+                  <div
+                    className="h-2"
+                    style={{ backgroundColor: banner.color || '#8B5CF6' }}
+                  />
                   {/* Previews PC e Mobile lado a lado */}
                   <div className="grid grid-cols-2 divide-x divide-border">
                     {/* PC */}

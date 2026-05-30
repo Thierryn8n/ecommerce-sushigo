@@ -70,8 +70,8 @@ export function BannersSection() {
               transition={{ duration: 0.5 }}
               className="relative w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[3/1]"
             >
-              {/* Background Image */}
-              {currentBanner.image_url && (
+              {/* Background Image or Color */}
+              {currentBanner.image_url ? (
                 <Image
                   src={currentBanner.image_url}
                   alt={currentBanner.title || 'Banner'}
@@ -79,8 +79,13 @@ export function BannersSection() {
                   className="object-cover"
                   priority
                 />
+              ) : (
+                <div
+                  className="absolute inset-0"
+                  style={{ backgroundColor: currentBanner.color || '#8B5CF6' }}
+                />
               )}
-              
+
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
