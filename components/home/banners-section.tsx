@@ -69,20 +69,16 @@ export function BannersSection() {
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.5 }}
               className="relative w-full aspect-[16/9] sm:aspect-[21/9] md:aspect-[3/1]"
+              style={{ backgroundColor: currentBanner.background_color || undefined }}
             >
-              {/* Background Image or Color */}
-              {currentBanner.image_url ? (
+              {/* Background Image */}
+              {currentBanner.image_url && (
                 <Image
                   src={currentBanner.image_url}
                   alt={currentBanner.title || 'Banner'}
                   fill
                   className="object-cover"
                   priority
-                />
-              ) : (
-                <div
-                  className="absolute inset-0"
-                  style={{ backgroundColor: currentBanner.color || '#8B5CF6' }}
                 />
               )}
 

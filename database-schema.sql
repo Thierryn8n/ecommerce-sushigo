@@ -96,10 +96,8 @@ CREATE TABLE public.banners (
   subtitle character varying(200),
   description text,
   image_url text,
-  mobile_image_url text,
   link_url character varying(500),
   button_text character varying(100),
-  color character varying(7) DEFAULT '#8B5CF6',
   display_order integer DEFAULT 0,
   is_active boolean DEFAULT true,
   start_date timestamp with time zone,
@@ -108,10 +106,10 @@ CREATE TABLE public.banners (
   CONSTRAINT banners_pkey PRIMARY KEY (id)
 );
 
-INSERT INTO public.banners (id, title, subtitle, description, image_url, mobile_image_url, link_url, button_text, color, display_order, is_active, start_date, end_date, created_at) VALUES 
-('05ba22d1-351b-455b-a782-637afc950a51', 'O melhor açaí, com o sabor do paraíso!', 'CANOA QUEBRADA', 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!', NULL, NULL, '/cardapio', 'PEÇA AGORA', '#8B5CF6', 1, true, NULL, NULL, '2026-05-23 00:28:23.302232+00'),
-('24a9a772-c7b4-4719-b544-9d09a4ec2042', 'Combos Especiais', 'ECONOMIZE MAIS', 'Monte seu combo perfeito com preços imperdíveis!', NULL, NULL, '/combos', 'VER COMBOS', '#EC4899', 2, true, NULL, NULL, '2026-05-23 00:28:23.302232+00'),
-('8c899f6b-ffe0-4f9c-8510-494e0cf14ff1', 'Frete Grátis', 'PRIMEIRA COMPRA', 'Use o cupom BEMVINDO10 e ganhe 10% de desconto!', NULL, NULL, '/cardapio', 'APROVEITAR', '#F59E0B', 3, true, NULL, NULL, '2026-05-23 00:28:23.302232+00');
+INSERT INTO public.banners (id, title, subtitle, description, image_url, link_url, button_text, display_order, is_active, start_date, end_date, created_at) VALUES 
+('05ba22d1-351b-455b-a782-637afc950a51', 'O melhor açaí, com o sabor do paraíso!', 'CANOA QUEBRADA', 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!', NULL, '/cardapio', 'PEÇA AGORA', 1, true, NULL, NULL, '2026-05-23 00:28:23.302232+00'),
+('24a9a772-c7b4-4719-b544-9d09a4ec2042', 'Combos Especiais', 'ECONOMIZE MAIS', 'Monte seu combo perfeito com preços imperdíveis!', NULL, '/combos', 'VER COMBOS', 2, true, NULL, NULL, '2026-05-23 00:28:23.302232+00'),
+('8c899f6b-ffe0-4f9c-8510-494e0cf14ff1', 'Frete Grátis', 'PRIMEIRA COMPRA', 'Use o cupom BEMVINDO10 e ganhe 10% de desconto!', NULL, '/cardapio', 'APROVEITAR', 3, true, NULL, NULL, '2026-05-23 00:28:23.302232+00');
 
 -- ============================================
 -- TABELA: bowls

@@ -239,11 +239,11 @@ export interface Banner {
   mobile_image_url: string | null
   link_url: string | null
   button_text: string | null
-  color: string | null
   display_order: number
   is_active: boolean
   start_date: string | null
   end_date: string | null
+  background_color: string | null
   created_at: string
 }
 
