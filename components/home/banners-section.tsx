@@ -96,7 +96,7 @@ export function BannersSection() {
                   <motion.div
                     animate={{ y: [0, -12, 0] }}
                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-52 md:h-52 lg:w-64 lg:h-64"
+                    className="relative w-48 h-48 sm:w-60 sm:h-60 md:w-80 md:h-80 lg:w-96 lg:h-96"
                   >
                     <Image
                       src={currentBanner.floating_image_url}
