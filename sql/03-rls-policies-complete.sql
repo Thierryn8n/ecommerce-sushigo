@@ -11,7 +11,7 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE combos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE product_addons ENABLE ROW LEVEL SECURITY;
-ALTER TABLE promotions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE addresses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
@@ -50,9 +50,9 @@ DROP POLICY IF EXISTS "addons_public_read" ON product_addons;
 CREATE POLICY "addons_public_read" ON product_addons
   FOR SELECT USING (is_active = true);
 
--- Promotions - Leitura publica (ativas e dentro do periodo)
-DROP POLICY IF EXISTS "promotions_public_read" ON promotions;
-CREATE POLICY "promotions_public_read" ON promotions
+-- Coupons - Leitura publica (ativos e dentro do periodo)
+DROP POLICY IF EXISTS "coupons_public_read" ON coupons;
+CREATE POLICY "coupons_public_read" ON coupons
   FOR SELECT USING (
     is_active = true 
     AND (starts_at IS NULL OR starts_at <= NOW()) 
@@ -158,8 +158,8 @@ CREATE POLICY "admin_full_combos" ON combos FOR ALL USING (is_admin());
 DROP POLICY IF EXISTS "admin_full_addons" ON product_addons;
 CREATE POLICY "admin_full_addons" ON product_addons FOR ALL USING (is_admin());
 
-DROP POLICY IF EXISTS "admin_full_promotions" ON promotions;
-CREATE POLICY "admin_full_promotions" ON promotions FOR ALL USING (is_admin());
+DROP POLICY IF EXISTS "admin_full_coupons" ON coupons;
+CREATE POLICY "admin_full_coupons" ON coupons FOR ALL USING (is_admin());
 
 DROP POLICY IF EXISTS "admin_full_users" ON users;
 CREATE POLICY "admin_full_users" ON users FOR ALL USING (is_admin());

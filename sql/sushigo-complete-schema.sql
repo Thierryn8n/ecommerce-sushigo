@@ -282,6 +282,20 @@ CREATE TABLE IF NOT EXISTS app_settings (
 );
 
 -- =====================================================
+-- TABLE 16: admin_users (Administradores)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS admin_users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID UNIQUE NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  role VARCHAR(50) DEFAULT 'admin',
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
 -- INDEXES (para melhor performance)
 -- =====================================================
 CREATE INDEX idx_products_category ON products(category_id);
