@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useToast } from '@/hooks/use-toast'
+import { PixQrCode } from '@/components/pix-qrcode'
 
 interface Order {
   id: string
@@ -41,6 +42,7 @@ export default function AcompanhamentoPedidoPage() {
   const [order, setOrder] = useState<Order | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [pixKey, setPixKey] = useState('')
   const params = useParams()
   const router = useRouter()
   const { toast } = useToast()
@@ -62,6 +64,19 @@ export default function AcompanhamentoPedidoPage() {
       setLoading(false)
     }
   }, [params.id, supabase])
+
+  // Buscar chave PIX
+  useEffect(() => {
+    async function fetchPixKey() {
+      const { data } = await supabase
+        .from('store_settings')
+        .select('value')
+        .eq('key', 'pix_key')
+        .single()
+      if (data?.value) setPixKey(data.value)
+    }
+    fetchPixKey()
+  }, [supabase])
 
   // Realtime subscription
   useEffect(() => {
@@ -220,6 +235,23 @@ export default function AcompanhamentoPedidoPage() {
               </div>
             </div>
           </motion.div>
+
+          {/* QR Code PIX - só aparece quando PIX pendente */}
+          {order.payment_method === 'pix' && order.payment_status === 'pendente' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="mb-6"
+            >
+              <PixQrCode
+                pixKey={pixKey}
+                amount={order.total}
+                orderNumber={order.order_number}
+                description={`Pedido #${order.order_number}`}
+              />
+            </motion.div>
+          )}
 
           {/* Status Timeline */}
           <motion.div

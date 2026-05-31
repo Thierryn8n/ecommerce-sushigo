@@ -40,6 +40,7 @@ export default function AdminConfiguracoes() {
     facebook: '',
     logoUrl: '',
     description: '',
+    pixKey: '',
   })
 
   useEffect(() => {
@@ -74,6 +75,7 @@ export default function AdminConfiguracoes() {
           facebook: settingsObj.facebook || store.facebook_url || '',
           logoUrl: store.logo_url || '',
           description: store.description || '',
+          pixKey: settingsObj.pix_key || '',
         })
       } catch (error) {
         console.error('Erro ao buscar configurações:', error)
@@ -103,6 +105,7 @@ export default function AdminConfiguracoes() {
         { key: 'close_time', value: settings.closeTime, description: 'Horário de fechamento' },
         { key: 'instagram', value: settings.instagram, description: 'Instagram' },
         { key: 'facebook', value: settings.facebook, description: 'Facebook' },
+        { key: 'pix_key', value: settings.pixKey, description: 'Chave PIX para pagamentos' },
       ]
 
       // Salvar cada configuração - usando upsert sem onConflict
@@ -413,6 +416,15 @@ export default function AdminConfiguracoes() {
                         onChange={(e) => setSettings({ ...settings, facebook: e.target.value })}
                         className="bg-muted border-border text-foreground"
                         placeholder="facebook.com/loja"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-foreground/70 text-sm mb-2 block">Chave PIX</label>
+                      <Input
+                        value={settings.pixKey}
+                        onChange={(e) => setSettings({ ...settings, pixKey: e.target.value })}
+                        className="bg-muted border-border text-foreground"
+                        placeholder="CPF, CNPJ, telefone ou chave aleatória"
                       />
                     </div>
                   </div>

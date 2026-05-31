@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { useCart } from '@/contexts/cart-context'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import { PixQrCode } from '@/components/pix-qrcode'
 
 const DELIVERY_FEE = 5.00
 
@@ -40,8 +41,22 @@ export default function CheckoutPage() {
     name: '',
     phone: '',
   })
+  const [pixKey, setPixKey] = useState('')
 
   const finalTotal = deliveryType === 'delivery' ? totalPrice + DELIVERY_FEE : totalPrice
+
+  // Buscar chave PIX das configurações
+  useEffect(() => {
+    async function fetchPixKey() {
+      const { data } = await supabase
+        .from('store_settings')
+        .select('value')
+        .eq('key', 'pix_key')
+        .single()
+      if (data?.value) setPixKey(data.value)
+    }
+    fetchPixKey()
+  }, [supabase])
 
   // Gerar mensagem do WhatsApp
   const getWhatsAppMessage = useCallback(() => {
@@ -551,6 +566,15 @@ export default function CheckoutPage() {
                     <span className="text-[#00BFFF]">R$ {finalTotal.toFixed(2).replace('.', ',')}</span>
                   </div>
                 </div>
+
+                {/* QR Code PIX - só aparece quando PIX selecionado */}
+                {paymentMethod === 'pix' && (
+                  <PixQrCode
+                    pixKey={pixKey}
+                    amount={finalTotal}
+                    description="Pedido SushiGo"
+                  />
+                )}
 
                 <div className="mt-4 sm:mt-6 space-y-3">
                   {/* Botão Principal: Finalizar Pedido */}
