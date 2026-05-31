@@ -609,7 +609,7 @@ function printOrder(order) {
   // Formatar itens para impressao
   const formattedOrder = {
     ...order,
-    store_name: storeInfo?.name || 'Acai da Praia',
+    store_name: storeInfo?.name || 'SushiGo',
     store_logo: storeInfo?.logo_url || '',
     items: (order.order_items || []).map(item => {
       // Toppings podem vir da tabela relacional (order_item_toppings) ou do JSONB (toppings)
@@ -638,8 +638,8 @@ function printOrder(order) {
         total_price: item.total_price || item.unit_price * item.quantity || 0,
         size_name: item.size_name || '',
         notes: item.notes || '',
-        weight_grams: item.weight_grams || 0,
-        acai_type: item.acai_type || '',
+        quantity_pieces: item.quantity_pieces || 0,
+        selected_molhos: item.selected_molhos || [],
         toppings: allToppings,
         sauces: sauces
       };

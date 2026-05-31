@@ -218,7 +218,7 @@ function generateReceiptHtml(order) {
     <body>
       <div class="header">
         ${order.store_logo ? `<img src="${order.store_logo}" class="logo" />` : ''}
-        <div class="title">${order.store_name || 'ACAI DA PRAIA'}</div>
+        <div class="title">${order.store_name || 'SUSHI GO'}</div>
       </div>
 
       <div class="divider"></div>
