@@ -55,6 +55,7 @@ interface AcaiType {
   price_addition: number
   weight_addition: number
   price_per_kg: number
+  image_url: string | null
 }
 
 interface Topping {
@@ -761,6 +762,17 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 : 'border-border hover:border-[#8A2BE2]/50'
                             }`}
                           >
+                            {type.image_url && (
+                              <div className="w-12 h-12 sm:w-16 sm:h-16 mb-2 rounded-lg overflow-hidden bg-muted">
+                                <Image
+                                  src={type.image_url}
+                                  alt={type.name}
+                                  width={64}
+                                  height={64}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
                             <p className="text-foreground font-semibold text-xs sm:text-sm">{type.name}</p>
                             {type.description && (
                               <p className="text-muted-foreground/70 text-[10px] sm:text-xs mt-0.5 line-clamp-1 sm:line-clamp-2">{type.description}</p>
