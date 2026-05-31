@@ -25,17 +25,21 @@ export function CartSidebar() {
   const handleWhatsApp = () => {
     const message = items.map(item => {
       let text = `*${item.name}* (${item.quantity}x)\n`
-      if (item.variant) text += `  Variação: ${item.variant.variant_name}\n`
-      if (item.quantityPieces && item.quantityPieces > 0) text += `  Peças: ${item.quantityPieces}\n`
-      if (item.selectedMolhos && item.selectedMolhos.length > 0) {
-        text += `  Molhos: ${item.selectedMolhos.join(', ')}\n`
+      if (item.size) text += `  Tamanho: ${item.size}\n`
+      if (item.acaiType) text += `  Tipo: ${item.acaiType}\n`
+      if (item.toppings.length > 0) {
+        text += `  Adicionais: ${item.toppings.map(t => t.name).join(', ')}\n`
+      }
+      if (item.sauces.length > 0) {
+        text += `  Coberturas: ${item.sauces.map(s => s.name).join(', ')}\n`
       }
       if (item.notes) text += `  Obs: ${item.notes}\n`
+      text += `  Valor: R$ ${(item.totalPrice * item.quantity).toFixed(2).replace('.', ',')}`
       return text
     }).join('\n\n')
 
     const total = `\n\n*TOTAL: R$ ${totalPrice.toFixed(2).replace('.', ',')}*`
-    const fullMessage = encodeURIComponent(`� *PEDIDO SUSHIGO*\n\n${message}${total}`)
+    const fullMessage = encodeURIComponent(`🍇 *PEDIDO AÇAÍ DA PRAIA*\n\n${message}${total}`)
     window.open(`https://wa.me/5588999999999?text=${fullMessage}`, '_blank')
   }
 
@@ -63,7 +67,7 @@ export function CartSidebar() {
             {/* Header */}
             <div className="p-4 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <ShoppingBag className="w-6 h-6 text-[#D62828]" />
+                <ShoppingBag className="w-6 h-6 text-[#FF8C00]" />
                 <h2 className="text-xl font-bold text-foreground">Meu Pedido</h2>
               </div>
               <button
@@ -101,19 +105,17 @@ export function CartSidebar() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <h3 className="text-foreground font-semibold truncate">{item.name}</h3>
-                          {item.variant && (
-                            <p className="text-muted-foreground text-xs">{item.variant.variant_name}</p>
+                          {item.size && (
+                            <p className="text-muted-foreground text-xs">{item.size}</p>
                           )}
-                          {item.selectedMolhos && item.selectedMolhos.length > 0 && (
+                          {item.toppings.length > 0 && (
                             <p className="text-muted-foreground/70 text-xs truncate">
-                              + {item.selectedMolhos.join(', ')}
+                              + {item.toppings.map(t => t.name).join(', ')}
                             </p>
                           )}
-                          {item.quantityPieces && item.quantityPieces > 0 && (
-                            <p className="text-muted-foreground/70 text-xs">
-                              {item.quantityPieces} peças
-                            </p>
-                          )}
+                          <p className="text-[#00BFFF] font-bold mt-1">
+                            R$ {formatPrice(item.totalPrice)}
+                          </p>
                         </div>
                       </div>
 
@@ -167,7 +169,7 @@ export function CartSidebar() {
                     WhatsApp
                   </Button>
                   <Link href="/checkout" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full bg-[#D62828] hover:bg-[#C1121F] text-white font-bold py-3 rounded-full">
+                    <Button className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full">
                       Finalizar
                     </Button>
                   </Link>

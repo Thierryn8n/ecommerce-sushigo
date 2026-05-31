@@ -141,12 +141,12 @@ export default function CuponsPage() {
       <AdminSidebar />
       <div className="lg:ml-56">
         <AdminHeader />
-        <main className="p-3 sm:p-4 md:p-6 lg:p-8 pb-20 lg:pb-8">
+        <main className="p-4 md:p-6 lg:p-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Cupons</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Gerenciar Cupons</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#D62828] hover:bg-[#FFC300]">
+            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#FF8C00] hover:bg-[#FFC300]">
               <Plus className="w-4 h-4 mr-2" />
               Novo Cupom
             </Button>
@@ -262,7 +262,7 @@ export default function CuponsPage() {
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={uploading} className="bg-[#D62828] hover:bg-[#FFC300]">
+                <Button type="submit" disabled={uploading} className="bg-[#FF8C00] hover:bg-[#FFC300]">
                   {uploading ? 'Salvando...' : 'Salvar'}
                 </Button>
               </div>

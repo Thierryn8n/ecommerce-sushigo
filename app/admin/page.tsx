@@ -194,7 +194,7 @@ export default function AdminDashboard() {
         <AdminSidebar />
         <div className="lg:ml-56">
           <AdminHeader />
-          <main className="p-3 sm:p-6 flex items-center justify-center h-[calc(100vh-4rem)]">
+          <main className="p-6 flex items-center justify-center h-[calc(100vh-4rem)]">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </main>
         </div>
@@ -208,52 +208,52 @@ export default function AdminDashboard() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-3 sm:p-6 pb-20 lg:pb-6">
+        <main className="p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-xl sm:text-2xl font-bold text-foreground mb-4 sm:mb-6">Dashboard</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-6">Dashboard</h1>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {statCards.map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border"
+                  className="bg-card rounded-2xl p-6 border border-border"
                 >
-                  <div className="flex items-center justify-between mb-2 sm:mb-4">
-                    <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-primary/10 flex items-center justify-center">
-                      <stat.icon className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <stat.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <span className="text-muted-foreground text-[10px] sm:text-sm font-medium">{stat.change}</span>
+                    <span className="text-muted-foreground text-sm font-medium">{stat.change}</span>
                   </div>
-                  <p className="text-muted-foreground text-[10px] sm:text-sm mb-0.5 sm:mb-1">{stat.label}</p>
-                  <p className="text-foreground text-base sm:text-2xl font-bold">{stat.value}</p>
+                  <p className="text-muted-foreground text-sm mb-1">{stat.label}</p>
+                  <p className="text-foreground text-2xl font-bold">{stat.value}</p>
                 </motion.div>
               ))}
             </div>
 
-            <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="grid lg:grid-cols-3 gap-6">
               {/* Recent Orders */}
-              <div className="lg:col-span-2 bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border">
-                <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className="text-base sm:text-lg font-bold text-foreground">Pedidos Recentes</h2>
-                  <Link href="/admin/pedidos" className="text-primary text-xs sm:text-sm hover:underline">
+              <div className="lg:col-span-2 bg-card rounded-2xl p-6 border border-border">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-foreground">Pedidos Recentes</h2>
+                  <Link href="/admin/pedidos" className="text-primary text-sm hover:underline">
                     Ver todos
                   </Link>
                 </div>
-                <div className="overflow-x-auto -mx-4 sm:mx-0">
-                  <table className="w-full min-w-[400px]">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
                     <thead>
-                      <tr className="text-muted-foreground text-xs sm:text-sm">
-                        <th className="text-left pb-3 sm:pb-4 pl-4 sm:pl-0">Pedido</th>
-                        <th className="text-left pb-3 sm:pb-4">Cliente</th>
-                        <th className="text-left pb-3 sm:pb-4 hidden sm:table-cell">Total</th>
-                        <th className="text-left pb-3 sm:pb-4 pr-4 sm:pr-0">Status</th>
+                      <tr className="text-muted-foreground text-sm">
+                        <th className="text-left pb-4">Pedido</th>
+                        <th className="text-left pb-4">Cliente</th>
+                        <th className="text-left pb-4 hidden sm:table-cell">Total</th>
+                        <th className="text-left pb-4">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -261,18 +261,18 @@ export default function AdminDashboard() {
                         const status = statusStyles[order.status] || statusStyles['pending']
                         return (
                           <tr key={order.id} className="border-t border-border">
-                            <td className="py-3 sm:py-4 pl-4 sm:pl-0">
-                              <Link href={`/admin/pedidos/${order.id}`} className="text-foreground font-medium hover:text-primary text-sm">
+                            <td className="py-4">
+                              <Link href={`/admin/pedidos/${order.id}`} className="text-foreground font-medium hover:text-primary">
                                 #{order.id.slice(-6)}
                               </Link>
-                              <p className="text-muted-foreground text-[10px] sm:text-xs">
+                              <p className="text-muted-foreground text-xs">
                                 {new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </td>
-                            <td className="py-3 sm:py-4 text-foreground/80 text-xs sm:text-sm">{order.customer_name}</td>
-                            <td className="py-3 sm:py-4 text-foreground font-medium hidden sm:table-cell">{formatCurrency(order.total)}</td>
-                            <td className="py-3 sm:py-4 pr-4 sm:pr-0">
-                              <span className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium ${status.bg} ${status.text}`}>
+                            <td className="py-4 text-foreground/80">{order.customer_name}</td>
+                            <td className="py-4 text-foreground font-medium hidden sm:table-cell">{formatCurrency(order.total)}</td>
+                            <td className="py-4">
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${status.bg} ${status.text}`}>
                                 {status.label}
                               </span>
                             </td>
@@ -280,7 +280,7 @@ export default function AdminDashboard() {
                         )
                       }) : (
                         <tr>
-                          <td colSpan={4} className="py-8 text-center text-muted-foreground text-sm">
+                          <td colSpan={4} className="py-8 text-center text-muted-foreground">
                             Nenhum pedido encontrado
                           </td>
                         </tr>
@@ -291,22 +291,22 @@ export default function AdminDashboard() {
               </div>
 
               {/* Top Products */}
-              <div className="bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-border">
-                <h2 className="text-base sm:text-lg font-bold text-foreground mb-4 sm:mb-6">Mais Vendidos</h2>
-                <div className="space-y-3 sm:space-y-4">
+              <div className="bg-card rounded-2xl p-6 border border-border">
+                <h2 className="text-lg font-bold text-foreground mb-6">Mais Vendidos</h2>
+                <div className="space-y-4">
                   {topProducts.length > 0 ? topProducts.map((product, index) => (
-                    <div key={product.name} className="flex items-center gap-3 sm:gap-4">
-                      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs sm:text-sm">
+                    <div key={product.name} className="flex items-center gap-4">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-foreground font-medium truncate text-sm">{product.name}</p>
-                        <p className="text-muted-foreground text-xs">{product.total_sales} vendas</p>
+                        <p className="text-foreground font-medium truncate">{product.name}</p>
+                        <p className="text-muted-foreground text-sm">{product.total_sales} vendas</p>
                       </div>
-                      <p className="text-primary font-semibold text-xs sm:text-sm">{formatCurrency(product.total_revenue)}</p>
+                      <p className="text-primary font-semibold">{formatCurrency(product.total_revenue)}</p>
                     </div>
                   )) : (
-                    <p className="text-muted-foreground text-center py-4 text-sm">Nenhum dado disponivel</p>
+                    <p className="text-muted-foreground text-center py-4">Nenhum dado disponível</p>
                   )}
                 </div>
               </div>
@@ -314,40 +314,40 @@ export default function AdminDashboard() {
 
             {/* Quick Stats */}
             {quickStats && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mt-4 sm:mt-6">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
                 <Link href="/admin/pedidos/kanban">
-                  <div className="bg-card rounded-xl p-3 sm:p-4 border border-border flex items-center gap-2 sm:gap-3 hover:border-yellow-500/50 transition-colors">
-                    <Clock className="w-6 h-6 sm:w-8 sm:h-8 text-yellow-500" />
+                  <div className="bg-card rounded-xl p-4 border border-border flex items-center gap-3 hover:border-yellow-500/50 transition-colors">
+                    <Clock className="w-8 h-8 text-yellow-500" />
                     <div>
-                      <p className="text-xl sm:text-2xl font-bold text-foreground">{quickStats.pending}</p>
-                      <p className="text-muted-foreground text-[10px] sm:text-xs">Pendentes</p>
+                      <p className="text-2xl font-bold text-foreground">{quickStats.pending}</p>
+                      <p className="text-muted-foreground text-xs">Pendentes</p>
                     </div>
                   </div>
                 </Link>
                 <Link href="/admin/pedidos/kanban">
-                  <div className="bg-card rounded-xl p-3 sm:p-4 border border-border flex items-center gap-2 sm:gap-3 hover:border-blue-500/50 transition-colors">
-                    <Package className="w-6 h-6 sm:w-8 sm:h-8 text-blue-500" />
+                  <div className="bg-card rounded-xl p-4 border border-border flex items-center gap-3 hover:border-blue-500/50 transition-colors">
+                    <Package className="w-8 h-8 text-blue-500" />
                     <div>
-                      <p className="text-xl sm:text-2xl font-bold text-foreground">{quickStats.preparing}</p>
-                      <p className="text-muted-foreground text-[10px] sm:text-xs">Preparando</p>
+                      <p className="text-2xl font-bold text-foreground">{quickStats.preparing}</p>
+                      <p className="text-muted-foreground text-xs">Preparando</p>
                     </div>
                   </div>
                 </Link>
                 <Link href="/admin/pedidos/kanban">
-                  <div className="bg-card rounded-xl p-3 sm:p-4 border border-border flex items-center gap-2 sm:gap-3 hover:border-green-500/50 transition-colors">
-                    <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-500" />
+                  <div className="bg-card rounded-xl p-4 border border-border flex items-center gap-3 hover:border-green-500/50 transition-colors">
+                    <CheckCircle className="w-8 h-8 text-green-500" />
                     <div>
-                      <p className="text-xl sm:text-2xl font-bold text-foreground">{quickStats.delivered}</p>
-                      <p className="text-muted-foreground text-[10px] sm:text-xs">Entregues</p>
+                      <p className="text-2xl font-bold text-foreground">{quickStats.delivered}</p>
+                      <p className="text-muted-foreground text-xs">Entregues (Hoje)</p>
                     </div>
                   </div>
                 </Link>
                 <Link href="/admin/pedidos/kanban">
-                  <div className="bg-card rounded-xl p-3 sm:p-4 border border-border flex items-center gap-2 sm:gap-3 hover:border-red-500/50 transition-colors">
-                    <XCircle className="w-6 h-6 sm:w-8 sm:h-8 text-red-500" />
+                  <div className="bg-card rounded-xl p-4 border border-border flex items-center gap-3 hover:border-red-500/50 transition-colors">
+                    <XCircle className="w-8 h-8 text-red-500" />
                     <div>
-                      <p className="text-xl sm:text-2xl font-bold text-foreground">{quickStats.cancelled}</p>
-                      <p className="text-muted-foreground text-[10px] sm:text-xs">Cancelados</p>
+                      <p className="text-2xl font-bold text-foreground">{quickStats.cancelled}</p>
+                      <p className="text-muted-foreground text-xs">Cancelados</p>
                     </div>
                   </div>
                 </Link>

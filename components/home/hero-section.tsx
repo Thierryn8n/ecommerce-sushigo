@@ -1,255 +1,169 @@
 "use client"
 
 import { motion } from 'framer-motion'
-import { ArrowRight, UtensilsCrossed } from 'lucide-react'
+import { Phone, Truck, Fish, Award } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useStore } from '@/lib/store-context'
 
 interface HeroSettings {
-  background_image: string
-  logo_image: string
   title_line1: string
   title_line2: string
   subtitle: string
-  highlight_text: string
   description: string
   cta_primary: string
   cta_secondary: string
-  cta_primary_link: string
-  cta_secondary_link: string
-  location_line1: string
-  location_line2: string
 }
 
 export function HeroSection() {
+  const { store } = useStore()
+  const [currentSlide, setCurrentSlide] = useState(0)
   const [settings, setSettings] = useState<HeroSettings>({
-    background_image: '',
-    logo_image: '',
-    title_line1: '',
-    title_line2: '',
-    subtitle: '',
-    highlight_text: '',
-    description: '',
-    cta_primary: '',
-    cta_secondary: '',
-    cta_primary_link: '',
-    cta_secondary_link: '',
-    location_line1: '',
-    location_line2: '',
+    title_line1: 'O MELHOR SUSHI,',
+    title_line2: 'ONDE VOCE ESTIVER.',
+    subtitle: 'Peixes selecionados, ingredientes frescos',
+    description: 'e o verdadeiro sabor da culinaria japonesa na sua casa.',
+    cta_primary: 'PEDIR AGORA',
+    cta_secondary: 'VER CARDAPIO',
   })
-  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     async function fetchSettings() {
       const supabase = createClient()
-
-      // Buscar store_id atual
-      const { data: storeData } = await supabase
-        .from('stores')
-        .select('id')
-        .limit(1)
-        .single()
-
-      const query = supabase
+      const { data } = await supabase
         .from('app_settings')
         .select('*')
         .eq('section', 'hero')
 
-      if (storeData?.id) query.eq('store_id', storeData.id)
-
-      const { data } = await query
-
       if (data) {
         const settingsObj: Partial<HeroSettings> = {}
         data.forEach((item) => {
-          if (item.value) settingsObj[item.key as keyof HeroSettings] = item.value
+          settingsObj[item.key as keyof HeroSettings] = item.value || ''
         })
         setSettings(prev => ({ ...prev, ...settingsObj }))
       }
-      setLoaded(true)
     }
-
     fetchSettings()
   }, [])
 
-  // Enquanto carrega, não mostra nada
-  if (!loaded) return null
+  // Auto-slide effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % 3)
+    }, 5000)
+    return () => clearInterval(timer)
+  }, [])
 
-  // Se não tiver nenhum campo preenchido, não mostra a seção
-  const hasContent = settings.logo_image || settings.title_line1 || settings.title_line2 || settings.subtitle ||
-    settings.highlight_text || settings.description || settings.background_image
-
-  if (!hasContent) return null
+  const whatsappNumber = store?.whatsapp_number?.replace(/\D/g, '') || '5585999999999'
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-[#0A0A0A]">
       {/* Background Image */}
-      {settings.background_image && (
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url('${settings.background_image}')` }}
+      <div className="absolute inset-0">
+        <Image
+          src="https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=1920&q=80"
+          alt="Sushi background"
+          fill
+          className="object-cover opacity-50"
+          priority
         />
-      )}
-
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3]
-          }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="absolute top-20 left-10 w-64 h-64 bg-primary/20 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ 
-            scale: [1, 1.3, 1],
-            opacity: [0.3, 0.6, 0.3]
-          }}
-          transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-          className="absolute bottom-20 right-10 w-80 h-80 bg-secondary/20 rounded-full blur-3xl"
-        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A] via-[#0A0A0A]/70 to-transparent" />
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 pt-32 pb-16">
-        <div className="max-w-4xl mx-auto text-center">
+      <div className="relative z-10 container mx-auto px-4 pt-28 pb-20">
+        <div className="max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Logo Image or Main Title */}
-            {settings.logo_image ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="relative w-full max-w-sm h-64 mb-6 mx-auto"
-              >
-                <Image
-                  src={settings.logo_image}
-                  alt="Logo Hero"
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </motion.div>
-            ) : (
-              (settings.title_line1 || settings.title_line2) && (
-                <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black mb-4">
-                  {settings.title_line1 && (
-                    <>
-                      <span className="text-primary-foreground drop-shadow-2xl" style={{
-                        textShadow: '0 0 40px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--primary) / 0.3)'
-                      }}>
-                        {settings.title_line1}
-                      </span>
-                      {settings.title_line2 && <br />}
-                    </>
-                  )}
-                  {settings.title_line2 && (
-                    <span className="text-secondary italic" style={{
-                      textShadow: '0 0 40px hsl(var(--secondary) / 0.5)'
-                    }}>
-                      {settings.title_line2}
-                    </span>
-                  )}
-                </h1>
-              )
-            )}
+            {/* Title */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight italic">
+              <span className="text-foreground">{settings.title_line1}</span>
+              <br />
+              <span className="text-primary">{settings.title_line2.split(' ')[0]}</span>
+              <span className="text-foreground"> {settings.title_line2.split(' ').slice(1).join(' ')}</span>
+            </h1>
 
             {/* Subtitle */}
-            {settings.subtitle && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3, duration: 0.8 }}
-                className="text-lg sm:text-xl md:text-2xl text-primary-foreground/90 mb-2 font-light"
-              >
-                {settings.subtitle}
-              </motion.p>
-            )}
-            {settings.highlight_text && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="text-xl sm:text-2xl md:text-3xl text-secondary font-semibold mb-6"
-              >
-                {settings.highlight_text}
-              </motion.p>
-            )}
-
-            {/* Description */}
-            {settings.description && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.7, duration: 0.8 }}
-                className="text-base sm:text-lg text-primary-foreground/70 mb-8 max-w-xl mx-auto leading-relaxed px-4 sm:px-0"
-              >
-                {settings.description}
-              </motion.p>
-            )}
+            <p className="text-foreground/70 text-base md:text-lg mb-8 leading-relaxed max-w-md">
+              {settings.subtitle}
+              <br />
+              {settings.description}
+            </p>
 
             {/* CTA Buttons */}
-            {(settings.cta_primary || settings.cta_secondary) && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center"
-              >
-                {settings.cta_primary && (
-                  <Link href={settings.cta_primary_link || '/cardapio'}>
-                    <Button 
-                      size="lg" 
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
-                    >
-                      {settings.cta_primary}
-                      <ArrowRight className="ml-2 w-5 h-5" />
-                    </Button>
-                  </Link>
-                )}
-                {settings.cta_secondary && (
-                  <Link href={settings.cta_secondary_link || '/cardapio'}>
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      className="border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 font-bold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
-                    >
-                      <UtensilsCrossed className="mr-2 w-5 h-5" />
-                      {settings.cta_secondary}
-                    </Button>
-                  </Link>
-                )}
-              </motion.div>
-            )}
-          </motion.div>
+            <div className="flex flex-col sm:flex-row gap-4 mb-16">
+              <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer">
+                <Button 
+                  size="lg" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm px-8 py-6 rounded-lg gap-2 w-full sm:w-auto"
+                >
+                  <Phone className="w-5 h-5" />
+                  {settings.cta_primary}
+                </Button>
+              </a>
+              <Link href="/cardapio">
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  className="border-2 border-foreground/30 bg-[#1A1A1A] text-foreground hover:bg-[#2A2A2A] font-bold text-sm px-8 py-6 rounded-lg w-full sm:w-auto"
+                >
+                  {settings.cta_secondary}
+                </Button>
+              </Link>
+            </div>
 
-          {/* Location Tag */}
-          {(settings.location_line1 || settings.location_line2) && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2, duration: 0.8 }}
-              className="absolute bottom-8 right-8 hidden md:block"
-            >
-              <div className="text-right">
-                {settings.location_line1 && <p className="text-primary-foreground/40 text-sm tracking-widest">{settings.location_line1}</p>}
-                {settings.location_line2 && <p className="text-primary-foreground/40 text-sm tracking-widest">{settings.location_line2}</p>}
+            {/* Benefits */}
+            <div className="flex flex-wrap gap-8">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-foreground font-bold text-sm">ENTREGA RAPIDA</p>
+                  <p className="text-foreground/50 text-xs">Rapido e seguro</p>
+                </div>
               </div>
-            </motion.div>
-          )}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center">
+                  <Fish className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-foreground font-bold text-sm">PEIXES FRESCOS</p>
+                  <p className="text-foreground/50 text-xs">Selecionados diariamente</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center">
+                  <Award className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-foreground font-bold text-sm">QUALIDADE PREMIUM</p>
+                  <p className="text-foreground/50 text-xs">O melhor sushi da cidade</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Thin Bottom Divider */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-t from-background to-transparent" />
+      {/* Carousel Dots */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+        {[0, 1, 2].map((index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentSlide(index)}
+            className={`w-2.5 h-2.5 rounded-full transition-colors ${
+              currentSlide === index ? 'bg-foreground' : 'bg-foreground/30'
+            }`}
+          />
+        ))}
+      </div>
     </section>
   )
 }

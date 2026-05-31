@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
-import { Plus, Search, Edit, Edit2, Trash2, Eye, EyeOff, Copy } from 'lucide-react'
+import { Plus, Search, Edit, Trash2, Eye, EyeOff, Copy } from 'lucide-react'
 import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -15,20 +15,17 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  price: number
+  base_price: number
+  promotion_price: number | null
+  base_weight_grams: number
   image_url: string | null
   banner_url: string | null
   is_active: boolean
   is_featured: boolean
   is_promotion: boolean
-  is_combo: boolean
-  base_pieces: number
-  allow_quantity_change: boolean
-  molhos_included: boolean
   display_order: number
   category_id: string | null
   category: { name: string; slug: string; color: string | null } | null
-  variants?: { id: string; variant_name: string; price: number; quantity_value: number; is_default: boolean }[]
 }
 
 // Helper para formatar preço de forma segura
@@ -81,19 +78,14 @@ export default function AdminProdutos() {
         name: `${product.name} (Cópia)`,
         slug: `${product.slug}-copia-${Date.now()}`,
         description: product.description,
-        price: product.price,
+        base_price: product.base_price,
+        promotion_price: product.promotion_price,
         image_url: product.image_url,
-        is_active: false,
-        is_featured: product.is_featured,
-        is_promotion: product.is_promotion,
-        is_combo: product.is_combo,
-        base_pieces: product.base_pieces,
-        allow_quantity_change: product.allow_quantity_change,
-        molhos_included: product.molhos_included,
-        category_id: product.category_id,
+        is_active: false, // Inativo por padrão
+        category_id: product.category?.name ? null : null,
         display_order: product.display_order,
       })
-      .select('*, category:categories(name, slug, color), variants:product_variants(*)')
+      .select('*, category:categories(name, slug, color)')
       .single()
 
     if (!error && data) {
@@ -109,8 +101,7 @@ export default function AdminProdutos() {
         .from('products')
         .select(`
           *,
-          category:categories(name, slug, color),
-          variants:product_variants(*)
+          category:categories(name, slug, color)
         `)
         .order('display_order')
 
@@ -163,17 +154,17 @@ export default function AdminProdutos() {
       <div className="lg:ml-56">
         <AdminHeader />
         
-        <main className="p-3 sm:p-6 pb-20 lg:pb-6">
+        <main className="p-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-              <h1 className="text-xl sm:text-2xl font-bold text-foreground">Produtos</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <h1 className="text-2xl font-bold text-foreground">Produtos</h1>
               <Button 
                 onClick={() => openModal()}
-                className="bg-[#D62828] hover:bg-[#FFC300] text-foreground w-full sm:w-auto"
+                className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Produto
@@ -181,101 +172,28 @@ export default function AdminProdutos() {
             </div>
 
             {/* Search */}
-            <div className="bg-card rounded-xl sm:rounded-2xl p-3 sm:p-4 border border-border mb-4 sm:mb-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-foreground/50" />
+            <div className="bg-card rounded-2xl p-4 border border-border mb-6">
+              <div className="relative max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/50" />
                 <Input
                   type="text"
                   placeholder="Buscar produtos..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9 sm:pl-10 bg-muted border-border text-foreground text-sm sm:text-base"
+                  className="pl-10 bg-muted border-border text-foreground"
                 />
               </div>
             </div>
 
-            {/* Products - Mobile Cards / Desktop Table */}
-            <div className="block sm:hidden space-y-3">
-              {loading ? (
-                [...Array(3)].map((_, i) => (
-                  <div key={i} className="bg-card rounded-xl p-4 border border-border animate-pulse">
-                    <div className="flex gap-3">
-                      <div className="w-16 h-16 bg-muted rounded-lg" />
-                      <div className="flex-1">
-                        <div className="h-4 bg-muted rounded w-3/4 mb-2" />
-                        <div className="h-3 bg-muted rounded w-1/2" />
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                filteredProducts.map((product) => (
-                  <motion.div
-                    key={product.id}
-                    className="bg-card rounded-xl p-4 border border-border"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <div className="flex gap-3">
-                      <div className="w-16 h-16 rounded-lg bg-muted overflow-hidden flex-shrink-0">
-                        <Image
-                          src={product.image_url || 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png'}
-                          alt={product.name}
-                          width={64}
-                          height={64}
-                          className="w-full h-full object-contain"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="text-foreground font-medium text-sm truncate">{product.name}</p>
-                            <span 
-                              className="inline-block px-2 py-0.5 rounded-full text-[10px] mt-1"
-                              style={{ 
-                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#D6282820',
-                                color: product.category?.color || '#D62828'
-                              }}
-                            >
-                              {product.category?.name || 'Sem categoria'}
-                            </span>
-                          </div>
-                          <button
-                            onClick={() => toggleProductStatus(product.id, product.is_active)}
-                            className={`p-1.5 rounded-lg transition-colors ${
-                              product.is_active ? 'bg-green-500/10 text-green-600' : 'bg-red-500/10 text-red-600'
-                            }`}
-                          >
-                            {product.is_active ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                          </button>
-                        </div>
-                        <div className="flex items-center justify-between mt-2">
-                          <span className="text-foreground/70 text-sm">{product.base_pieces} peças</span>
-                          <div className="flex gap-1">
-                            <button onClick={() => openModal(product)} className="p-1.5 rounded-lg hover:bg-muted text-foreground/60">
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button onClick={() => deleteProduct(product.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-red-500">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
-              )}
-            </div>
-
-            {/* Desktop Table */}
-            <div className="hidden sm:block bg-card rounded-2xl border border-border overflow-hidden">
+            {/* Products Table */}
+            <div className="bg-card rounded-2xl border border-border overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="bg-muted">
                       <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Produto</th>
                       <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Categoria</th>
-                      <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Peso</th>
+                      <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Preco</th>
                       <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Status</th>
                       <th className="text-right text-foreground/60 text-sm font-medium px-6 py-4">Acoes</th>
                     </tr>
@@ -319,15 +237,22 @@ export default function AdminProdutos() {
                             <span 
                               className="px-3 py-1 rounded-full text-sm"
                               style={{ 
-                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#D6282820',
-                                color: product.category?.color || '#D62828'
+                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#8A2BE220',
+                                color: product.category?.color || '#8A2BE2'
                               }}
                             >
                               {product.category?.name || 'Sem categoria'}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-foreground font-medium">{product.base_pieces} peças</p>
+                            {product.promotion_price ? (
+                              <div>
+                                <p className="text-foreground/50 text-sm line-through">R$ {formatPrice(product.base_price)}</p>
+                                <p className="text-[#00BFFF] font-bold">R$ {formatPrice(product.promotion_price)}</p>
+                              </div>
+                            ) : (
+                              <p className="text-foreground font-medium">R$ {formatPrice(product.base_price)}</p>
+                            )}
                           </td>
                           <td className="px-6 py-4">
                             <button
@@ -351,7 +276,7 @@ export default function AdminProdutos() {
                             <div className="flex items-center justify-end gap-2">
                               <button 
                                 onClick={() => openModal(product)}
-                                className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-foreground/70 hover:text-[#D62828] transition-colors"
+                                className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-foreground/70 hover:text-[#FF8C00] transition-colors"
                                 title="Editar"
                               >
                                 <Edit className="w-4 h-4" />

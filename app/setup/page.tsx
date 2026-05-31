@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { Store, User, Mail, Lock, Phone, MapPin, CheckCircle, Loader2, Fish } from 'lucide-react'
+import { Store, User, Mail, Lock, Phone, MapPin, CheckCircle, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { createClient } from '@/lib/supabase/client'
@@ -27,8 +27,8 @@ export default function SetupPage() {
     city: '',
     state: '',
     zip_code: '',
-    primary_color: '#D62828',
-    secondary_color: '#D4A017',
+    primary_color: '#5B1E87',
+    secondary_color: '#FF8C00',
   })
   
   // Owner data
@@ -195,7 +195,7 @@ export default function SetupPage() {
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">Nome da Loja *</label>
                 <Input
-                  placeholder="Ex: SushiGo Delivery"
+                  placeholder="Ex: Açaí da Praia"
                   value={storeData.name}
                   onChange={(e) => setStoreData({ ...storeData, name: e.target.value })}
                   className="bg-background border-border"

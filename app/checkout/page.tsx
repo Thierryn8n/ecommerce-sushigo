@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,16 +14,6 @@ import { Input } from '@/components/ui/input'
 import { useCart } from '@/contexts/cart-context'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
-import {
-  fetchAddressByCep,
-  maskCep,
-  maskPhone,
-  unmask,
-  saveCustomerToLocal,
-  saveAddressToLocal,
-  loadCustomerFromLocal,
-  loadAddressFromLocal,
-} from '@/lib/address'
 
 const DELIVERY_FEE = 5.00
 
@@ -44,7 +34,6 @@ export default function CheckoutPage() {
     complement: '',
     neighborhood: '',
     city: '',
-    state: 'CE',
   })
 
   const [customer, setCustomer] = useState({
@@ -52,103 +41,22 @@ export default function CheckoutPage() {
     phone: '',
   })
 
-  const [isLoadingCep, setIsLoadingCep] = useState(false)
-
   const finalTotal = deliveryType === 'delivery' ? totalPrice + DELIVERY_FEE : totalPrice
-
-  // Carregar dados salvos ao montar
-  useEffect(() => {
-    async function loadSavedData() {
-      // Tenta carregar do Supabase se usuário estiver logado
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('full_name, phone')
-          .eq('id', user.id)
-          .single()
-        if (profile) {
-          setCustomer({
-            name: profile.full_name || '',
-            phone: profile.phone ? maskPhone(profile.phone) : '',
-          })
-        }
-        const { data: addresses } = await supabase
-          .from('addresses')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('is_default', { ascending: false })
-          .limit(1)
-        if (addresses && addresses.length > 0) {
-          const a = addresses[0]
-          setAddress({
-            cep: a.zip_code ? maskCep(a.zip_code) : '',
-            street: a.street || '',
-            number: a.number || '',
-            complement: a.complement || '',
-            neighborhood: a.neighborhood || '',
-            city: a.city || '',
-            state: a.state || 'CE',
-          })
-        }
-        return
-      }
-
-      // Usuário não logado: carrega do localStorage
-      const savedCustomer = loadCustomerFromLocal()
-      if (savedCustomer) {
-        setCustomer({
-          name: savedCustomer.name,
-          phone: maskPhone(savedCustomer.phone),
-        })
-      }
-      const savedAddress = loadAddressFromLocal()
-      if (savedAddress) {
-        setAddress({
-          cep: maskCep(savedAddress.cep),
-          street: savedAddress.street,
-          number: savedAddress.number,
-          complement: savedAddress.complement,
-          neighborhood: savedAddress.neighborhood,
-          city: savedAddress.city,
-          state: savedAddress.state || 'CE',
-        })
-      }
-    }
-    loadSavedData()
-  }, [supabase])
-
-  // Buscar CEP
-  const handleCepChange = async (value: string) => {
-    const masked = maskCep(value)
-    setAddress(prev => ({ ...prev, cep: masked }))
-    const raw = unmask(masked)
-    if (raw.length === 8) {
-      setIsLoadingCep(true)
-      const data = await fetchAddressByCep(raw)
-      if (data) {
-        setAddress(prev => ({
-          ...prev,
-          street: data.logradouro || prev.street,
-          neighborhood: data.bairro || prev.neighborhood,
-          city: data.localidade || prev.city,
-          state: data.uf || 'CE',
-        }))
-      }
-      setIsLoadingCep(false)
-    }
-  }
 
   // Gerar mensagem do WhatsApp
   const getWhatsAppMessage = useCallback(() => {
     const itemsList = items.map(item => {
       let text = `*${item.name}* (${item.quantity}x)\n`
-      if (item.variant) text += `  Variação: ${item.variant.variant_name}\n`
-      if (item.quantityPieces && item.quantityPieces > 0) text += `  Peças: ${item.quantityPieces}\n`
-      if (item.selectedMolhos.length > 0) {
-        text += `  Molhos: ${item.selectedMolhos.join(', ')}\n`
+      if (item.size) text += `  Tamanho: ${item.size}\n`
+      if (item.acaiType) text += `  Tipo: ${item.acaiType}\n`
+      if (item.toppings.length > 0) {
+        text += `  Adicionais: ${item.toppings.map(t => t.name).join(', ')}\n`
+      }
+      if (item.sauces.length > 0) {
+        text += `  Coberturas: ${item.sauces.map(s => s.name).join(', ')}\n`
       }
       if (item.notes) text += `  Obs: ${item.notes}\n`
+      text += `  Valor: R$ ${((item.totalPrice || 0) * item.quantity).toFixed(2).replace('.', ',')}`
       return text
     }).join('\n\n')
 
@@ -169,7 +77,7 @@ export default function CheckoutPage() {
     const finalTotalText = `\n*TOTAL:* R$ ${finalTotal.toFixed(2).replace('.', ',')}`
 
     return encodeURIComponent(
-      `*PEDIDO SUSHIGO*\n\n${itemsList}${customerInfo}${deliveryInfo}${paymentInfo}${total}${delivery}${finalTotalText}`
+      `*PEDIDO AÇAÍ DA PRAIA*\n\n${itemsList}${customerInfo}${deliveryInfo}${paymentInfo}${total}${delivery}${finalTotalText}`
     )
   }, [items, address, deliveryType, paymentMethod, change, customer, totalPrice, finalTotal])
 
@@ -198,65 +106,13 @@ export default function CheckoutPage() {
       // Buscar usuário logado
       const { data: { user } } = await supabase.auth.getUser()
 
-      // Salvar dados do usuário logado no Supabase
-      if (user) {
-        await supabase.from('profiles').upsert({
-          id: user.id,
-          full_name: customer.name,
-          phone: unmask(customer.phone),
-          updated_at: new Date().toISOString(),
-        })
-        if (deliveryType === 'delivery') {
-          // Atualizar endereço existente ou criar novo
-          const { data: existingAddr } = await supabase
-            .from('addresses')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('is_default', true)
-            .limit(1)
-            .single()
-
-          const addrPayload = {
-            user_id: user.id,
-            street: address.street,
-            number: address.number,
-            complement: address.complement || null,
-            neighborhood: address.neighborhood,
-            city: address.city,
-            state: address.state || 'CE',
-            zip_code: unmask(address.cep),
-            is_default: true,
-          }
-
-          if (existingAddr) {
-            await supabase.from('addresses').update(addrPayload).eq('id', existingAddr.id)
-          } else {
-            await supabase.from('addresses').insert(addrPayload)
-          }
-        }
-      } else {
-        // Salvar no localStorage para não logados
-        saveCustomerToLocal({ name: customer.name, phone: unmask(customer.phone) })
-        if (deliveryType === 'delivery') {
-          saveAddressToLocal({
-            cep: unmask(address.cep),
-            street: address.street,
-            number: address.number,
-            complement: address.complement,
-            neighborhood: address.neighborhood,
-            city: address.city,
-            state: address.state || 'CE',
-          })
-        }
-      }
-
       // Criar pedido no banco
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user?.id || null,
           customer_name: customer.name,
-          customer_phone: unmask(customer.phone),
+          customer_phone: customer.phone,
           customer_email: user?.email || null,
           delivery_address: deliveryType === 'delivery'
             ? `${address.street}, ${address.number}${address.complement ? ` - ${address.complement}` : ''} - ${address.neighborhood}, ${address.city} - CEP: ${address.cep}`
@@ -282,8 +138,6 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
-        quantity_pieces: (item as any).quantityPieces || item.quantity || 1,
-        selected_molhos: (item as any).selectedMolhos || [],
         toppings: item.toppings,
         sauces: item.sauces
       }))
@@ -308,11 +162,11 @@ export default function CheckoutPage() {
 
       // Redirecionar para página de acompanhamento
       router.push(`/pedido/${orderData.id}/acompanhamento`)
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao salvar pedido:', error)
       toast({
-        title: 'Erro ao salvar pedido',
-        description: error?.message || 'Não foi possível salvar o pedido. Tente novamente.',
+        title: 'Erro',
+        description: 'Não foi possível salvar o pedido. Tente novamente.',
         variant: 'destructive'
       })
     } finally {
@@ -342,60 +196,8 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true)
     try {
-      // Buscar usuário logado
+      // Buscar usuário logado ou criar um guest
       const { data: { user } } = await supabase.auth.getUser()
-
-      // Salvar dados do usuário logado no Supabase
-      if (user) {
-        await supabase.from('profiles').upsert({
-          id: user.id,
-          full_name: customer.name,
-          phone: unmask(customer.phone),
-          updated_at: new Date().toISOString(),
-        })
-        if (deliveryType === 'delivery') {
-          // Atualizar endereço existente ou criar novo
-          const { data: existingAddr } = await supabase
-            .from('addresses')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('is_default', true)
-            .limit(1)
-            .single()
-
-          const addrPayload = {
-            user_id: user.id,
-            street: address.street,
-            number: address.number,
-            complement: address.complement || null,
-            neighborhood: address.neighborhood,
-            city: address.city,
-            state: address.state || 'CE',
-            zip_code: unmask(address.cep),
-            is_default: true,
-          }
-
-          if (existingAddr) {
-            await supabase.from('addresses').update(addrPayload).eq('id', existingAddr.id)
-          } else {
-            await supabase.from('addresses').insert(addrPayload)
-          }
-        }
-      } else {
-        // Salvar no localStorage para não logados
-        saveCustomerToLocal({ name: customer.name, phone: unmask(customer.phone) })
-        if (deliveryType === 'delivery') {
-          saveAddressToLocal({
-            cep: unmask(address.cep),
-            street: address.street,
-            number: address.number,
-            complement: address.complement,
-            neighborhood: address.neighborhood,
-            city: address.city,
-            state: address.state || 'CE',
-          })
-        }
-      }
 
       // Criar pedido
       const { data: orderData, error: orderError } = await supabase
@@ -403,7 +205,7 @@ export default function CheckoutPage() {
         .insert({
           user_id: user?.id || null,
           customer_name: customer.name,
-          customer_phone: unmask(customer.phone),
+          customer_phone: customer.phone,
           customer_email: user?.email || null,
           delivery_address: deliveryType === 'delivery' 
             ? `${address.street}, ${address.number}${address.complement ? ` - ${address.complement}` : ''} - ${address.neighborhood}, ${address.city} - CEP: ${address.cep}`
@@ -429,8 +231,6 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
-        quantity_pieces: (item as any).quantityPieces || item.quantity || 1,
-        selected_molhos: (item as any).selectedMolhos || [],
         toppings: item.toppings,
         sauces: item.sauces
       }))
@@ -451,11 +251,11 @@ export default function CheckoutPage() {
 
       // Redirecionar para página de acompanhamento
       router.push(`/pedido/${orderData.id}/acompanhamento`)
-    } catch (error: any) {
+    } catch (error) {
       console.error('Erro ao finalizar pedido:', error)
       toast({
-        title: 'Erro ao finalizar pedido',
-        description: error?.message || 'Verifique os dados e tente novamente.',
+        title: 'Erro',
+        description: 'Não foi possível finalizar o pedido. Tente novamente.',
         variant: 'destructive'
       })
     } finally {
@@ -472,7 +272,7 @@ export default function CheckoutPage() {
             <h1 className="text-3xl font-bold text-foreground mb-4">Seu carrinho está vazio</h1>
             <p className="text-foreground/70 mb-8">Adicione produtos para continuar</p>
             <Link href="/cardapio">
-              <Button className="bg-[#D62828] hover:bg-[#FFC300]">
+              <Button className="bg-[#FF8C00] hover:bg-[#FFC300]">
                 Ver Cardápio
               </Button>
             </Link>
@@ -506,7 +306,7 @@ export default function CheckoutPage() {
                 className="bg-card rounded-2xl p-4 sm:p-6 border border-border"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D62828] flex items-center justify-center text-xs sm:text-sm font-bold">1</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-xs sm:text-sm font-bold">1</span>
                   Seus Dados
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -523,9 +323,8 @@ export default function CheckoutPage() {
                     <label className="text-foreground/70 text-sm mb-2 block">WhatsApp</label>
                     <Input
                       value={customer.phone}
-                      onChange={(e) => setCustomer({ ...customer, phone: maskPhone(e.target.value) })}
+                      onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
                       placeholder="(00) 00000-0000"
-                      maxLength={15}
                       className="bg-muted border-border text-foreground"
                     />
                   </div>
@@ -540,7 +339,7 @@ export default function CheckoutPage() {
                 className="bg-card rounded-2xl p-4 sm:p-6 border border-border"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D62828] flex items-center justify-center text-xs sm:text-sm font-bold">2</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-xs sm:text-sm font-bold">2</span>
                   Tipo de Entrega
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -548,11 +347,11 @@ export default function CheckoutPage() {
                     onClick={() => setDeliveryType('delivery')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all flex items-center gap-3 sm:gap-4 ${
                       deliveryType === 'delivery'
-                        ? 'border-[#D62828] bg-[#D62828]/10'
-                        : 'border-border hover:border-[#D62828]/50'
+                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
+                        : 'border-border hover:border-[#8A2BE2]/50'
                     }`}
                   >
-                    <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-[#D62828]" />
+                    <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-[#FF8C00]" />
                     <div className="text-left">
                       <p className="text-foreground font-semibold text-sm sm:text-base">Entrega</p>
                       <p className="text-foreground/50 text-xs sm:text-sm">+R$ {DELIVERY_FEE.toFixed(2).replace('.', ',')}</p>
@@ -562,11 +361,11 @@ export default function CheckoutPage() {
                     onClick={() => setDeliveryType('pickup')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all flex items-center gap-3 sm:gap-4 ${
                       deliveryType === 'pickup'
-                        ? 'border-[#D62828] bg-[#D62828]/10'
-                        : 'border-border hover:border-[#D62828]/50'
+                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
+                        : 'border-border hover:border-[#8A2BE2]/50'
                     }`}
                   >
-                    <Store className="w-6 h-6 sm:w-8 sm:h-8 text-[#D62828]" />
+                    <Store className="w-6 h-6 sm:w-8 sm:h-8 text-[#8A2BE2]" />
                     <div className="text-left">
                       <p className="text-foreground font-semibold text-sm sm:text-base">Retirar no Local</p>
                       <p className="text-foreground/50 text-xs sm:text-sm">Grátis</p>
@@ -582,18 +381,14 @@ export default function CheckoutPage() {
                     className="mt-4 sm:mt-6 space-y-3 sm:space-y-4"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                      <div className="relative">
+                      <div>
                         <label className="text-foreground/70 text-sm mb-1 sm:mb-2 block">CEP</label>
                         <Input
                           value={address.cep}
-                          onChange={(e) => handleCepChange(e.target.value)}
+                          onChange={(e) => setAddress({ ...address, cep: e.target.value })}
                           placeholder="00000-000"
-                          maxLength={9}
                           className="bg-muted border-border text-foreground"
                         />
-                        {isLoadingCep && (
-                          <Loader2 className="absolute right-3 top-[2.1rem] w-4 h-4 animate-spin text-muted-foreground" />
-                        )}
                       </div>
                       <div className="sm:col-span-2">
                         <label className="text-foreground/70 text-sm mb-1 sm:mb-2 block">Rua</label>
@@ -655,7 +450,7 @@ export default function CheckoutPage() {
                 className="bg-card rounded-2xl p-4 sm:p-6 border border-border"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D62828] flex items-center justify-center text-xs sm:text-sm font-bold">3</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-xs sm:text-sm font-bold">3</span>
                   Forma de Pagamento
                 </h2>
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
@@ -663,8 +458,8 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod('pix')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                       paymentMethod === 'pix'
-                        ? 'border-[#D62828] bg-[#D62828]/10'
-                        : 'border-border hover:border-[#D62828]/50'
+                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
+                        : 'border-border hover:border-[#8A2BE2]/50'
                     }`}
                   >
                     <QrCode className="w-6 h-6 sm:w-8 sm:h-8 text-[#00BFFF] mx-auto mb-1 sm:mb-2" />
@@ -674,19 +469,19 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod('card')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                       paymentMethod === 'card'
-                        ? 'border-[#D62828] bg-[#D62828]/10'
-                        : 'border-border hover:border-[#D62828]/50'
+                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
+                        : 'border-border hover:border-[#8A2BE2]/50'
                     }`}
                   >
-                    <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-[#D62828] mx-auto mb-1 sm:mb-2" />
+                    <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-[#8A2BE2] mx-auto mb-1 sm:mb-2" />
                     <p className="text-foreground font-semibold text-center text-xs sm:text-sm">Cartão</p>
                   </button>
                   <button
                     onClick={() => setPaymentMethod('cash')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                       paymentMethod === 'cash'
-                        ? 'border-[#D62828] bg-[#D62828]/10'
-                        : 'border-border hover:border-[#D62828]/50'
+                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
+                        : 'border-border hover:border-[#8A2BE2]/50'
                     }`}
                   >
                     <Banknote className="w-6 h-6 sm:w-8 sm:h-8 text-[#00FF7F] mx-auto mb-1 sm:mb-2" />
@@ -731,8 +526,11 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-foreground font-medium text-sm truncate">{item.name}</p>
-                        <p className="text-foreground/50 text-xs">{item.quantity}x · {(item as any).quantityPieces || item.quantity || 0} peças</p>
+                        <p className="text-foreground/50 text-xs">{item.quantity}x R$ {Number(item.totalPrice || 0).toFixed(2).replace('.', ',')}</p>
                       </div>
+                      <p className="text-foreground font-semibold text-sm">
+                        R$ {((item.totalPrice || 0) * item.quantity).toFixed(2).replace('.', ',')}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -759,7 +557,7 @@ export default function CheckoutPage() {
                   <Button
                     onClick={handleFinalizeOrder}
                     disabled={isSubmitting}
-                    className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 sm:py-4 rounded-full text-base sm:text-lg"
+                    className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 sm:py-4 rounded-full text-base sm:text-lg"
                   >
                     {isSubmitting ? (
                       <>

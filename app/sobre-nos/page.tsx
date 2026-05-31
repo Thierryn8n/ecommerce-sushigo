@@ -26,8 +26,8 @@ export default function SobreNosPage() {
               Nossa História
             </h1>
             <p className="text-lg text-muted-foreground">
-              Conheça a história do SushiGo e nossa paixão por entregar 
-              o melhor sushi premium da cidade para você.
+              Conheça a história do Açaí da Praia e nossa paixão por entregar 
+              o melhor açaí de Canoa Quebrada para você.
             </p>
           </motion.div>
         </div>
@@ -44,8 +44,8 @@ export default function SobreNosPage() {
             >
               <div className="relative aspect-square rounded-2xl overflow-hidden">
                 <Image
-                  src="/logo-sushigo.png"
-                  alt="SushiGo"
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png"
+                  alt="Açaí da Praia"
                   fill
                   className="object-contain p-8"
                 />
@@ -59,21 +59,21 @@ export default function SobreNosPage() {
               className="space-y-6"
             >
               <h2 className="text-3xl font-bold text-foreground">
-                Tradição Japonesa em Cada Peça
+                Do Pará para Canoa Quebrada
               </h2>
               <p className="text-muted-foreground leading-relaxed">
-                O SushiGo nasceu em 2020, quando nosso fundador, apaixonado 
-                pela culinária japonesa, decidiu trazer o verdadeiro sabor do sushi 
-                tradicional para a cidade.
+                O Açaí da Praia nasceu em 2018, quando nosso fundador, apaixonado 
+                pela cultura amazônica, decidiu trazer o verdadeiro sabor do açaí 
+                paraense para o litoral cearense.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Começamos com uma pequena loja no centro, 
-                e rapidamente conquistamos o coração dos moradores com 
-                nossos sushis frescos e ingredientes selecionados.
+                Começamos com uma pequena barraquinha na praia de Canoa Quebrada, 
+                e rapidamente conquistamos o coração dos moradores e turistas com 
+                nosso açaí cremoso e ingredientes selecionados.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 Hoje, somos referência em qualidade e sabor, mantendo sempre o 
-                compromisso com peixes frescos e o verdadeiro sushi japonês.
+                compromisso com ingredientes frescos e o verdadeiro açaí amazônico.
               </p>
             </motion.div>
           </div>
@@ -93,7 +93,7 @@ export default function SobreNosPage() {
               Nossos Valores
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Qualidade, frescor e paixão em cada peça de sushi
+              Qualidade, frescor e paixão em cada tigela de açaí
             </p>
           </motion.div>
 
@@ -102,17 +102,17 @@ export default function SobreNosPage() {
               {
                 icon: Leaf,
                 title: "100% Natural",
-                description: "Utilizamos apenas peixes frescos de alta qualidade, importados e selecionados."
+                description: "Utilizamos apenas açaí puro, sem conservantes ou aditivos artificiais."
               },
               {
                 icon: Heart,
                 title: "Feito com Amor",
-                description: "Cada sushi é preparado com carinho e atenção aos detalhes por nossos sushimen."
+                description: "Cada tigela é preparada com carinho e atenção aos detalhes."
               },
               {
                 icon: Award,
                 title: "Qualidade Premium",
-                description: "Ingredientes selecionados e peixes importados de qualidade premium."
+                description: "Ingredientes selecionados e açaí direto do Pará."
               }
             ].map((value, index) => (
               <motion.div
@@ -198,7 +198,7 @@ export default function SobreNosPage() {
               </h2>
               <p className="text-muted-foreground leading-relaxed">
                 Localizado no coração de Canoa Quebrada, nosso espaço foi 
-                pensado para você aproveitar o melhor sushi com vista para 
+                pensado para você aproveitar o melhor açaí com vista para 
                 o pôr do sol mais bonito do Ceará.
               </p>
 

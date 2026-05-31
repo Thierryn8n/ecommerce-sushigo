@@ -45,8 +45,8 @@ export default function ContatoPage() {
               
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#D62828]/20 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6 text-[#D62828]" />
+                  <div className="w-12 h-12 rounded-xl bg-[#FF8C00]/20 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-6 h-6 text-[#FF8C00]" />
                   </div>
                   <div>
                     <h3 className="text-foreground font-semibold mb-1">WhatsApp</h3>
@@ -62,12 +62,12 @@ export default function ContatoPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#D62828]/20 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6 text-[#D62828]" />
+                  <div className="w-12 h-12 rounded-xl bg-[#8A2BE2]/20 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-6 h-6 text-[#8A2BE2]" />
                   </div>
                   <div>
                     <h3 className="text-foreground font-semibold mb-1">E-mail</h3>
-                    <p className="text-foreground/70">contato@sushigo.com</p>
+                    <p className="text-foreground/70">contato@acaidapraia.com</p>
                   </div>
                 </div>
 
@@ -159,10 +159,10 @@ export default function ContatoPage() {
                   <textarea
                     rows={4}
                     placeholder="Sua mensagem..."
-                    className="w-full bg-[#2a1a35] border border-border rounded-lg p-3 text-foreground placeholder:text-foreground/40 focus:border-[#D62828] focus:outline-none resize-none"
+                    className="w-full bg-[#2a1a35] border border-border rounded-lg p-3 text-foreground placeholder:text-foreground/40 focus:border-[#8A2BE2] focus:outline-none resize-none"
                   />
                 </div>
-                <Button className="w-full bg-[#D62828] hover:bg-[#FFC300] text-foreground font-bold py-3 rounded-full">
+                <Button className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold py-3 rounded-full">
                   Enviar Mensagem
                 </Button>
               </form>

@@ -8,11 +8,13 @@ import {
   Calendar,
   TrendingUp,
   ShoppingBag,
+  ChevronDown,
+  ChevronUp,
   Star,
   Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface OrderItem {
   id: string
@@ -20,20 +22,11 @@ interface OrderItem {
   quantity: number
   unit_price: number
   product_image?: string
-  toppings?: string[] | { name: string; image?: string }[]
-  sauces?: string[] | { name: string; image?: string }[]
+  toppings?: { name: string; image?: string }[]
+  sauces?: { name: string; image?: string }[]
   bowl_type?: string
   bowl_image?: string
   size?: string
-}
-
-// Helper para normalizar toppings/sauces
-function normalizeItems(items?: string[] | { name: string; image?: string }[]): { name: string; image?: string }[] {
-  if (!items || items.length === 0) return []
-  if (typeof items[0] === 'string') {
-    return (items as string[]).map(name => ({ name }))
-  }
-  return items as { name: string; image?: string }[]
 }
 
 interface Order {
@@ -72,38 +65,40 @@ export default function HistoricoPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      // Buscar pedidos com items
       const { data, error } = await supabase
         .from('orders')
         .select(`
           *,
-          order_items (
-            *,
-            product:products (
-              id,
-              name,
-              image_url
-            )
-          )
+          order_items (*)
         `)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      
-      // Processar dados para adicionar imagem do produto se nao existir no item
-      const processedOrders = (data || []).map(order => ({
-        ...order,
-        order_items: order.order_items?.map((item: OrderItem & { product?: { image_url?: string } }) => ({
-          ...item,
-          // Se nao tem product_image, usa a imagem do produto relacionado
-          product_image: item.product_image || item.product?.image_url || null
-        }))
-      }))
-      
-      setOrders(processedOrders)
+      if (error) {
+        console.error('DEBUG - Erro na query:', error)
+        throw error
+      }
+      console.log('DEBUG - Pedidos encontrados:', data)
+      console.log('DEBUG - User ID:', user.id)
+      console.log('DEBUG - Quantidade:', data?.length || 0)
+      // Debug detalhado dos itens
+      data?.forEach((order, idx) => {
+        console.log(`DEBUG - Pedido ${idx + 1}:`, {
+          id: order.id,
+          status: order.status,
+          items_count: order.order_items?.length || 0,
+          items: order.order_items?.map((item: OrderItem) => ({
+            name: item.product_name,
+            has_image: !!item.product_image,
+            toppings: item.toppings?.length || 0,
+            sauces: item.sauces?.length || 0,
+            bowl: item.bowl_type
+          }))
+        })
+      })
+      setOrders(data || [])
     } catch (error) {
-      console.error('Erro ao buscar historico:', error)
+      console.error('Erro ao buscar histórico:', error)
     } finally {
       setLoading(false)
     }
@@ -149,6 +144,22 @@ export default function HistoricoPage() {
     return groups
   }, {} as Record<string, Order[]>)
 
+  // Debug info
+  console.log('DEBUG - orders.length:', orders.length)
+  console.log('DEBUG - filteredOrders.length:', filteredOrders.length)
+  console.log('DEBUG - groupedOrders keys:', Object.keys(groupedOrders))
+  console.log('DEBUG - selectedPeriod:', selectedPeriod)
+  
+  // Debug visual - remover após teste
+  const debugVisual = (
+    <div className="bg-yellow-100 dark:bg-yellow-900/20 border border-yellow-400 dark:border-yellow-600 rounded-lg p-3 mb-4 text-sm">
+      <p className="font-semibold text-yellow-800 dark:text-yellow-200">Debug:</p>
+      <p className="text-yellow-700 dark:text-yellow-300">Total orders: {orders.length}</p>
+      <p className="text-yellow-700 dark:text-yellow-300">Filtered: {filteredOrders.length}</p>
+      <p className="text-yellow-700 dark:text-yellow-300">Grouped keys: {Object.keys(groupedOrders).length}</p>
+    </div>
+  )
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -159,19 +170,20 @@ export default function HistoricoPage() {
 
   return (
     <div className="space-y-6">
+      {debugVisual}
       {/* Header */}
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">Historico de Compras</h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm sm:text-base">Veja todas as suas compras e estatisticas</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Histórico de Compras</h1>
+          <p className="text-slate-500 dark:text-slate-400">Veja todas as suas compras e estatísticas</p>
         </div>
         
         {/* Period Filter */}
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2">
           {[
             { value: 'all', label: 'Tudo' },
-            { value: 'week', label: '7d' },
-            { value: 'month', label: '30d' },
+            { value: 'week', label: '7 dias' },
+            { value: 'month', label: '30 dias' },
             { value: 'year', label: 'Ano' }
           ].map(period => (
             <Button
@@ -180,8 +192,8 @@ export default function HistoricoPage() {
               size="sm"
               onClick={() => setSelectedPeriod(period.value)}
               className={selectedPeriod === period.value 
-                ? 'bg-violet-500 text-white text-xs sm:text-sm' 
-                : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs sm:text-sm'
+                ? 'bg-violet-500 text-white' 
+                : 'border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }
             >
               {period.label}
@@ -191,53 +203,53 @@ export default function HistoricoPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-violet-200 dark:border-violet-500/30">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-violet-100 dark:bg-violet-500/20 rounded-lg">
-              <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 dark:text-violet-400" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-violet-200 dark:border-violet-500/30">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-violet-100 dark:bg-violet-500/20 rounded-lg">
+              <ShoppingBag className="w-5 h-5 text-violet-600 dark:text-violet-400" />
             </div>
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">{filteredOrders.length}</p>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Pedidos</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{filteredOrders.length}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Total de Pedidos</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-green-500/20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg">
-              <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-green-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-500/20 rounded-lg">
+              <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">
-                R$ {totalSpent.toFixed(0)}
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                R$ {totalSpent.toFixed(2).replace('.', ',')}
               </p>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Total</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Total Gasto</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-purple-500/20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-purple-500/20 rounded-lg">
-              <Package className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-purple-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-500/20 rounded-lg">
+              <Package className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">{completedOrders}</p>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Entregues</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{completedOrders}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Pedidos Entregues</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white dark:bg-slate-900 rounded-xl p-3 sm:p-4 border border-blue-500/20">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-blue-500/20 rounded-lg">
-              <Star className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+        <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-blue-500/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <Star className="w-5 h-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-lg sm:text-2xl font-bold text-slate-900 dark:text-white">{totalItems}</p>
-              <p className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400">Itens</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">{totalItems}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Itens Comprados</p>
             </div>
           </div>
         </div>
@@ -294,21 +306,15 @@ export default function HistoricoPage() {
                       <div className="border-t border-slate-200 dark:border-slate-800">
                         <div className="p-4 space-y-4">
                               {order.order_items?.map((item) => (
-                                <div key={item.id} className="flex gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+                                <div key={item.id} className="flex gap-3 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                                   {/* Imagem do Produto */}
-                                  <div className="relative w-20 h-20 flex-shrink-0 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-hidden">
-                                    {item.product_image ? (
-                                      <img 
-                                        src={item.product_image} 
-                                        alt={item.product_name}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full flex items-center justify-center">
-                                        <Package className="w-8 h-8 text-slate-400" />
-                                      </div>
-                                    )}
+                                  <div className="relative w-20 h-20 flex-shrink-0">
+                                    <img 
+                                      src={item.product_image || '/placeholder-product.png'} 
+                                      alt={item.product_name}
+                                      className="w-full h-full object-cover rounded-lg"
+                                      onError={(e) => { (e.target as HTMLImageElement).src = '/placeholder-product.png' }}
+                                    />
                                   </div>
                                   
                                   {/* Informações do Item */}
@@ -326,12 +332,12 @@ export default function HistoricoPage() {
                                       </span>
                                     </div>
                                     
-                                    {/* Embalagem */}
+                                    {/* Vasilha */}
                                     {item.bowl_image && (
                                       <div className="flex items-center gap-2 mt-2">
                                         <img 
                                           src={item.bowl_image} 
-                                          alt={item.bowl_type || 'Embalagem'}
+                                          alt={item.bowl_type || 'Vasilha'}
                                           className="w-6 h-6 object-cover rounded"
                                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                                         />
@@ -342,14 +348,13 @@ export default function HistoricoPage() {
                                     {/* Toppings/Condimentos */}
                                     {item.toppings && item.toppings.length > 0 && (
                                       <div className="mt-2 flex flex-wrap gap-1">
-                                        {normalizeItems(item.toppings).map((topping, idx) => (
+                                        {item.toppings.map((topping, idx) => (
                                           <div key={idx} className="flex items-center gap-1 bg-slate-100 dark:bg-slate-700 rounded-full px-2 py-1">
                                             {topping.image && (
                                               <img 
                                                 src={topping.image} 
                                                 alt={topping.name}
                                                 className="w-4 h-4 object-cover rounded-full"
-                                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                                               />
                                             )}
                                             <span className="text-xs text-slate-600 dark:text-slate-300">{topping.name}</span>
@@ -362,14 +367,13 @@ export default function HistoricoPage() {
                                     {item.sauces && item.sauces.length > 0 && (
                                       <div className="mt-2 flex flex-wrap gap-1">
                                         <span className="text-xs text-slate-500 dark:text-slate-400 mr-1">Molhos:</span>
-                                        {normalizeItems(item.sauces).map((sauce, idx) => (
+                                        {item.sauces.map((sauce, idx) => (
                                           <div key={idx} className="flex items-center gap-1 bg-orange-50 dark:bg-orange-900/20 rounded-full px-2 py-1">
                                             {sauce.image && (
                                               <img 
                                                 src={sauce.image} 
                                                 alt={sauce.name}
                                                 className="w-4 h-4 object-cover rounded-full"
-                                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                                               />
                                             )}
                                             <span className="text-xs text-orange-600 dark:text-orange-400">{sauce.name}</span>

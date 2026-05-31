@@ -53,7 +53,7 @@ export function BenefitsSection() {
     },
     {
       icon: Leaf,
-      title: settings.benefit_2_title || 'Sushi 100% Fresco',
+      title: settings.benefit_2_title || 'Acai 100% Natural',
       description: settings.benefit_2_subtitle || 'Puro e saudavel',
       color: 'hsl(var(--secondary))'
     },
@@ -92,9 +92,9 @@ export function BenefitsSection() {
   }
 
   return (
-    <section className="py-6 sm:py-8 bg-gradient-to-r from-muted via-muted/50 to-muted">
-      <div className="container mx-auto px-3 sm:px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+    <section className="py-8 bg-gradient-to-r from-muted via-muted/50 to-muted">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {benefits.map((benefit, index) => (
             <motion.div
               key={benefit.title}
@@ -102,17 +102,17 @@ export function BenefitsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
               viewport={{ once: true }}
-              className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-2 sm:gap-3 p-3 sm:p-0 bg-card/50 sm:bg-transparent rounded-xl sm:rounded-none"
+              className="flex items-center gap-3"
             >
               <div 
-                className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center flex-shrink-0"
+                className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
                 style={{ backgroundColor: `hsl(var(--secondary) / 0.2)` }}
               >
-                <benefit.icon className="w-5 h-5 sm:w-6 sm:h-6 text-secondary" />
+                <benefit.icon className="w-6 h-6 text-secondary" />
               </div>
               <div>
-                <h4 className="text-foreground font-semibold text-xs sm:text-sm leading-tight">{benefit.title}</h4>
-                <p className="text-muted-foreground text-[10px] sm:text-xs">{benefit.description}</p>
+                <h4 className="text-foreground font-semibold text-sm">{benefit.title}</h4>
+                <p className="text-muted-foreground text-xs">{benefit.description}</p>
               </div>
             </motion.div>
           ))}

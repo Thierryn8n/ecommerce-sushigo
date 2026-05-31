@@ -36,7 +36,7 @@ export async function updateSession(request: NextRequest) {
   const url = request.nextUrl.clone()
 
   // Proteger rotas de admin
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  if (request.nextUrl.pathname.startsWith('/admin') && request.nextUrl.pathname !== '/admin') {
     if (!user) {
       url.pathname = '/login-adm'
       return NextResponse.redirect(url)

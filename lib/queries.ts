@@ -75,14 +75,11 @@ export async function getProducts(categorySlug?: string) {
   return data || []
 }
 
-// Buscar produto por ID ou slug (com variações e itens de combo)
+// Buscar produto por ID ou slug
 export async function getProduct(idOrSlug: string) {
   const supabase = await createClient()
   
-  // Verifica se é um UUID válido
-  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug)
-  
-  // Busca o produto
+  // Tenta buscar por ID primeiro, depois por slug
   let query = supabase
     .from('products')
     .select(`
@@ -90,6 +87,9 @@ export async function getProduct(idOrSlug: string) {
       category:categories(name, slug, color)
     `)
     .eq('is_active', true)
+
+  // Verifica se é um UUID válido
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug)
   
   if (isUuid) {
     query = query.eq('id', idOrSlug)
@@ -97,93 +97,34 @@ export async function getProduct(idOrSlug: string) {
     query = query.eq('slug', idOrSlug)
   }
 
-  const { data: product, error } = await query.single()
-  
+  const { data, error } = await query.single()
+
   if (error) {
     console.error('Erro ao buscar produto:', error)
     return null
   }
-  
-  // Se for combo, busca os itens
-  if (product?.is_combo) {
-    const { data: comboItems } = await supabase
-      .from('combo_items')
-      .select(`
-        *,
-        sushi_type:sushi_types(*)
-      `)
-      .eq('combo_product_id', product.id)
-      .order('display_order')
-    
-    product.combo_items = comboItems || []
-  }
-  
-  // Se tiver variações, busca as variações
-  if (product?.is_variable_quantity) {
-    const { data: variants } = await supabase
-      .from('product_variants')
-      .select('*')
-      .eq('product_id', product.id)
-      .eq('is_active', true)
-      .order('display_order')
-    
-    product.variants = variants || []
-  }
-  
-  return product
+  return data
 }
 
-// Buscar produtos combos ativos
+// Buscar combos ativos
 export async function getCombos() {
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('products')
+    .from('combos')
     .select(`
       *,
-      category:categories(name, slug, color)
+      items:combo_items(
+        quantity,
+        product:products(name, image_url),
+        size:sizes(name, ml)
+      )
     `)
     .eq('is_active', true)
-    .eq('is_combo', true)
     .order('display_order')
 
   if (error) {
     console.error('Erro ao buscar combos:', error)
-    return []
-  }
-  
-  // Para cada combo, busca os itens
-  const combosWithItems = await Promise.all(
-    (data || []).map(async (combo) => {
-      const { data: items } = await supabase
-        .from('combo_items')
-        .select(`
-          *,
-          sushi_type:sushi_types(*)
-        `)
-        .eq('combo_product_id', combo.id)
-        .order('display_order')
-      
-      return { ...combo, combo_items: items || [] }
-    })
-  )
-  
-  return combosWithItems
-}
-
-// Buscar variações de um produto
-export async function getProductVariants(productId: string) {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('product_variants')
-    .select('*')
-    .eq('product_id', productId)
-    .eq('is_active', true)
-    .order('display_order')
-
-  if (error) {
-    console.error('Erro ao buscar variações:', error)
     return []
   }
   return data || []
@@ -206,61 +147,52 @@ export async function getSizes() {
   return data || []
 }
 
-// Buscar molhos (shoyu, wasabi, gengibre)
-export async function getSauces() {
+// Buscar toppings/complementos
+export async function getToppings() {
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('sauces')
+    .from('toppings')
     .select('*')
     .eq('is_active', true)
     .order('display_order')
 
   if (error) {
-    console.error('Erro ao buscar molhos:', error)
+    console.error('Erro ao buscar toppings:', error)
     return []
   }
   return data || []
 }
 
-// Buscar tipos de sushi (Hot Roll, Uramaki, Sashimi, etc)
-export async function getSushiTypes(category?: string) {
-  const supabase = await createClient()
-  
-  let query = supabase
-    .from('sushi_types')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order')
-  
-  if (category) {
-    query = query.eq('category', category)
-  }
-
-  const { data, error } = await query
-
-  if (error) {
-    console.error('Erro ao buscar tipos de sushi:', error)
-    return []
-  }
-  return data || []
-}
-
-// Buscar itens de um combo específico
-export async function getComboItems(comboProductId: string) {
+// Buscar vasilhas/bowls
+export async function getBowls() {
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('combo_items')
-    .select(`
-      *,
-      sushi_type:sushi_types(*)
-    `)
-    .eq('combo_product_id', comboProductId)
+    .from('bowls')
+    .select('*')
+    .eq('is_active', true)
     .order('display_order')
 
   if (error) {
-    console.error('Erro ao buscar itens do combo:', error)
+    console.error('Erro ao buscar vasilhas:', error)
+    return []
+  }
+  return data || []
+}
+
+// Buscar tipos de açaí
+export async function getAcaiTypes() {
+  const supabase = await createClient()
+  
+  const { data, error } = await supabase
+    .from('acai_types')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order')
+
+  if (error) {
+    console.error('Erro ao buscar tipos de açaí:', error)
     return []
   }
   return data || []

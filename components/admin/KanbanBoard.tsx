@@ -310,7 +310,7 @@ export function KanbanBoard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D62828]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FF8C00]"></div>
       </div>
     )
   }
@@ -320,7 +320,7 @@ export function KanbanBoard() {
     const activeColumn = columns[activeColumnIndex]
     
     return (
-      <div className="min-h-[calc(100vh-7rem)] flex flex-col overflow-x-auto" style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)', backgroundSize: '32px 32px'}}>
+      <div className="h-[calc(100vh-7rem)] flex flex-col">
         {/* Header com navegação */}
         <div className="px-4 py-3 bg-card border-b border-border flex items-center justify-between">
           <Button
@@ -348,7 +348,7 @@ export function KanbanBoard() {
                 <div
                   key={idx}
                   className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    idx === activeColumnIndex ? 'bg-[#D62828]' : 'bg-muted-foreground/30'
+                    idx === activeColumnIndex ? 'bg-[#FF8C00]' : 'bg-muted-foreground/30'
                   }`}
                 />
               ))}
@@ -738,14 +738,18 @@ export function KanbanBoard() {
 
           {/* Container das Colunas */}
           <motion.div 
-            className="flex gap-2 p-4 h-full"
-            animate={{ x: -carouselIndex * (260 + 8) }} // 260px (w-64) + 8px (gap)
+            className="flex gap-4 p-4 h-full"
+            animate={{ x: -carouselIndex * (260 + 16) }} // 260px (w-64) + 16px (gap)
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             {columns.map((column, colIdx) => (
               <div
                 key={column.status.id}
-                className={`w-48 flex-shrink-0 transition-all duration-300 flex flex-col h-full ${dragOverColumn === column.status.id ? 'ring-4 ring-[#D62828] ring-opacity-50 scale-105' : ''}`}
+                className={`w-64 flex-shrink-0 transition-all duration-300 ${
+                  colIdx >= carouselIndex && colIdx < carouselIndex + columnsPerView
+                    ? 'opacity-100'
+                    : 'opacity-40'
+                } ${dragOverColumn === column.status.id ? 'ring-4 ring-[#FF8C00] ring-opacity-50 scale-105' : ''}`}
                 onDragOver={(e) => {
                   e.preventDefault()
                   e.dataTransfer.dropEffect = 'move'
@@ -784,7 +788,7 @@ export function KanbanBoard() {
                 </div>
                 
                 {/* Área de pedidos */}
-                <div className="bg-card rounded-b-xl border-x border-b border-border p-3 space-y-3 flex-1">
+                <div className="bg-card rounded-b-xl border-x border-b border-border p-3 space-y-3 min-h-[300px] max-h-[calc(100vh-16rem)] overflow-y-auto">
                   <AnimatePresence>
                     {column.orders.map(order => (
                       <motion.div
@@ -835,7 +839,7 @@ export function KanbanBoard() {
               </span>
             </div>
             <div className="text-[10px] text-muted-foreground/60">
-              Kanban v2.0 • SushiGo
+              Kanban v2.0 • Açaí da Praia
             </div>
           </div>
         </div>
@@ -934,7 +938,7 @@ function MobileOrderCard({ order, columns, onMove, onClick }: MobileOrderCardPro
             <Clock className="w-3.5 h-3.5" />
             {formatDateTime(order.created_at).split(' ')[0]}
           </div>
-          <p className="text-xl font-bold text-[#D62828]">
+          <p className="text-xl font-bold text-[#FF8C00]">
             R$ {formatPrice(order.total_amount)}
           </p>
         </div>
@@ -1074,7 +1078,7 @@ function DesktopOrderCard({ order, columns, onMove, onDragStart, onDragEnd }: De
 
           {/* Valor destacado */}
           <div className="mt-2 flex items-center justify-between">
-            <p className="text-lg font-bold text-[#D62828] tracking-tight">
+            <p className="text-lg font-bold text-[#FF8C00] tracking-tight">
               R$ {formatPrice(order.total_amount)}
             </p>
             {order.payment_status === 'paid' && (
@@ -1185,7 +1189,7 @@ function DesktopOrderCard({ order, columns, onMove, onDragStart, onDragEnd }: De
               {order.payment_method === 'cash' && 'Dinheiro'}
               {order.payment_method === 'wallet' && 'Carteira'}
             </div>
-            <p className="text-2xl font-bold text-[#D62828]">
+            <p className="text-2xl font-bold text-[#FF8C00]">
               R$ {formatPrice(order.total_amount)}
             </p>
           </div>
@@ -1200,7 +1204,7 @@ function DesktopOrderCard({ order, columns, onMove, onDragStart, onDragEnd }: De
               <div className="space-y-2 text-xs text-muted-foreground">
                 {order.status_history.slice(0, 5).map((hist, idx) => (
                   <div key={idx} className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#D62828]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#FF8C00]" />
                     <span>{hist.from_status} → {hist.to_status}</span>
                     <span className="text-muted-foreground/60">
                       ({formatDateTime(hist.moved_at)})
@@ -1304,7 +1308,7 @@ function OrderDetail({ order, columns, onMove, onClose }: OrderDetailProps) {
           <p className="font-medium">{order.customer_name}</p>
           <a 
             href={`tel:${order.customer_phone}`}
-            className="text-sm text-[#D62828] flex items-center gap-1 mt-1"
+            className="text-sm text-[#FF8C00] flex items-center gap-1 mt-1"
           >
             <Phone className="w-4 h-4" />
             {order.customer_phone}
@@ -1347,7 +1351,7 @@ function OrderDetail({ order, columns, onMove, onClose }: OrderDetailProps) {
             {order.payment_method === 'cash' && 'Dinheiro'}
             {order.payment_method === 'wallet' && 'Carteira'}
           </div>
-          <p className="text-xl font-bold text-[#D62828]">
+          <p className="text-xl font-bold text-[#FF8C00]">
             R$ {formatPrice(order.total_amount)}
           </p>
         </div>
@@ -1362,7 +1366,7 @@ function OrderDetail({ order, columns, onMove, onClose }: OrderDetailProps) {
             <div className="space-y-2 text-xs text-muted-foreground">
               {order.status_history.slice(0, 5).map((hist, idx) => (
                 <div key={idx} className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#D62828]" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#FF8C00]" />
                   <span>{hist.from_status} → {hist.to_status}</span>
                   <span className="text-muted-foreground/60">
                     ({formatDateTime(hist.moved_at)})

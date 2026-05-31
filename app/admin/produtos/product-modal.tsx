@@ -19,16 +19,14 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  price: number
+  base_price: number
+  promotion_price: number | null
+  base_weight_grams: number
   image_url: string | null
   banner_url: string | null
   is_active: boolean
   is_featured: boolean
   is_promotion: boolean
-  is_combo: boolean
-  base_pieces: number
-  allow_quantity_change: boolean
-  molhos_included: boolean
   display_order: number
   category_id: string | null
 }
@@ -54,16 +52,14 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
     name: '',
     slug: '',
     description: '',
-    price: 0,
+    base_price: 0,
+    promotion_price: null,
+    base_weight_grams: 200,
     image_url: null,
     banner_url: null,
     is_active: true,
     is_featured: false,
     is_promotion: false,
-    is_combo: false,
-    base_pieces: 8,
-    allow_quantity_change: false,
-    molhos_included: true,
     display_order: 0,
     category_id: null,
   })
@@ -81,22 +77,21 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
       setFormData({
         ...product,
         description: product.description || '',
+        promotion_price: product.promotion_price || null,
       })
     } else {
       setFormData({
         name: '',
         slug: '',
         description: '',
-        price: 0,
+        base_price: 0,
+        promotion_price: null,
+        base_weight_grams: 200,
         image_url: null,
         banner_url: null,
         is_active: true,
         is_featured: false,
         is_promotion: false,
-        is_combo: false,
-        base_pieces: 8,
-        allow_quantity_change: false,
-        molhos_included: true,
         display_order: 0,
         category_id: null,
       })
@@ -142,6 +137,9 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
     if (!formData.slug.trim()) {
       newErrors.slug = 'Slug é obrigatório'
     }
+    if (formData.base_price <= 0) {
+      newErrors.base_price = 'Preço deve ser maior que zero'
+    }
     if (!formData.category_id) {
       newErrors.category_id = 'Categoria é obrigatória'
     }
@@ -168,7 +166,9 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_pieces: formData.base_pieces,
+            base_price: formData.base_price,
+            promotion_price: formData.promotion_price || null,
+            base_weight_grams: formData.base_weight_grams,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
             is_active: formData.is_active,
@@ -192,7 +192,9 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_pieces: formData.base_pieces,
+            base_price: formData.base_price,
+            promotion_price: formData.promotion_price || null,
+            base_weight_grams: formData.base_weight_grams,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
             is_active: formData.is_active,
@@ -341,7 +343,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   )}
                   {uploadingImage && (
                     <div className="absolute inset-0 bg-[#1a0a25]/80 flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 text-[#D62828] animate-spin" />
+                      <Loader2 className="w-6 h-6 text-[#FF8C00] animate-spin" />
                     </div>
                   )}
                 </div>
@@ -396,7 +398,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   )}
                   {uploadingBanner && (
                     <div className="absolute inset-0 bg-[#1a0a25]/80 flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 text-[#D62828] animate-spin" />
+                      <Loader2 className="w-6 h-6 text-[#FF8C00] animate-spin" />
                     </div>
                   )}
                 </div>
@@ -431,7 +433,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 <Input
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="Ex: Combo 8 peças"
+                  placeholder="Ex: Açaí 500g"
                   className="bg-[#2a1a35] border-[#3a2a45] text-white"
                 />
                 {errors.name && (
@@ -444,7 +446,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 <Input
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="combo-8-pecas"
+                  placeholder="acai-500g"
                   className="bg-[#2a1a35] border-[#3a2a45] text-white"
                 />
                 {errors.slug && (
@@ -457,24 +459,56 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             <div>
               <label className="text-white/70 text-sm mb-2 block">Descrição</label>
               <textarea
-                value={formData.description || ''}
+                value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Descrição do produto..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D62828]/50"
+                className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#FF8C00]/50"
               />
             </div>
 
-            <div>
-              <label className="text-white/70 text-sm mb-2 block">Quantidade Base (peças)</label>
-              <Input
-                type="number"
-                min="0"
-                value={formData.base_pieces}
-                onChange={(e) => setFormData({ ...formData, base_pieces: parseInt(e.target.value) || 0 })}
-                placeholder="8"
-                className="bg-[#2a1a35] border-[#3a2a45] text-white"
-              />
+            {/* Preços */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-white/70 text-sm mb-2 block">Preço Base (R$) *</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.base_price}
+                  onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
+                  placeholder="0.00"
+                  className="bg-[#2a1a35] border-[#3a2a45] text-white"
+                />
+                {errors.base_price && (
+                  <p className="text-red-400 text-xs mt-1">{errors.base_price}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-white/70 text-sm mb-2 block">Preço Promoção (R$)</label>
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.promotion_price || ''}
+                  onChange={(e) => setFormData({ ...formData, promotion_price: e.target.value ? parseFloat(e.target.value) : null })}
+                  placeholder="0.00"
+                  className="bg-[#2a1a35] border-[#3a2a45] text-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-white/70 text-sm mb-2 block">Peso Base (g)</label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={formData.base_weight_grams}
+                  onChange={(e) => setFormData({ ...formData, base_weight_grams: parseInt(e.target.value) || 0 })}
+                  placeholder="200"
+                  className="bg-[#2a1a35] border-[#3a2a45] text-white"
+                />
+              </div>
             </div>
 
             {/* Categoria e Ordem */}
@@ -484,7 +518,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 <select
                   value={formData.category_id || ''}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value || null })}
-                  className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#D62828]/50"
+                  className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#FF8C00]/50"
                 >
                   <option value="">Selecione...</option>
                   {categories.map((cat) => (
@@ -518,7 +552,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   type="checkbox"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#D62828] focus:ring-[#D62828]"
+                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#FF8C00] focus:ring-[#FF8C00]"
                 />
                 <span className="text-white text-sm">Ativo</span>
               </label>
@@ -528,7 +562,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   type="checkbox"
                   checked={formData.is_featured}
                   onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#D62828] focus:ring-[#D62828]"
+                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#FF8C00] focus:ring-[#FF8C00]"
                 />
                 <span className="text-white text-sm">Destaque</span>
               </label>
@@ -538,7 +572,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   type="checkbox"
                   checked={formData.is_promotion}
                   onChange={(e) => setFormData({ ...formData, is_promotion: e.target.checked })}
-                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#D62828] focus:ring-[#D62828]"
+                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#FF8C00] focus:ring-[#FF8C00]"
                 />
                 <span className="text-white text-sm">Promoção</span>
               </label>
@@ -558,7 +592,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-[#D62828] hover:bg-[#FFC300] text-white"
+                className="bg-[#FF8C00] hover:bg-[#FFC300] text-white"
               >
                 {loading ? (
                   <>

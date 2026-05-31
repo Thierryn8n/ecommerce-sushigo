@@ -31,7 +31,7 @@ export async function createCheckoutSession(
       cancel_url: `${process.env.NEXT_PUBLIC_URL}/checkout/cancel`,
       customer_email: customerEmail,
       metadata: {
-        order_type: 'sushi_delivery',
+        order_type: 'acai_delivery',
       },
     })
 

@@ -1,10 +1,10 @@
 {
-  "name": "SushiGo",
+  "name": "SushiGo Delivery",
   "short_name": "SushiGo",
-  "description": "Sushi premium acessível. Delivery rápido com visual moderno japonês. Peça agora!",
+  "description": "O melhor sushi da cidade. Peca online e receba em casa!",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
+  "background_color": "#0A0A0A",
   "theme_color": "#D62828",
   "orientation": "portrait-primary",
   "scope": "/",
@@ -23,25 +23,11 @@
     }
   ],
   "categories": ["food", "delivery"],
-  "screenshots": [
-    {
-      "src": "/screenshot1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshot2.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Cardápio",
-      "short_name": "Cardápio",
-      "description": "Ver nosso cardápio completo",
+      "name": "Cardapio",
+      "short_name": "Cardapio",
+      "description": "Ver nosso cardapio completo",
       "url": "/cardapio",
       "icons": [
         {

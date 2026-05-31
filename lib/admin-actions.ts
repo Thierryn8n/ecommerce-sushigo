@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import type { Product, Category, Sauce, SushiType, ProductVariant, Combo, Order, Coupon, DeliveryArea, BusinessHour } from '@/lib/types'
+import type { Product, Category, Size, Topping, Combo, Order, Coupon, DeliveryArea, BusinessHour } from '@/lib/types'
 
 // Verificar se usuário é admin
 async function checkAdmin() {
@@ -86,7 +86,10 @@ export async function getAllOrders(filters?: {
     .from('orders')
     .select(`
       *,
-      items:order_items(*)
+      items:order_items(
+        *,
+        toppings:order_item_toppings(*)
+      )
     `)
     .order('created_at', { ascending: false })
   
@@ -240,13 +243,13 @@ export async function updateCategory(id: string, category: Partial<Category>): P
   return data
 }
 
-// ============ MOLHOS (SAUCES) ============
-export async function getAllSauces(): Promise<Sauce[]> {
+// ============ TOPPINGS ============
+export async function getAllToppings(): Promise<Topping[]> {
   await checkAdmin()
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('sauces')
+    .from('toppings')
     .select('*')
     .order('display_order')
   
@@ -254,13 +257,13 @@ export async function getAllSauces(): Promise<Sauce[]> {
   return data || []
 }
 
-export async function createSauce(sauce: Omit<Sauce, 'id' | 'created_at'>): Promise<Sauce> {
+export async function createTopping(topping: Omit<Topping, 'id' | 'created_at'>): Promise<Topping> {
   await checkAdmin()
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('sauces')
-    .insert(sauce)
+    .from('toppings')
+    .insert(topping)
     .select()
     .single()
   
@@ -268,13 +271,13 @@ export async function createSauce(sauce: Omit<Sauce, 'id' | 'created_at'>): Prom
   return data
 }
 
-export async function updateSauce(id: string, sauce: Partial<Sauce>): Promise<Sauce> {
+export async function updateTopping(id: string, topping: Partial<Topping>): Promise<Topping> {
   await checkAdmin()
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('sauces')
-    .update(sauce)
+    .from('toppings')
+    .update(topping)
     .eq('id', id)
     .select()
     .single()
@@ -283,13 +286,13 @@ export async function updateSauce(id: string, sauce: Partial<Sauce>): Promise<Sa
   return data
 }
 
-// ============ TIPOS DE SUSHI ============
-export async function getAllSushiTypes(): Promise<SushiType[]> {
+// ============ TAMANHOS ============
+export async function getAllSizes(): Promise<Size[]> {
   await checkAdmin()
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('sushi_types')
+    .from('sizes')
     .select('*')
     .order('display_order')
   
@@ -297,71 +300,13 @@ export async function getAllSushiTypes(): Promise<SushiType[]> {
   return data || []
 }
 
-export async function createSushiType(sushiType: Omit<SushiType, 'id' | 'created_at'>): Promise<SushiType> {
+export async function updateSize(id: string, size: Partial<Size>): Promise<Size> {
   await checkAdmin()
   const supabase = await createClient()
   
   const { data, error } = await supabase
-    .from('sushi_types')
-    .insert(sushiType)
-    .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
-
-export async function updateSushiType(id: string, sushiType: Partial<SushiType>): Promise<SushiType> {
-  await checkAdmin()
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('sushi_types')
-    .update(sushiType)
-    .eq('id', id)
-    .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
-
-// ============ VARIAÇÕES DE PRODUTO ============
-export async function getProductVariants(productId: string): Promise<ProductVariant[]> {
-  await checkAdmin()
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('product_variants')
-    .select('*')
-    .eq('product_id', productId)
-    .order('display_order')
-  
-  if (error) throw error
-  return data || []
-}
-
-export async function createProductVariant(variant: Omit<ProductVariant, 'id' | 'created_at'>): Promise<ProductVariant> {
-  await checkAdmin()
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('product_variants')
-    .insert(variant)
-    .select()
-    .single()
-  
-  if (error) throw error
-  return data
-}
-
-export async function updateProductVariant(id: string, variant: Partial<ProductVariant>): Promise<ProductVariant> {
-  await checkAdmin()
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase
-    .from('product_variants')
-    .update(variant)
+    .from('sizes')
+    .update(size)
     .eq('id', id)
     .select()
     .single()

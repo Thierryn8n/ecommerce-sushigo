@@ -25,6 +25,8 @@ interface Product {
   name: string
   slug: string
   description: string | null
+  base_price: number
+  promotion_price: number | null
   image_url: string | null
   category_id: string | null
   category: Category | null
@@ -89,7 +91,7 @@ function CardapioContent() {
   })
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-[#120018]">
       <Header />
       
       {/* Hero Banner */}
@@ -104,7 +106,7 @@ function CardapioContent() {
               Nosso <span className="text-secondary">Cardapio</span>
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Escolha seus sushis favoritos e monte do seu jeito com os melhores ingredientes!
+              Escolha seu acai favorito e monte do seu jeito com os melhores ingredientes!
             </p>
           </motion.div>
         </div>
@@ -197,6 +199,11 @@ function CardapioContent() {
                           fill
                           className="object-contain p-4 group-hover:scale-110 transition-transform duration-300"
                         />
+                        {product.promotion_price && (
+                          <div className="absolute top-3 left-3 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+                            PROMO
+                          </div>
+                        )}
                         {product.category && (
                           <div 
                             className="absolute top-3 right-3 text-primary-foreground text-xs px-2 py-1 rounded-full"
@@ -213,7 +220,22 @@ function CardapioContent() {
                         <p className="text-muted-foreground text-sm mb-3 line-clamp-2">{product.description}</p>
                         
                         <div className="flex items-center justify-between">
-                          <span className="text-primary font-bold text-sm">Monte do seu jeito</span>
+                          <div>
+                            {product.promotion_price ? (
+                              <>
+                                <span className="text-muted-foreground text-sm line-through">
+                                  R$ {Number(product.base_price).toFixed(2).replace('.', ',')}
+                                </span>
+                                <p className="text-primary font-bold text-xl">
+                                  R$ {Number(product.promotion_price).toFixed(2).replace('.', ',')}
+                                </p>
+                              </>
+                            ) : (
+                              <p className="text-primary font-bold text-xl">
+                                R$ {Number(product.base_price).toFixed(2).replace('.', ',')}
+                              </p>
+                            )}
+                          </div>
                           <button className="w-10 h-10 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-primary-foreground transition-colors">
                             <Plus className="w-5 h-5" />
                           </button>
@@ -237,7 +259,7 @@ function CardapioContent() {
 export default function CardapioPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-[#120018]">
         <Header />
         <section className="pt-24 pb-12">
           <div className="container mx-auto px-4">

@@ -6,13 +6,11 @@ export async function uploadImage(
   path: string
 ): Promise<{ url: string; error?: string }> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     const fileExt = file.name.split('.').pop()
-    const fileName = `${Date.now()}.${fileExt}`
-    const filePath = `${path}/${fileName}`
-    
-    console.log("[v0] Uploading image to:", filePath)
+    const fileName = `${path}/${Date.now()}.${fileExt}`
+    const filePath = fileName
     
     const { data, error } = await supabase.storage
       .from(bucket)
@@ -21,23 +19,16 @@ export async function uploadImage(
         cacheControl: '3600',
       })
     
-    if (error) {
-      console.error("[v0] Upload error:", error)
-      throw error
-    }
-    
-    console.log("[v0] Upload success:", data)
+    if (error) throw error
     
     const { data: { publicUrl } } = supabase.storage
       .from(bucket)
       .getPublicUrl(filePath)
     
-    console.log("[v0] Public URL:", publicUrl)
-    
     return { url: publicUrl }
-  } catch (error: any) {
-    console.error('[v0] Error uploading image:', error)
-    return { url: '', error: error.message || 'Failed to upload image' }
+  } catch (error) {
+    console.error('Error uploading image:', error)
+    return { url: '', error: 'Failed to upload image' }
   }
 }
 

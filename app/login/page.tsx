@@ -74,7 +74,7 @@ export default function LoginPage() {
     <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
-        <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
+        <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-white mb-8 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
           Voltar
         </Link>
@@ -82,13 +82,13 @@ export default function LoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card rounded-3xl p-8 border border-border"
+          className="bg-[#1a0a25] rounded-3xl p-8 border border-border"
         >
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <Image
-              src="/logo-sushigo.png"
-              alt="SushiGo"
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png"
+              alt="Açaí da Praia"
               width={100}
               height={100}
             />
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 setError('')
               }}
               className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all ${
-                isLogin ? 'bg-[#D62828] text-white' : 'text-muted-foreground'
+                isLogin ? 'bg-[#FF8C00] text-white' : 'text-white/60'
               }`}
             >
               Entrar
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 setError('')
               }}
               className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all ${
-                !isLogin ? 'bg-[#D62828] text-white' : 'text-muted-foreground'
+                !isLogin ? 'bg-[#FF8C00] text-white' : 'text-white/60'
               }`}
             >
               Criar Conta
@@ -131,13 +131,13 @@ export default function LoginPage() {
               <div>
                 <label className="text-muted-foreground text-sm mb-2 block">Nome completo</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
                   <Input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Seu nome"
-                    className="pl-10 bg-muted border-border text-foreground"
+                    className="pl-10 bg-muted border-border text-white"
                   />
                 </div>
               </div>
@@ -146,13 +146,13 @@ export default function LoginPage() {
             <div>
               <label className="text-muted-foreground text-sm mb-2 block">E-mail</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
                 <Input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="seu@email.com"
-                  className="pl-10 bg-muted border-border text-foreground"
+                  className="pl-10 bg-muted border-border text-white"
                 />
               </div>
             </div>
@@ -160,18 +160,18 @@ export default function LoginPage() {
             <div>
               <label className="text-muted-foreground text-sm mb-2 block">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="********"
-                  className="pl-10 pr-10 bg-muted border-border text-foreground"
+                  className="pl-10 pr-10 bg-muted border-border text-white"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground/50 hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -182,13 +182,13 @@ export default function LoginPage() {
               <div>
                 <label className="text-muted-foreground text-sm mb-2 block">Confirmar Senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/50" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
                   <Input
                     type="password"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     placeholder="********"
-                    className="pl-10 bg-muted border-border text-foreground"
+                    className="pl-10 bg-muted border-border text-white"
                   />
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function LoginPage() {
 
             {isLogin && (
               <div className="text-right">
-                <Link href="/esqueci-senha" className="text-[#D62828] text-sm hover:text-[#FFC300] transition-colors">
+                <Link href="/esqueci-senha" className="text-[#FF8C00] text-sm hover:text-[#FFC300] transition-colors">
                   Esqueci minha senha
                 </Link>
               </div>
@@ -205,7 +205,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6 disabled:opacity-50"
+              className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6 disabled:opacity-50"
             >
               {loading ? 'Processando...' : isLogin ? 'Entrar' : 'Criar Conta'}
             </Button>
@@ -213,15 +213,15 @@ export default function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-muted-foreground text-sm">ou</span>
-            <div className="flex-1 h-px bg-border" />
+            <div className="flex-1 h-px bg-[#3a2a45]" />
+            <span className="text-white/50 text-sm">ou</span>
+            <div className="flex-1 h-px bg-[#3a2a45]" />
           </div>
 
           {/* Social Login */}
           <Button
             variant="outline"
-            className="w-full border-border text-foreground hover:bg-muted rounded-full"
+            className="w-full border-border text-white hover:bg-muted rounded-full"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -247,7 +247,7 @@ export default function LoginPage() {
 
         {/* Admin Link */}
         <div className="text-center mt-6">
-          <Link href="/login-adm" className="text-muted-foreground text-sm hover:text-foreground transition-colors">
+          <Link href="/login-adm" className="text-white/50 text-sm hover:text-muted-foreground transition-colors">
             Acesso Administrativo
           </Link>
         </div>

@@ -7,45 +7,68 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 
-interface AppSettings {
-  [key: string]: string
+interface Combo {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  pieces_count: number
+  serves_people: number
+  price: number
+  promotion_price: number | null
+  image_url: string | null
 }
 
 export function CombosSection() {
-  const [settings, setSettings] = useState<AppSettings>({})
+  const [combos, setCombos] = useState<Combo[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchData() {
+    async function fetchCombos() {
       const supabase = createClient()
-
-      // Buscar configurações da home
-      const { data: settingsData } = await supabase
-        .from('app_settings')
+      const { data } = await supabase
+        .from('combos')
         .select('*')
-        .eq('section', 'home')
+        .eq('is_active', true)
+        .order('display_order')
+        .limit(4)
 
-      if (settingsData) {
-        const settingsObj: AppSettings = {}
-        settingsData.forEach((item) => {
-          settingsObj[item.key] = item.value || ''
-        })
-        setSettings(settingsObj)
-      }
-
+      if (data) setCombos(data)
       setLoading(false)
     }
-
-    fetchData()
+    fetchCombos()
   }, [])
+
+  // Dados de exemplo para quando nao houver combos no banco
+  const defaultCombos = [
+    { id: '1', name: 'COMBO 10 PESSOAS', pieces_count: 250, serves_people: 10, price: 449.90, image_url: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&q=80', slug: 'combo-10-pessoas' },
+    { id: '2', name: 'COMBO 20 PESSOAS', pieces_count: 500, serves_people: 20, price: 849.90, image_url: 'https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&q=80', slug: 'combo-20-pessoas' },
+    { id: '3', name: 'COMBO 30 PESSOAS', pieces_count: 750, serves_people: 30, price: 1249.90, image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80', slug: 'combo-30-pessoas' },
+    { id: '4', name: 'COMBO 40 PESSOAS', pieces_count: 1000, serves_people: 40, price: 1699.90, image_url: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=400&q=80', slug: 'combo-40-pessoas' },
+  ]
+
+  const displayCombos = combos.length > 0 ? combos : defaultCombos
 
   if (loading) {
     return (
-      <section className="py-16 bg-background">
+      <section className="py-14 bg-[#0A0A0A]">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="animate-pulse h-64 bg-muted rounded-3xl"></div>
-            <div className="animate-pulse h-64 bg-muted rounded-3xl"></div>
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-2xl font-black text-foreground">COMBOS PARA TODOS</h2>
+            <div className="h-10 w-36 bg-[#1A1A1A] rounded animate-pulse" />
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="rounded-xl overflow-hidden animate-pulse">
+                <div className="aspect-square bg-[#1A1A1A]" />
+                <div className="p-4 bg-[#141414]">
+                  <div className="h-4 bg-[#1A1A1A] rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-[#1A1A1A] rounded w-1/2 mb-3" />
+                  <div className="h-6 bg-[#1A1A1A] rounded w-2/3 mb-3" />
+                  <div className="h-10 bg-[#1A1A1A] rounded" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -53,97 +76,56 @@ export function CombosSection() {
   }
 
   return (
-    <section className="py-10 sm:py-16 bg-background">
-      <div className="container mx-auto px-3 sm:px-4">
-        <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
-          {/* Combos Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-primary to-primary/80 p-5 sm:p-8"
-          >
-            <div className="relative z-10">
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-primary-foreground mb-1 sm:mb-2">
-                {settings.combos_title?.split(' ')[0] || 'COMBOS'}
-              </h3>
-              <p className="text-xl sm:text-2xl md:text-3xl font-black text-secondary mb-2 sm:mb-4">
-                {settings.combos_title?.split(' ').slice(1).join(' ') || 'ESPECIAIS'}
-              </p>
-              <p className="text-primary-foreground/80 text-sm sm:text-base mb-4 sm:mb-6">
-                {settings.combos_description || 'Mais sabor por um preco incrivel!'}
-              </p>
-              <Link href="/combos">
-                <Button className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base">
-                  VER COMBOS
-                </Button>
-              </Link>
-            </div>
-            {/* Decorative Image */}
-            <div className="absolute right-0 bottom-0 w-28 h-28 sm:w-40 sm:h-40 opacity-80">
-              <Image
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png"
-                alt="Combo"
-                fill
-                className="object-contain"
-              />
-            </div>
-          </motion.div>
+    <section className="py-14 bg-[#0A0A0A]">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-xl md:text-2xl font-black text-foreground">COMBOS PARA TODOS</h2>
+          <Link href="/combos">
+            <Button 
+              variant="outline" 
+              className="border-[#2A2A2A] bg-transparent text-foreground hover:bg-[#1A1A1A] hover:border-primary rounded-md text-xs md:text-sm px-4 md:px-6"
+            >
+              VER TODOS COMBOS
+            </Button>
+          </Link>
+        </div>
 
-          {/* App Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-secondary to-secondary/80 p-5 sm:p-8"
-          >
-            <div className="relative z-10">
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-secondary-foreground mb-2 sm:mb-4">
-                {settings.app_title || 'BAIXE NOSSO APP'}
-              </h3>
-              <p className="text-secondary-foreground/80 text-sm sm:text-base mb-4 sm:mb-6">
-                {settings.app_description || 'Mais praticidade, promocoes exclusivas e muito mais!'}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                <Link href={settings.app_store_url || '#'} target="_blank">
-                  <button className="bg-black text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black/80 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-                    </svg>
-                    <div className="text-left">
-                      <p className="text-[8px] leading-none">Baixar na</p>
-                      <p className="text-xs sm:text-sm font-semibold">App Store</p>
-                    </div>
-                  </button>
-                </Link>
-                <Link href={settings.play_store_url || '#'} target="_blank">
-                  <button className="bg-black text-white px-3 sm:px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-black/80 transition-colors w-full sm:w-auto justify-center sm:justify-start">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
-                    </svg>
-                    <div className="text-left">
-                      <p className="text-[8px] leading-none">Disponivel no</p>
-                      <p className="text-xs sm:text-sm font-semibold">Google Play</p>
-                    </div>
-                  </button>
-                </Link>
-              </div>
-            </div>
-            {/* Phone Mockup */}
-            <div className="absolute right-2 sm:right-4 -bottom-4 w-24 h-36 sm:w-32 sm:h-48 opacity-90">
-              <div className="w-full h-full bg-background rounded-xl sm:rounded-2xl border-2 sm:border-4 border-background/50 flex items-center justify-center">
-                <Image
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png"
-                  alt="App"
-                  width={60}
-                  height={60}
-                  className="object-contain w-10 h-10 sm:w-[60px] sm:h-[60px]"
-                />
-              </div>
-            </div>
-          </motion.div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {displayCombos.map((combo, index) => (
+            <motion.div
+              key={combo.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              <Link href={`/combo/${combo.slug}`}>
+                <div className="group bg-[#141414] rounded-xl overflow-hidden border border-[#2A2A2A] hover:border-primary/50 transition-all duration-300">
+                  <div className="relative aspect-square bg-[#1A1A1A] overflow-hidden">
+                    <Image
+                      src={combo.image_url || 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80'}
+                      alt={combo.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-4 md:p-5">
+                    <h3 className="text-foreground font-black text-sm md:text-base mb-1">{combo.name}</h3>
+                    <p className="text-foreground/50 text-xs md:text-sm mb-3">{combo.pieces_count} Pecas</p>
+                    <p className="text-primary font-black text-lg md:text-xl mb-4">
+                      R$ {Number(combo.promotion_price || combo.price).toFixed(2).replace('.', ',')}
+                    </p>
+                    <Button 
+                      variant="outline"
+                      className="w-full border-[#2A2A2A] bg-transparent text-foreground hover:bg-[#1A1A1A] hover:border-primary font-bold text-xs md:text-sm h-9 md:h-10"
+                    >
+                      VER DETALHES
+                    </Button>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

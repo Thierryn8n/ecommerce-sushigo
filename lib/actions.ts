@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import type { 
   Product, 
   Category, 
+  Size, 
+  Topping, 
   Combo, 
   DeliveryArea, 
   BusinessHour, 
@@ -89,6 +91,42 @@ export async function getProductsByCategory(categorySlug: string): Promise<Produ
   
   if (error) throw error
   return data || []
+}
+
+// ============ TAMANHOS ============
+export async function getSizes(): Promise<Size[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('sizes')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order')
+  
+  if (error) throw error
+  return data || []
+}
+
+// ============ TOPPINGS ============
+export async function getToppings(): Promise<Topping[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('toppings')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order')
+  
+  if (error) throw error
+  return data || []
+}
+
+export async function getToppingsByCategory(): Promise<Record<string, Topping[]>> {
+  const toppings = await getToppings()
+  return toppings.reduce((acc, topping) => {
+    const category = topping.category || 'outros'
+    if (!acc[category]) acc[category] = []
+    acc[category].push(topping)
+    return acc
+  }, {} as Record<string, Topping[]>)
 }
 
 // ============ COMBOS ============
@@ -235,13 +273,18 @@ export async function createOrder(orderData: {
   items: Array<{
     product_id: string
     product_name: string
-    variant_id?: string
-    variant_name?: string
+    size_id: string
+    size_name: string
     quantity: number
-    quantity_pieces?: number
     unit_price: number
     total_price: number
     notes?: string
+    toppings: Array<{
+      topping_id: string
+      topping_name: string
+      price: number
+      quantity: number
+    }>
   }>
 }): Promise<Order> {
   const supabase = await createClient()
@@ -274,22 +317,38 @@ export async function createOrder(orderData: {
   
   // Criar itens do pedido
   for (const item of orderData.items) {
-    const { error: itemError } = await supabase
+    const { data: orderItem, error: itemError } = await supabase
       .from('order_items')
       .insert({
         order_id: order.id,
         product_id: item.product_id,
         product_name: item.product_name,
-        variant_id: item.variant_id || null,
-        variant_name: item.variant_name || null,
+        size_id: item.size_id,
+        size_name: item.size_name,
         quantity: item.quantity,
-        quantity_pieces: item.quantity_pieces || item.quantity,
         unit_price: item.unit_price,
         total_price: item.total_price,
         notes: item.notes
       })
+      .select()
+      .single()
     
     if (itemError) throw itemError
+    
+    // Criar toppings do item
+    if (item.toppings.length > 0) {
+      const { error: toppingsError } = await supabase
+        .from('order_item_toppings')
+        .insert(item.toppings.map(t => ({
+          order_item_id: orderItem.id,
+          topping_id: t.topping_id,
+          topping_name: t.topping_name,
+          price: t.price,
+          quantity: t.quantity
+        })))
+      
+      if (toppingsError) throw toppingsError
+    }
   }
   
   return order
@@ -305,7 +364,10 @@ export async function getUserOrders(): Promise<Order[]> {
     .from('orders')
     .select(`
       *,
-      items:order_items(*)
+      items:order_items(
+        *,
+        toppings:order_item_toppings(*)
+      )
     `)
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
@@ -320,7 +382,10 @@ export async function getOrderById(id: string): Promise<Order | null> {
     .from('orders')
     .select(`
       *,
-      items:order_items(*)
+      items:order_items(
+        *,
+        toppings:order_item_toppings(*)
+      )
     `)
     .eq('id', id)
     .single()

@@ -160,7 +160,7 @@ export default function CadastrarAdminPage() {
                 className="object-contain"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-[#D62828] flex items-center justify-center text-white font-bold text-3xl">
+              <div className="w-24 h-24 rounded-full bg-[#FF8C00] flex items-center justify-center text-white font-bold text-3xl">
                 {store?.name?.charAt(0) || 'A'}
               </div>
             )}
@@ -169,7 +169,7 @@ export default function CadastrarAdminPage() {
           {/* Title */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Shield className="w-6 h-6 text-[#D62828]" />
+              <Shield className="w-6 h-6 text-[#FF8C00]" />
               <h1 className="text-2xl font-bold text-white">Cadastrar Administrador</h1>
             </div>
             <p className="text-white/60 text-sm">
@@ -264,7 +264,7 @@ export default function CadastrarAdminPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
+              className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
             >
               {loading ? 'Cadastrando...' : 'Cadastrar Administrador'}
             </Button>

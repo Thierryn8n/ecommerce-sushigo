@@ -34,7 +34,7 @@ const promotions = [
   {
     id: 3,
     title: "Combo Casal",
-    description: "2 Combos Tradicionais + 2 Refrigerantes por apenas R$ 39,90",
+    description: "2 Açaís Tradicionais + 2 Águas por apenas R$ 39,90",
     originalPrice: "R$ 45,80",
     promoPrice: "R$ 39,90",
     icon: Tag,
@@ -43,7 +43,7 @@ const promotions = [
   {
     id: 4,
     title: "Happy Hour",
-    description: "20% de desconto em todos os combos das 14h às 17h",
+    description: "20% de desconto em todos os açaís das 14h às 17h",
     discount: "20% OFF",
     schedule: "14h às 17h",
     icon: Clock,
@@ -52,13 +52,13 @@ const promotions = [
 ]
 
 const weeklyDeals = [
-  { day: "Segunda", deal: "Combo Fit com 15% de desconto" },
-  { day: "Terça", deal: "Combo Kids por R$ 12,90" },
-  { day: "Quarta", deal: "2 por 1 em combos de 8 peças" },
+  { day: "Segunda", deal: "Açaí Fit com 15% de desconto" },
+  { day: "Terça", deal: "Açaí Kids por R$ 12,90" },
+  { day: "Quarta", deal: "2 por 1 em açaís de 300ml" },
   { day: "Quinta", deal: "Frete grátis para toda Canoa Quebrada" },
-  { day: "Sexta", deal: "Combo Premium com Molho Especial grátis" },
+  { day: "Sexta", deal: "Açaí Premium com Nutella grátis" },
   { day: "Sábado", deal: "Combo Família com 20% de desconto" },
-  { day: "Domingo", deal: "Molho extra grátis em qualquer combo" }
+  { day: "Domingo", deal: "Topping extra grátis em qualquer açaí" }
 ]
 
 export default function PromocoesPage() {
@@ -85,7 +85,7 @@ export default function PromocoesPage() {
             </h1>
             <p className="text-lg text-muted-foreground">
               Aproveite nossos cupons e ofertas especiais para saborear o melhor 
-              sushi de Canoa Quebrada com descontos exclusivos.
+              açaí de Canoa Quebrada com descontos exclusivos.
             </p>
           </motion.div>
         </div>
