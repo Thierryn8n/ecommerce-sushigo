@@ -24,6 +24,7 @@ export default function TiposAcaiPage() {
     description: '',
     price_addition: '',
     weight_addition: '',
+    price_per_kg: '',
     image_url: '',
     is_active: true,
     display_order: '0',
@@ -66,6 +67,7 @@ export default function TiposAcaiPage() {
       description: formData.description || null,
       price_addition: parseFloat(formData.price_addition) || 0,
       weight_addition: parseInt(formData.weight_addition) || 0,
+      price_per_kg: parseFloat(formData.price_per_kg) || 0,
       image_url: imageUrl || null,
       is_active: formData.is_active,
       display_order: parseInt(formData.display_order),
@@ -100,6 +102,7 @@ export default function TiposAcaiPage() {
       description: type.description || '',
       price_addition: type.price_addition.toString(),
       weight_addition: type.weight_addition.toString(),
+      price_per_kg: type.price_per_kg?.toString() || '',
       image_url: type.image_url || '',
       is_active: type.is_active,
       display_order: type.display_order.toString(),
@@ -110,7 +113,7 @@ export default function TiposAcaiPage() {
   const resetForm = () => {
     setEditingType(null)
     setFormData({
-      name: '', description: '', price_addition: '', weight_addition: '',
+      name: '', description: '', price_addition: '', weight_addition: '', price_per_kg: '',
       image_url: '', is_active: true, display_order: '0',
     })
     setImageFile(null)
@@ -160,8 +163,8 @@ export default function TiposAcaiPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="price_addition">Adicional Preco (R$)</Label>
-                      <Input id="price_addition" type="number" step="0.01" value={formData.price_addition} onChange={(e) => setFormData({ ...formData, price_addition: e.target.value })} className="bg-muted border-border" />
+                      <Label htmlFor="price_per_kg">Preco por Quilo (R$)</Label>
+                      <Input id="price_per_kg" type="number" step="0.01" value={formData.price_per_kg} onChange={(e) => setFormData({ ...formData, price_per_kg: e.target.value })} className="bg-muted border-border" />
                     </div>
                     <div>
                       <Label htmlFor="weight_addition">Adicional Peso (g)</Label>
@@ -169,6 +172,10 @@ export default function TiposAcaiPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="price_addition">Adicional Preco Fixo (R$)</Label>
+                      <Input id="price_addition" type="number" step="0.01" value={formData.price_addition} onChange={(e) => setFormData({ ...formData, price_addition: e.target.value })} className="bg-muted border-border" />
+                    </div>
                     <div>
                       <Label htmlFor="display_order">Ordem</Label>
                       <Input id="display_order" type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} className="bg-muted border-border" />
@@ -213,7 +220,7 @@ export default function TiposAcaiPage() {
                 <h3 className="text-xl font-bold text-foreground mb-1">{type.name}</h3>
                 {type.description && <p className="text-muted-foreground text-sm mb-2">{type.description}</p>}
                 <div className="flex justify-between items-center text-sm mb-2">
-                  <span className="text-[#FFC300] font-semibold">{type.price_addition > 0 ? `+R$ ${type.price_addition.toFixed(2)}` : 'Sem adicional'}</span>
+                  <span className="text-[#FFC300] font-semibold">R$ {type.price_per_kg?.toFixed(2) || '0.00'}/kg</span>
                   <span className="text-foreground/70 flex items-center gap-1"><Weight className="w-3 h-3" /> {type.weight_addition}g</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">

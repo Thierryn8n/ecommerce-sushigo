@@ -53,6 +53,7 @@ interface AcaiType {
   description: string | null
   price_addition: number
   weight_addition: number
+  price_per_kg: number
 }
 
 interface Topping {
@@ -90,7 +91,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const [acaiTypes, setAcaiTypes] = useState<AcaiType[]>([])
   const [toppings, setToppings] = useState<Topping[]>([])
   const [sauces, setSauces] = useState<Sauce[]>([])
-  const [pricePerKg, setPricePerKg] = useState<number>(0)
   const [loading, setLoading] = useState(true)
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -170,17 +170,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
       if (productData) {
         setProduct(productData)
-      }
-
-      // Buscar preco por kg
-      const { data: priceData } = await supabase
-        .from('store_settings')
-        .select('value')
-        .eq('key', 'price_per_kg')
-        .limit(1)
-        .single()
-      if (priceData?.value) {
-        setPricePerKg(parseFloat(priceData.value))
       }
 
       // Buscar vasilhas
@@ -316,10 +305,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   // Calculate total price
   const calculateTotal = () => {
-    // Se preco por kg estiver configurado, calcula por peso
-    if (pricePerKg > 0) {
+    // Preco por kg vem do tipo de acai selecionado
+    const typePricePerKg = acaiType?.price_per_kg || 0
+    if (typePricePerKg > 0) {
       const weight = calculateWeight()
-      return (weight / 1000) * pricePerKg
+      return (weight / 1000) * typePricePerKg
     }
     
     // Sistema antigo: preco fixo + adicionais
@@ -483,7 +473,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-muted-foreground text-sm sm:text-base">Total do Pedido</span>
-                      {pricePerKg > 0 && (
+                      {(acaiType?.price_per_kg || 0) > 0 && (
                         <p className="text-xs text-muted-foreground/70">{totalWeight}g = {(totalWeight / 1000).toFixed(3).replace('.', ',')}kg</p>
                       )}
                     </div>
@@ -496,8 +486,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           {quantity}x R$ {totalPrice.toFixed(2).replace('.', ',')}
                         </p>
                       )}
-                      {pricePerKg > 0 && (
-                        <p className="text-[10px] text-muted-foreground/60">R$ {pricePerKg}/kg</p>
+                      {(acaiType?.price_per_kg || 0) > 0 && (
+                        <p className="text-[10px] text-muted-foreground/60">R$ {acaiType?.price_per_kg || 0}/kg</p>
                       )}
                     </div>
                   </div>
@@ -505,7 +495,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 {/* Summary */}
                 <div className="space-y-2 text-sm">
-                  {pricePerKg > 0 && (
+                  {(acaiType?.price_per_kg || 0) > 0 && (
                     <div className="flex justify-between text-muted-foreground">
                       <span>Peso Total:</span>
                       <span className="text-foreground font-semibold">{totalWeight}g ({(totalWeight / 1000).toFixed(3).replace('.', ',')}kg)</span>

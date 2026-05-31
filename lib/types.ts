@@ -226,6 +226,7 @@ export interface AcaiType {
   description: string | null
   price_addition: number
   weight_addition: number
+  price_per_kg: number
   image_url: string | null
   is_active: boolean
   display_order: number
