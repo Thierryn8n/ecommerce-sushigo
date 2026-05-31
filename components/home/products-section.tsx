@@ -54,12 +54,16 @@ export function ProductsSection() {
   const displayProducts = products.length > 0 ? products : defaultProducts
 
   const handleAddToCart = (product: Product) => {
+    const price = product.promotion_price || product.base_price
     addItem({
-      id: product.id,
+      id: crypto.randomUUID(),
+      productId: product.id,
       name: product.name,
-      price: product.promotion_price || product.base_price,
-      quantity: 1,
       image: product.image_url || '',
+      basePrice: price,
+      totalPrice: price,
+      quantity: 1,
+      quantityPieces: product.pieces_count,
     })
   }
 
@@ -111,31 +115,35 @@ export function ProductsSection() {
               viewport={{ once: true }}
               className="flex-shrink-0 w-36 md:w-44"
             >
-              <Link href={`/produto/${product.slug}`}>
-                <div className="relative aspect-square bg-[#2A2A2A] rounded-xl overflow-hidden mb-3 group">
-                  <Image
-                    src={product.image_url || 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300&q=80'}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+              <div className="bg-[#141414] rounded-xl border border-[#2A2A2A] overflow-hidden hover:border-primary/50 transition-all duration-300">
+                <Link href={`/produto/${product.slug}`}>
+                  <div className="relative aspect-square bg-[#1A1A1A] overflow-hidden group">
+                    <Image
+                      src={product.image_url || 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=300&q=80'}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                </Link>
+                <div className="p-3">
+                  <h3 className="text-foreground font-bold text-xs md:text-sm mb-0.5 line-clamp-1">{product.name}</h3>
+                  <p className="text-foreground/50 text-xs mb-3">{product.pieces_count} unidades</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-primary font-bold text-sm md:text-base">
+                      R$ {Number(product.promotion_price || product.base_price).toFixed(2).replace('.', ',')}
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault()
+                        handleAddToCart(product as Product)
+                      }}
+                      className="w-8 h-8 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-primary-foreground transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </Link>
-              <h3 className="text-foreground font-bold text-xs md:text-sm mb-0.5 line-clamp-1">{product.name}</h3>
-              <p className="text-foreground/50 text-xs mb-2">{product.pieces_count} unidades</p>
-              <div className="flex items-center justify-between">
-                <p className="text-primary font-bold text-sm md:text-base">
-                  R$ {Number(product.promotion_price || product.base_price).toFixed(2).replace('.', ',')}
-                </p>
-                <button
-                  onClick={(e) => {
-                    e.preventDefault()
-                    handleAddToCart(product as Product)
-                  }}
-                  className="w-8 h-8 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-primary-foreground transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
               </div>
             </motion.div>
           ))}
