@@ -23,11 +23,11 @@ export function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [settings, setSettings] = useState<HeroSettings>({
     title_line1: 'O MELHOR SUSHI,',
-    title_line2: 'ONDE VOCE ESTIVER.',
+    title_line2: 'ONDE VOCÊ ESTIVER.',
     subtitle: 'Peixes selecionados, ingredientes frescos',
-    description: 'e o verdadeiro sabor da culinaria japonesa na sua casa.',
+    description: 'e o verdadeiro sabor da culinária japonesa na sua casa.',
     cta_primary: 'PEDIR AGORA',
-    cta_secondary: 'VER CARDAPIO',
+    cta_secondary: 'VER CARDÁPIO',
   })
 
   useEffect(() => {
@@ -81,70 +81,71 @@ export function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Title */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight italic">
-              <span className="text-foreground">{settings.title_line1}</span>
+            {/* Title - Design exato da imagem */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
+              <span className="text-[#D62828]">{settings.title_line1.split(',')[0]}</span>
+              <span className="text-white">,</span>
               <br />
-              <span className="text-primary">{settings.title_line2.split(' ')[0]}</span>
-              <span className="text-foreground"> {settings.title_line2.split(' ').slice(1).join(' ')}</span>
+              <span className="text-[#D62828]">{settings.title_line2.split(' ')[0]}</span>
+              <span className="text-white"> {settings.title_line2.split(' ').slice(1).join(' ')}</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-foreground/70 text-base md:text-lg mb-8 leading-relaxed max-w-md">
+            <p className="text-white/80 text-base md:text-lg mb-8 leading-relaxed max-w-md">
               {settings.subtitle}
               <br />
               {settings.description}
             </p>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Estilo exato das imagens */}
             <div className="flex flex-col sm:flex-row gap-4 mb-16">
-              <a href={`https://wa.me/${whatsappNumber}`} target="_blank" rel="noopener noreferrer">
+              <Link href="/checkout">
                 <Button 
                   size="lg" 
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm px-8 py-6 rounded-lg gap-2 w-full sm:w-auto"
+                  className="bg-[#D62828] hover:bg-[#D62828]/90 text-white font-bold text-sm px-8 py-6 rounded-md gap-2 w-full sm:w-auto"
                 >
                   <Phone className="w-5 h-5" />
                   {settings.cta_primary}
                 </Button>
-              </a>
+              </Link>
               <Link href="/cardapio">
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="border-2 border-foreground/30 bg-[#1A1A1A] text-foreground hover:bg-[#2A2A2A] font-bold text-sm px-8 py-6 rounded-lg w-full sm:w-auto"
+                  className="border border-white/30 bg-[#1A1A1A]/80 text-white hover:bg-[#1A1A1A] font-bold text-sm px-8 py-6 rounded-md w-full sm:w-auto"
                 >
                   {settings.cta_secondary}
                 </Button>
               </Link>
             </div>
 
-            {/* Benefits */}
+            {/* Benefits - Texto exato das imagens */}
             <div className="flex flex-wrap gap-8">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center">
-                  <Truck className="w-5 h-5 text-primary" />
+                  <Truck className="w-5 h-5 text-[#D62828]" />
                 </div>
                 <div>
-                  <p className="text-foreground font-bold text-sm">ENTREGA RAPIDA</p>
-                  <p className="text-foreground/50 text-xs">Rapido e seguro</p>
+                  <p className="text-white font-bold text-sm">ENTREGA RÁPIDA</p>
+                  <p className="text-white/60 text-xs">Até 60 minutos</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center">
-                  <Fish className="w-5 h-5 text-primary" />
+                  <Fish className="w-5 h-5 text-[#D62828]" />
                 </div>
                 <div>
-                  <p className="text-foreground font-bold text-sm">PEIXES FRESCOS</p>
-                  <p className="text-foreground/50 text-xs">Selecionados diariamente</p>
+                  <p className="text-white font-bold text-sm">PEIXES SELECIONADOS</p>
+                  <p className="text-white/60 text-xs">Qualidade premium</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-[#1A1A1A] border border-[#2A2A2A] flex items-center justify-center">
-                  <Award className="w-5 h-5 text-primary" />
+                  <Award className="w-5 h-5 text-[#D62828]" />
                 </div>
                 <div>
-                  <p className="text-foreground font-bold text-sm">QUALIDADE PREMIUM</p>
-                  <p className="text-foreground/50 text-xs">O melhor sushi da cidade</p>
+                  <p className="text-white font-bold text-sm">EMBALAGEM PREMIUM</p>
+                  <p className="text-white/60 text-xs">Segurança e qualidade</p>
                 </div>
               </div>
             </div>
@@ -152,18 +153,6 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Carousel Dots */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-        {[0, 1, 2].map((index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-2.5 h-2.5 rounded-full transition-colors ${
-              currentSlide === index ? 'bg-foreground' : 'bg-foreground/30'
-            }`}
-          />
-        ))}
-      </div>
     </section>
   )
 }
