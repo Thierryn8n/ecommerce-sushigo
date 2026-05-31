@@ -836,7 +836,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         )}
                                         <p className="text-foreground text-xs font-medium leading-tight mb-0.5">{topping.name}</p>
                                         <p className="text-[#FF8C00] text-[10px] mb-1">
-                                          {isAuto && qty > 0 ? 'Incluso' : `+R$ ${formatPrice(topping.price)}`}
+                                          {isAuto && qty > 0 ? `Incluso · ${topping.weight_grams}g` : `+R$ ${formatPrice(topping.price)}`}
                                         </p>
                                         <div className="flex items-center justify-center">
                                           <div className="flex items-center gap-0.5 bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5">
