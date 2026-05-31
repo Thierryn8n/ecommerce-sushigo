@@ -44,11 +44,11 @@ export function ProductsSection() {
 
   // Dados de exemplo para quando nao houver produtos no banco
   const defaultProducts = [
-    { id: '1', name: 'HOT ROLL SALMAO', pieces_count: 10, base_price: 24.90, image_url: 'https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=300&q=80', slug: 'hot-roll-salmao' },
-    { id: '2', name: 'URAMAKI FILADELFIA', pieces_count: 8, base_price: 22.90, image_url: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=300&q=80', slug: 'uramaki-filadelfia' },
-    { id: '3', name: 'SASHIMI SALMAO', pieces_count: 10, base_price: 29.90, image_url: 'https://images.unsplash.com/photo-1534256958597-7fe685cbd745?w=300&q=80', slug: 'sashimi-salmao' },
-    { id: '4', name: 'NIGUIRI SALMAO', pieces_count: 2, base_price: 10.90, image_url: 'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=300&q=80', slug: 'niguiri-salmao' },
-    { id: '5', name: 'JOE SALMAO', pieces_count: 2, base_price: 12.90, image_url: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=300&q=80', slug: 'joe-salmao' },
+    { id: '1', name: 'HOT ROLL SALMAO', pieces_count: 10, base_price: 24.90, image_url: '/images/hot-roll-salmao.png', slug: 'hot-roll-salmao' },
+    { id: '2', name: 'URAMAKI FILADELFIA', pieces_count: 8, base_price: 22.90, image_url: '/images/uramaki-filadelfia.png', slug: 'uramaki-filadelfia' },
+    { id: '3', name: 'SASHIMI SALMAO', pieces_count: 10, base_price: 29.90, image_url: '/images/sashimi-salmao.png', slug: 'sashimi-salmao' },
+    { id: '4', name: 'NIGUIRI SALMAO', pieces_count: 2, base_price: 10.90, image_url: '/images/nigiri-salmao.png', slug: 'niguiri-salmao' },
+    { id: '5', name: 'JOE SALMAO', pieces_count: 2, base_price: 12.90, image_url: '/images/joe-salmao.png', slug: 'joe-salmao' },
   ]
 
   const displayProducts = products.length > 0 ? products : defaultProducts

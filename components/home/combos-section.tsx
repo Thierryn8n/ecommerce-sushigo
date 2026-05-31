@@ -41,10 +41,10 @@ export function CombosSection() {
 
   // Dados de exemplo para quando nao houver combos no banco
   const defaultCombos = [
-    { id: '1', name: 'COMBO 10 PESSOAS', pieces_count: 250, serves_people: 10, price: 449.90, image_url: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&q=80', slug: 'combo-10-pessoas' },
-    { id: '2', name: 'COMBO 20 PESSOAS', pieces_count: 500, serves_people: 20, price: 849.90, image_url: 'https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?w=400&q=80', slug: 'combo-20-pessoas' },
-    { id: '3', name: 'COMBO 30 PESSOAS', pieces_count: 750, serves_people: 30, price: 1249.90, image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80', slug: 'combo-30-pessoas' },
-    { id: '4', name: 'COMBO 40 PESSOAS', pieces_count: 1000, serves_people: 40, price: 1699.90, image_url: 'https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=400&q=80', slug: 'combo-40-pessoas' },
+    { id: '1', name: 'COMBO 10 PESSOAS', pieces_count: 250, serves_people: 10, price: 449.90, image_url: '/images/combo-10.png', slug: 'combo-10-pessoas' },
+    { id: '2', name: 'COMBO 20 PESSOAS', pieces_count: 500, serves_people: 20, price: 849.90, image_url: '/images/combo-20.png', slug: 'combo-20-pessoas' },
+    { id: '3', name: 'COMBO 30 PESSOAS', pieces_count: 750, serves_people: 30, price: 1249.90, image_url: '/images/combo-30.png', slug: 'combo-30-pessoas' },
+    { id: '4', name: 'COMBO 40 PESSOAS', pieces_count: 1000, serves_people: 40, price: 1699.90, image_url: '/images/combo-40.png', slug: 'combo-40-pessoas' },
   ]
 
   const displayCombos = combos.length > 0 ? combos : defaultCombos
