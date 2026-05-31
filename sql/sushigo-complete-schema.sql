@@ -11,8 +11,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- =====================================================
 -- ENUMS (Tipos)
 -- =====================================================
-CREATE TYPE order_status AS ENUM ('pendente', 'confirmado', 'preparando', 'saiu_entrega', 'entregue', 'cancelado');
-CREATE TYPE payment_method AS ENUM ('pix', 'cartao_credito', 'cartao_debito', 'dinheiro');
+
+-- Criar ENUMs somente se nao existirem
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'order_status') THEN
+    CREATE TYPE order_status AS ENUM ('pendente', 'confirmado', 'preparando', 'saiu_entrega', 'entregue', 'cancelado');
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_method') THEN
+    CREATE TYPE payment_method AS ENUM ('pix', 'cartao_credito', 'cartao_debito', 'dinheiro');
+  END IF;
+END $$;
 
 -- =====================================================
 -- TABLE 1: stores (Configurações da Loja)
