@@ -24,6 +24,7 @@ export default function VasilhasPage() {
     name: '',
     description: '',
     ml: '',
+    max_weight: '',
     price_addition: '',
     image_url: '',
     bowl_type: '',
@@ -69,7 +70,7 @@ export default function VasilhasPage() {
       name: formData.name,
       description: formData.description || null,
       ml: parseInt(formData.ml),
-      max_weight: null,
+      max_weight: formData.max_weight ? parseInt(formData.max_weight) : null,
       price_addition: parseFloat(formData.price_addition),
       image_url: imageUrl || null,
       bowl_type: formData.bowl_type || null,
@@ -116,6 +117,7 @@ export default function VasilhasPage() {
       name: bowl.name,
       description: bowl.description || '',
       ml: bowl.ml.toString(),
+      max_weight: bowl.max_weight?.toString() || '',
       price_addition: bowl.price_addition.toString(),
       image_url: bowl.image_url || '',
       bowl_type: bowl.bowl_type || '',
@@ -131,6 +133,7 @@ export default function VasilhasPage() {
       name: '',
       description: '',
       ml: '',
+      max_weight: '',
       price_addition: '',
       image_url: '',
       bowl_type: '',
@@ -195,6 +198,18 @@ export default function VasilhasPage() {
                     className="bg-muted border-border"
                   />
                 </div>
+                <div>
+                  <Label htmlFor="max_weight">Peso Máximo (g)</Label>
+                  <Input
+                    id="max_weight"
+                    type="number"
+                    value={formData.max_weight}
+                    onChange={(e) => setFormData({ ...formData, max_weight: e.target.value })}
+                    className="bg-muted border-border"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="price_addition">Preço Adicional (R$)</Label>
                   <Input

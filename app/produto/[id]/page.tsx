@@ -284,10 +284,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   const bowl = bowls.find(b => b.id === selectedBowl)
   const acaiType = acaiTypes.find(t => t.id === selectedType)
 
-  // Calculate total weight in grams
-  const calculateWeight = () => {
+  // Calculate weight of ingredients only (bowl max_weight is reference, not added)
+  const calculateIngredientsWeight = () => {
     let weight = product?.base_weight_grams || 0
-    if (bowl) weight += bowl.ml || 0
     if (acaiType) weight += acaiType.weight_addition || 0
     
     Object.entries(selectedToppings).forEach(([toppingId, qty]) => {
@@ -301,6 +300,32 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     })
     
     return weight
+  }
+
+  // Calculate total weight in grams
+  const calculateWeight = () => {
+    return calculateIngredientsWeight()
+  }
+
+  // Auto-select bowl based on ingredients weight vs bowl max_weight
+  const autoSelectBowl = () => {
+    const weight = calculateIngredientsWeight()
+    if (bowls.length === 0) return
+
+    const sortedBowls = [...bowls]
+      .filter(b => b.max_weight != null && b.max_weight > 0)
+      .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
+
+    // Find smallest bowl that fits the weight
+    let selected = sortedBowls.find(b => (b.max_weight || 0) >= weight)
+    // If no bowl fits, select the largest one
+    if (!selected && sortedBowls.length > 0) {
+      selected = sortedBowls[sortedBowls.length - 1]
+    }
+
+    if (selected && selected.id !== selectedBowl) {
+      setSelectedBowl(selected.id)
+    }
   }
 
   // Calculate total price
@@ -419,6 +444,34 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     )
   }
 
+  // Auto-select bowl when ingredients change
+  useEffect(() => {
+    if (bowls.length === 0) return
+    const weight = (product?.base_weight_grams || 0) +
+      (acaiType?.weight_addition || 0) +
+      Object.entries(selectedToppings).reduce((sum, [id, qty]) => {
+        const t = toppings.find(tp => tp.id === id)
+        return sum + ((t?.weight_grams || 0) * qty)
+      }, 0) +
+      selectedSauces.reduce((sum, id) => {
+        const s = sauces.find(sa => sa.id === id)
+        return sum + (s?.weight_grams || 0)
+      }, 0)
+
+    const sortedBowls = [...bowls]
+      .filter(b => b.max_weight != null && b.max_weight > 0)
+      .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
+
+    let selected = sortedBowls.find(b => (b.max_weight || 0) >= weight)
+    if (!selected && sortedBowls.length > 0) {
+      selected = sortedBowls[sortedBowls.length - 1]
+    }
+
+    if (selected && selected.id !== selectedBowl) {
+      setSelectedBowl(selected.id)
+    }
+  }, [selectedToppings, selectedSauces, selectedType, product, toppings, sauces, bowls])
+
   const toppingCategories = [
     { id: 'fruta', name: 'Frutas', slug: 'fruta' },
     { id: 'granola', name: 'Granolas', slug: 'granola' },
@@ -502,10 +555,28 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </div>
                   )}
                   {bowl && (
-                    <div className="flex justify-between text-muted-foreground">
-                      <span>Tamanho:</span>
-                      <span className="text-foreground">{bowl.name}</span>
-                    </div>
+                    <>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Tamanho:</span>
+                        <span className="text-foreground">{bowl.name}</span>
+                      </div>
+                      <div className="flex justify-between text-muted-foreground">
+                        <span>Limite:</span>
+                        <span className={`font-semibold ${totalWeight > (bowl.max_weight || 0) ? 'text-red-400' : totalWeight > (bowl.max_weight || 0) * 0.8 ? 'text-[#FFC300]' : 'text-foreground'}`}>
+                          {bowl.max_weight || 0}g
+                        </span>
+                      </div>
+                      {totalWeight > (bowl.max_weight || 0) && (
+                        <div className="text-red-400 text-xs bg-red-500/10 rounded-lg p-2 mt-1">
+                          Peso excede o limite da vasilha! ({totalWeight}g / {bowl.max_weight}g)
+                        </div>
+                      )}
+                      {totalWeight > (bowl.max_weight || 0) * 0.8 && totalWeight <= (bowl.max_weight || 0) && (
+                        <div className="text-[#FFC300] text-xs bg-[#FFC300]/10 rounded-lg p-2 mt-1">
+                          Peso proximo do limite ({totalWeight}g / {bowl.max_weight}g)
+                        </div>
+                      )}
+                    </>
                   )}
                   {acaiType && (
                     <div className="flex justify-between text-muted-foreground">
@@ -625,7 +696,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                               )}
                             </div>
                             <p className="text-foreground font-semibold text-xs leading-tight">{bowlItem.name}</p>
-                            <p className="text-muted-foreground/70 text-[10px] sm:text-xs">{bowlItem.ml}ml</p>
+                            <p className="text-muted-foreground/70 text-[10px] sm:text-xs">ate {bowlItem.max_weight}g</p>
                             {Number(bowlItem.price_addition || 0) > 0 && (
                               <p className="text-[#FF8C00] text-[10px] sm:text-xs font-semibold mt-0.5">
                                 +R$ {formatPrice(bowlItem.price_addition)}
