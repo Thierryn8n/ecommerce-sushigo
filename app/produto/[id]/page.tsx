@@ -560,7 +560,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           {/* Mini seção com vasilias adequadas */}
                           {(() => {
                             const options = bowls
-                              .filter(b => !b.is_special && b.max_weight != null && b.max_weight > 0 && b.max_weight >= totalWeight)
+                              .filter(b => b.max_weight != null && b.max_weight > 0 && b.max_weight >= totalWeight)
                               .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
                               .slice(0, 3)
                             return options.length > 0 ? (
@@ -587,7 +587,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 </div>
                               </div>
                             ) : (
-                              <p className="text-[10px] mt-1 opacity-80">Nenhuma vasilha padrão comporta este peso.</p>
+                              <p className="text-[10px] mt-1 opacity-80">Nenhuma vasilha comporta este peso.</p>
                             )
                           })()}
                         </div>
