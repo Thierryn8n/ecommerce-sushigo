@@ -233,6 +233,38 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     fetchData()
   }, [id])
 
+  // Auto-select bowl when ingredients change
+  useEffect(() => {
+    if (bowls.length === 0) return
+
+    const currentType = acaiTypes.find(t => t.id === selectedType)
+    const currentBowl = bowls.find(b => b.id === selectedBowl)
+
+    const weight = (product?.base_weight_grams || 0) +
+      (currentType?.weight_addition || 0) +
+      Object.entries(selectedToppings).reduce((sum, [tid, qty]) => {
+        const t = toppings.find(tp => tp.id === tid)
+        return sum + ((t?.weight_grams || 0) * qty)
+      }, 0) +
+      selectedSauces.reduce((sum, sid) => {
+        const s = sauces.find(sa => sa.id === sid)
+        return sum + (s?.weight_grams || 0)
+      }, 0)
+
+    const sortedBowls = [...bowls]
+      .filter(b => b.max_weight != null && b.max_weight > 0)
+      .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
+
+    let selected = sortedBowls.find(b => (b.max_weight || 0) >= weight)
+    if (!selected && sortedBowls.length > 0) {
+      selected = sortedBowls[sortedBowls.length - 1]
+    }
+
+    if (selected && selected.id !== selectedBowl) {
+      setSelectedBowl(selected.id)
+    }
+  }, [selectedToppings, selectedSauces, selectedType, product, toppings, sauces, bowls, acaiTypes, selectedBowl])
+
   if (loading) {
     return (
       <main className="min-h-screen bg-background">
@@ -305,27 +337,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
   // Calculate total weight in grams
   const calculateWeight = () => {
     return calculateIngredientsWeight()
-  }
-
-  // Auto-select bowl based on ingredients weight vs bowl max_weight
-  const autoSelectBowl = () => {
-    const weight = calculateIngredientsWeight()
-    if (bowls.length === 0) return
-
-    const sortedBowls = [...bowls]
-      .filter(b => b.max_weight != null && b.max_weight > 0)
-      .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
-
-    // Find smallest bowl that fits the weight
-    let selected = sortedBowls.find(b => (b.max_weight || 0) >= weight)
-    // If no bowl fits, select the largest one
-    if (!selected && sortedBowls.length > 0) {
-      selected = sortedBowls[sortedBowls.length - 1]
-    }
-
-    if (selected && selected.id !== selectedBowl) {
-      setSelectedBowl(selected.id)
-    }
   }
 
   // Calculate total price
@@ -443,34 +454,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         : [...prev, sauceId]
     )
   }
-
-  // Auto-select bowl when ingredients change
-  useEffect(() => {
-    if (bowls.length === 0) return
-    const weight = (product?.base_weight_grams || 0) +
-      (acaiType?.weight_addition || 0) +
-      Object.entries(selectedToppings).reduce((sum, [id, qty]) => {
-        const t = toppings.find(tp => tp.id === id)
-        return sum + ((t?.weight_grams || 0) * qty)
-      }, 0) +
-      selectedSauces.reduce((sum, id) => {
-        const s = sauces.find(sa => sa.id === id)
-        return sum + (s?.weight_grams || 0)
-      }, 0)
-
-    const sortedBowls = [...bowls]
-      .filter(b => b.max_weight != null && b.max_weight > 0)
-      .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
-
-    let selected = sortedBowls.find(b => (b.max_weight || 0) >= weight)
-    if (!selected && sortedBowls.length > 0) {
-      selected = sortedBowls[sortedBowls.length - 1]
-    }
-
-    if (selected && selected.id !== selectedBowl) {
-      setSelectedBowl(selected.id)
-    }
-  }, [selectedToppings, selectedSauces, selectedType, product, toppings, sauces, bowls])
 
   const toppingCategories = [
     { id: 'fruta', name: 'Frutas', slug: 'fruta' },
