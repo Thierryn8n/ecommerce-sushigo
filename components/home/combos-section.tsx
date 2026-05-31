@@ -58,10 +58,10 @@ export function CombosSection() {
   }
 
   return (
-    <section className="py-12 bg-[#0A0A0A]">
+    <section className="py-16 bg-card">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-xl font-bold text-foreground tracking-wide">COMBOS PARA TODOS</h2>
+        <div className="flex items-center justify-between mb-12">
+          <h2 className="text-3xl font-black text-foreground">COMBOS PARA TODOS</h2>
           <Link href="/combos">
             <Button variant="outline" className="border-border text-foreground hover:bg-muted rounded-lg text-sm">
               VER TODOS COMBOS
@@ -69,7 +69,7 @@ export function CombosSection() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {combos.map((combo, index) => (
             <motion.div
               key={combo.id}
@@ -79,8 +79,7 @@ export function CombosSection() {
               viewport={{ once: true }}
             >
               <Link href={`/combo/${combo.slug}`}>
-                <div className="group bg-card rounded-xl overflow-hidden border border-border hover:border-primary transition-all">
-                  {/* Image */}
+                <div className="group bg-card rounded-lg overflow-hidden border border-border hover:border-primary transition-all">
                   <div className="relative aspect-square bg-muted">
                     <Image
                       src={combo.image_url || 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=400&q=80'}
@@ -89,17 +88,14 @@ export function CombosSection() {
                       className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-
-                  {/* Info */}
-                  <div className="p-4">
-                    <h3 className="text-foreground font-bold text-sm mb-1">{combo.name.toUpperCase()}</h3>
-                    <p className="text-foreground/50 text-xs mb-2">{combo.pieces_count} Pecas</p>
-                    <p className="text-primary font-bold text-lg">
+                  <div className="p-5">
+                    <h3 className="text-foreground font-black text-base mb-2">{combo.name.toUpperCase()}</h3>
+                    <p className="text-muted-foreground text-sm mb-3">{combo.pieces_count} Peças</p>
+                    <p className="text-primary font-black text-xl mb-4">
                       R$ {Number(combo.promotion_price || combo.price).toFixed(2).replace('.', ',')}
                     </p>
                     <Button 
-                      variant="outline" 
-                      className="w-full mt-3 border-border text-foreground hover:bg-muted text-xs h-9"
+                      className="w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm h-10"
                     >
                       VER DETALHES
                     </Button>

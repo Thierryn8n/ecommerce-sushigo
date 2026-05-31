@@ -112,17 +112,17 @@ export function Footer() {
 
           {/* Horarios e Pagamento */}
           <div>
-            <h4 className="text-foreground font-semibold mb-4 text-sm tracking-wide">HORARIO DE FUNCIONAMENTO</h4>
-            <p className="text-foreground/60 text-sm mb-1">Segunda a Domingo</p>
-            <p className="text-foreground font-semibold text-sm mb-6">11:00 as 23:30</p>
+            <h4 className="text-foreground font-bold mb-3 text-sm tracking-wide">HORÁRIO DE FUNCIONAMENTO</h4>
+            <p className="text-foreground/60 text-sm mb-0.5">Segunda a Domingo</p>
+            <p className="text-primary font-bold text-sm mb-6">11:00 às 23:30</p>
 
-            <h4 className="text-foreground font-semibold mb-3 text-sm tracking-wide">FORMAS DE PAGAMENTO</h4>
+            <h4 className="text-foreground font-bold mb-3 text-sm tracking-wide">FORMAS DE PAGAMENTO</h4>
             <div className="flex gap-2 flex-wrap">
-              <div className="bg-muted px-3 py-1.5 rounded text-xs font-semibold text-foreground/80">VISA</div>
-              <div className="bg-muted px-3 py-1.5 rounded text-xs font-semibold text-foreground/80">MASTER</div>
-              <div className="bg-muted px-3 py-1.5 rounded text-xs font-semibold text-foreground/80">ELO</div>
-              <div className="bg-muted px-3 py-1.5 rounded text-xs font-semibold text-green-500">PIX</div>
-              <div className="bg-muted px-3 py-1.5 rounded text-xs font-semibold text-foreground/80">DINHEIRO</div>
+              <div className="bg-muted px-2.5 py-1 rounded text-xs font-bold text-foreground/70">💳 VISA</div>
+              <div className="bg-muted px-2.5 py-1 rounded text-xs font-bold text-foreground/70">💳 MASTER</div>
+              <div className="bg-muted px-2.5 py-1 rounded text-xs font-bold text-foreground/70">💳 ELO</div>
+              <div className="bg-muted px-2.5 py-1 rounded text-xs font-bold text-green-500">📱 PIX</div>
+              <div className="bg-muted px-2.5 py-1 rounded text-xs font-bold text-foreground/70">💵 DINHEIRO</div>
             </div>
           </div>
         </div>

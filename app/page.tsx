@@ -6,6 +6,7 @@ import { CategoriesSection } from '@/components/home/categories-section'
 import { CombosSection } from '@/components/home/combos-section'
 import { ProductsSection } from '@/components/home/products-section'
 import { PromoBanner } from '@/components/home/promo-banner'
+import { PromosSection } from '@/components/home/promos-section'
 
 export default function HomePage() {
   return (
@@ -15,7 +16,7 @@ export default function HomePage() {
       <CategoriesSection />
       <CombosSection />
       <ProductsSection />
-      <PromoBanner />
+      <PromosSection />
       <Footer />
       <CartSidebar />
     </main>
