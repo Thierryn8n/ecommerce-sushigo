@@ -413,10 +413,10 @@ ON CONFLICT (section, key) DO NOTHING;
 -- =====================================================
 -- 5. BANNERS (Banners promocionais)
 -- =====================================================
+-- Banners (sem ON CONFLICT pois nao tem UNIQUE constraint especifico)
 INSERT INTO banners (title, subtitle, description, button_text, link_url, display_order, is_active, start_date, end_date) VALUES
 ('PROMOÇÕES EXCLUSIVAS', 'Ofertas especiais toda semana para você aproveitar', 'Veja nossas promoções de combos e produtos selecionados', 'Ver Promoções', '/promocoes', 1, true, NOW(), NOW() + INTERVAL '30 days'),
-('NOVIDADE: Hot Rolls', 'Experimente nossos novos hot rolls com sabores exclusivos', 'Crocantes por fora, saborosos por dentro', 'Ver Cardápio', '/cardapio', 2, true, NOW(), NOW() + INTERVAL '30 days')
-ON CONFLICT DO NOTHING;
+('NOVIDADE: Hot Rolls', 'Experimente nossos novos hot rolls com sabores exclusivos', 'Crocantes por fora, saborosos por dentro', 'Ver Cardápio', '/cardapio', 2, true, NOW(), NOW() + INTERVAL '30 days');
 
 -- =====================================================
 -- 6. HORÁRIO DE FUNCIONAMENTO

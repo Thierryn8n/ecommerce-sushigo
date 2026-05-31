@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS banners (
 -- =====================================================
 CREATE TABLE IF NOT EXISTS business_hours (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  day_of_week INTEGER NOT NULL,
+  day_of_week INTEGER NOT NULL UNIQUE,
   open_time TIME WITHOUT TIME ZONE,
   close_time TIME WITHOUT TIME ZONE,
   is_closed BOOLEAN DEFAULT false,
