@@ -15,9 +15,20 @@ Arquivo: `02-indexes.sql`
 - Melhora performance das queries
 
 ## PASSO 3: Configurar RLS (Obrigatório)
+
+**ATENÇÃO: Use o arquivo correto baseado no schema escolhido:**
+
+### Se usou `01-tables.sql` (schema com customers):
 Arquivo: `03-rls-policies.sql`
-- Habilita Row Level Security
-- Define políticas de acesso
+- Usa tabela `customers` com `user_id`
+- Usa `customer_addresses` e `customer_id` em orders
+
+### Se usou `sushigo-complete-schema.sql` (schema com users):
+Arquivo: `03-rls-policies-complete.sql` ⭐ **USE ESTE!**
+- Usa tabela `users` com `id` direto
+- Usa `addresses` e `user_id` em orders
+
+**Erro comum:** Usar `03-rls-policies.sql` quando executou `sushigo-complete-schema.sql` causa erro "column user_id does not exist" porque os schemas são diferentes!
 
 ## PASSO 4: Inserir Dados Iniciais (Opcional)
 Arquivo: `04-seed-data.sql`
@@ -32,7 +43,7 @@ Arquivo: `05-functions.sql`
 - Buckets do Storage
 
 ## PASSO 6: Configurar PIX (Opcional)
-Arquivo: `04-add-pix-payment.sql` (na pasta raiz)
+Arquivo: `04-add-pix-payment.sql`
 - Cria tabela store_settings
 - Adiciona suporte a pagamento PIX
 - Configura políticas RLS para PIX
@@ -76,5 +87,9 @@ Erro: "relation 'banners' does not exist"
 
 Erro: "relation 'business_hours' does not exist"
 → Corrigido: Tabela 'business_hours' adicionada ao 01-tables.sql
+
+Erro: "column 'user_id' does not exist"
+→ **Causa:** Usou `sushigo-complete-schema.sql` mas executou `03-rls-policies.sql` (schema errado)
+→ **Solução:** Execute `03-rls-policies-complete.sql` em vez disso!
 
 # ============================================
