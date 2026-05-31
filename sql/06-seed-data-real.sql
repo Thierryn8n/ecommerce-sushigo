@@ -421,6 +421,14 @@ INSERT INTO banners (title, subtitle, description, button_text, link_url, displa
 -- =====================================================
 -- 6. HORÁRIO DE FUNCIONAMENTO
 -- =====================================================
+
+-- Limpar dados existentes e garantir constraint UNIQUE
+DELETE FROM business_hours;
+
+-- Adicionar constraint se não existir (ignora erro se já existe)
+ALTER TABLE business_hours DROP CONSTRAINT IF EXISTS business_hours_day_of_week_key;
+ALTER TABLE business_hours ADD CONSTRAINT business_hours_day_of_week_key UNIQUE (day_of_week);
+
 INSERT INTO business_hours (day_of_week, open_time, close_time, is_closed) VALUES
 (0, '11:00:00', '23:30:00', false), -- Domingo
 (1, '11:00:00', '23:30:00', false), -- Segunda
