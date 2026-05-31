@@ -55,8 +55,8 @@ DROP POLICY IF EXISTS "coupons_public_read" ON coupons;
 CREATE POLICY "coupons_public_read" ON coupons
   FOR SELECT USING (
     is_active = true 
-    AND (starts_at IS NULL OR starts_at <= NOW()) 
-    AND (ends_at IS NULL OR ends_at >= NOW())
+    AND (valid_from IS NULL OR valid_from <= NOW()) 
+    AND (valid_until IS NULL OR valid_until >= NOW())
   );
 
 -- App Settings - Leitura publica
