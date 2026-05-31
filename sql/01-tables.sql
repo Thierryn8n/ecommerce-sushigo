@@ -216,6 +216,38 @@ CREATE TABLE IF NOT EXISTS app_settings (
 );
 
 -- =====================================================
+-- TABELA: banners (Banners Promocionais)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS banners (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title VARCHAR(200),
+  subtitle VARCHAR(200),
+  description TEXT,
+  image_url TEXT,
+  link_url TEXT,
+  display_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  starts_at TIMESTAMPTZ,
+  ends_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- TABELA: business_hours (Horario de Funcionamento)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS business_hours (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  day_of_week INTEGER NOT NULL CHECK (day_of_week BETWEEN 0 AND 6),
+  open_time TIME,
+  close_time TIME,
+  is_closed BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(day_of_week)
+);
+
+-- =====================================================
 -- TABELA: admin_users (Usuarios Admin)
 -- =====================================================
 CREATE TABLE IF NOT EXISTS admin_users (
