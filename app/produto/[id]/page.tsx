@@ -556,15 +556,39 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       {totalWeight > (bowl.max_weight || 0) && (
                         <div className="text-red-400 text-xs bg-red-500/10 rounded-lg p-2 mt-1">
                           <p>Peso excede o limite da vasilha! ({totalWeight}g / {bowl.max_weight}g)</p>
-                          <button
-                            onClick={() => {
-                              setCurrentStep(1)
-                              manualBowlSelection.current = false
-                            }}
-                            className="mt-1 text-[#FF8C00] hover:text-[#FFC300] font-semibold underline text-[10px]"
-                          >
-                            Trocar vasilha
-                          </button>
+                          {/* Mini seção com vasilias adequadas */}
+                          {(() => {
+                            const options = bowls
+                              .filter(b => !b.is_special && b.max_weight != null && b.max_weight > 0 && b.max_weight >= totalWeight)
+                              .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
+                              .slice(0, 3)
+                            return options.length > 0 ? (
+                              <div className="mt-2">
+                                <p className="text-[10px] mb-1 font-semibold">Vasilhas recomendadas:</p>
+                                <div className="flex gap-1.5">
+                                  {options.map(b => (
+                                    <button
+                                      key={b.id}
+                                      onClick={() => {
+                                        manualBowlSelection.current = true
+                                        setSelectedBowl(b.id)
+                                      }}
+                                      className={`flex-1 p-1.5 rounded-md border text-[10px] leading-tight text-center transition-colors ${
+                                        selectedBowl === b.id
+                                          ? 'border-[#FF8C00] bg-[#FF8C00]/10 text-foreground'
+                                          : 'border-red-400/30 bg-red-500/5 text-red-300 hover:border-[#FF8C00]/50'
+                                      }`}
+                                    >
+                                      <span className="block font-semibold text-foreground">{b.name}</span>
+                                      <span className="block text-[9px]">ate {b.max_weight}g</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-[10px] mt-1 opacity-80">Nenhuma vasilha padrão comporta este peso.</p>
+                            )
+                          })()}
                         </div>
                       )}
                       {totalWeight > (bowl.max_weight || 0) * 0.8 && totalWeight <= (bowl.max_weight || 0) && (
