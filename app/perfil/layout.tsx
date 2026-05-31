@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
@@ -14,7 +15,8 @@ import {
   LogOut,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  Home
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
@@ -35,19 +37,19 @@ const menuItems = [
   },
   { 
     href: '/perfil/historico', 
-    label: 'Histórico de Compras', 
+    label: 'Historico de Compras', 
     icon: History,
     description: 'Todas as suas compras'
   },
   { 
     href: '/perfil/enderecos', 
-    label: 'Meus Endereços', 
+    label: 'Meus Enderecos', 
     icon: MapPin,
     description: 'Cadastrar e gerenciar'
   },
   { 
     href: '/perfil/conta', 
-    label: 'Segurança', 
+    label: 'Seguranca', 
     icon: Shield,
     description: 'Senha e login'
   },
@@ -55,7 +57,7 @@ const menuItems = [
     href: '/perfil/carrinho-abandonado', 
     label: 'Carrinhos Salvos', 
     icon: ShoppingCart,
-    description: 'Itens não finalizados'
+    description: 'Itens nao finalizados'
   },
 ]
 
@@ -90,21 +92,21 @@ export default function PerfilLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF8C00]"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen bg-background">
       {/* Mobile Menu Button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <Button
           variant="outline"
           size="icon"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-white shadow-lg hover:bg-slate-50"
+          className="bg-card border-border text-foreground shadow-lg hover:bg-muted"
         >
           {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
@@ -121,23 +123,32 @@ export default function PerfilLayout({
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
               className={`
                 fixed lg:sticky lg:top-0 lg:h-screen inset-y-0 left-0 z-40
-                w-[280px] bg-white dark:bg-slate-900
-                border-r border-slate-200 dark:border-slate-800
+                w-[280px] bg-card
+                border-r border-border
                 flex flex-col shadow-xl lg:shadow-none
                 ${isMobileMenuOpen ? 'block' : 'hidden lg:flex'}
               `}
             >
               {/* Logo/Header */}
-              <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-                <Link href="/" className="flex items-center gap-3 group">
-                  <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/25 group-hover:scale-105 transition-transform">
-                    <User className="w-6 h-6 text-white" />
+              <div className="p-6 border-b border-border">
+                <Link href="/" className="flex items-center gap-3 group mb-4">
+                  <Image
+                    src="/images/logo-sushigo.png"
+                    alt="SushiGo"
+                    width={140}
+                    height={56}
+                    className="object-contain"
+                  />
+                </Link>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                    <User className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h1 className="text-slate-900 dark:text-white font-bold text-lg tracking-tight">Minha Conta</h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-xs font-medium">Área do Cliente</p>
+                    <h1 className="text-foreground font-bold text-sm">Minha Conta</h1>
+                    <p className="text-muted-foreground text-xs">Area do Cliente</p>
                   </div>
-                </Link>
+                </div>
               </div>
 
               {/* Menu Items */}
@@ -154,38 +165,47 @@ export default function PerfilLayout({
                       className={`
                         flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
                         ${isActive 
-                          ? 'bg-gradient-to-r from-violet-500/10 to-purple-500/5 border border-violet-500/20' 
-                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent'
+                          ? 'bg-primary/10 border border-primary/30' 
+                          : 'hover:bg-muted border border-transparent'
                         }
                       `}
                     >
                       <div className={`
                         p-2 rounded-lg transition-colors
-                        ${isActive ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/25' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:text-violet-500'}
+                        ${isActive ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground group-hover:text-primary'}
                       `}>
                         <Icon className="w-4 h-4" />
                       </div>
                       <div className="flex-1">
-                        <p className={`font-medium ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white'}`}>
+                        <p className={`font-medium text-sm ${isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'}`}>
                           {item.label}
                         </p>
-                        <p className="text-xs text-slate-400">{item.description}</p>
+                        <p className="text-xs text-muted-foreground/60">{item.description}</p>
                       </div>
                       <ChevronRight className={`
                         w-4 h-4 transition-transform
-                        ${isActive ? 'text-violet-500 translate-x-0' : 'text-slate-300 dark:text-slate-600 -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}
+                        ${isActive ? 'text-primary translate-x-0' : 'text-muted-foreground -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'}
                       `} />
                     </Link>
                   )
                 })}
               </nav>
 
-              {/* Logout Button */}
-              <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+              {/* Bottom Actions */}
+              <div className="p-4 border-t border-border space-y-2">
+                <Link href="/">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-3 text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    <Home className="w-4 h-4" />
+                    <span className="font-medium">Voltar a Loja</span>
+                  </Button>
+                </Link>
                 <Button
                   onClick={handleLogout}
                   variant="ghost"
-                  className="w-full justify-start gap-3 text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                  className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="font-medium">Sair da Conta</span>

@@ -7,7 +7,7 @@ import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { useStore } from '@/lib/store-context'
-import { CheckCircle, XCircle, Clock, Shield, UserCheck } from 'lucide-react'
+import { CheckCircle, XCircle, Clock, Shield, UserPlus, Loader2, Mail, Phone } from 'lucide-react'
 
 interface AdminRequest {
   id: string
@@ -46,7 +46,7 @@ export default function AprovarAdminsPage() {
         if (error) throw error
         setRequests(data || [])
       } catch (error) {
-        console.error('Erro ao buscar solicitações:', error)
+        console.error('Erro ao buscar solicitacoes:', error)
       } finally {
         setLoading(false)
       }
@@ -61,7 +61,6 @@ export default function AprovarAdminsPage() {
     try {
       setActionLoading(profileId)
 
-      // Verificar se ainda pode adicionar admin (máximo 2)
       const { data: approvedAdmins } = await supabase
         .from('profiles')
         .select('id')
@@ -70,7 +69,7 @@ export default function AprovarAdminsPage() {
         .eq('is_approved', true)
 
       if (approvedAdmins && approvedAdmins.length >= 2) {
-        alert('Esta loja já atingiu o limite de 2 administradores')
+        alert('Esta loja ja atingiu o limite de 2 administradores')
         return
       }
 
@@ -81,7 +80,6 @@ export default function AprovarAdminsPage() {
 
       if (error) throw error
 
-      // Atualizar lista
       setRequests(requests.map(r => 
         r.id === profileId ? { ...r, is_approved: true } : r
       ))
@@ -106,13 +104,12 @@ export default function AprovarAdminsPage() {
 
       if (error) throw error
 
-      // Remover da lista
       setRequests(requests.filter(r => r.id !== profileId))
 
-      alert('Solicitação rejeitada')
+      alert('Solicitacao rejeitada')
     } catch (error) {
       console.error('Erro ao rejeitar admin:', error)
-      alert('Erro ao rejeitar solicitação')
+      alert('Erro ao rejeitar solicitacao')
     } finally {
       setActionLoading(null)
     }
@@ -120,8 +117,14 @@ export default function AprovarAdminsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-foreground">Carregando...</div>
+      <div className="min-h-screen bg-background">
+        <AdminSidebar />
+        <div className="lg:ml-56">
+          <AdminHeader />
+          <main className="p-6 flex items-center justify-center h-[calc(100vh-4rem)]">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </main>
+        </div>
       </div>
     )
   }
@@ -141,10 +144,13 @@ export default function AprovarAdminsPage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-foreground">Gerenciar Administradores</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Gerenciar Administradores</h1>
+                <p className="text-muted-foreground text-sm">Aprove ou rejeite solicitacoes de acesso</p>
+              </div>
               <Link href="/admin/cadastrar-admin">
-                <Button className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold">
-                  <UserCheck className="w-5 h-5 mr-2" />
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
+                  <UserPlus className="w-5 h-5 mr-2" />
                   Cadastrar Novo Admin
                 </Button>
               </Link>
@@ -154,8 +160,8 @@ export default function AprovarAdminsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <div className="bg-card rounded-2xl p-6 border border-border">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#FF8C00]/20 flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-[#FF8C00]" />
+                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-primary" />
                   </div>
                   <div>
                     <p className="text-muted-foreground text-sm">Total de Admins</p>
@@ -189,9 +195,9 @@ export default function AprovarAdminsPage() {
 
             {/* Limit Warning */}
             {approvedCount >= 2 && (
-              <div className="bg-yellow-500/20 border border-yellow-500/50 rounded-lg p-4 mb-6">
-                <p className="text-yellow-400 text-sm">
-                  ⚠️ Esta loja atingiu o limite de 2 administradores aprovados.
+              <div className="bg-accent/20 border border-accent/50 rounded-lg p-4 mb-6">
+                <p className="text-accent text-sm">
+                  Esta loja atingiu o limite de 2 administradores aprovados.
                 </p>
               </div>
             )}
@@ -202,9 +208,9 @@ export default function AprovarAdminsPage() {
 
               {requests.length === 0 ? (
                 <div className="text-center py-12">
-                  <Shield className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
+                  <Shield className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
                   <p className="text-muted-foreground">Nenhum administrador cadastrado</p>
-                  <Link href="/admin/cadastrar-admin" className="text-[#FF8C00] text-sm mt-2 inline-block">
+                  <Link href="/admin/cadastrar-admin" className="text-primary text-sm mt-2 inline-block hover:underline">
                     Cadastrar o primeiro administrador
                   </Link>
                 </div>
@@ -216,25 +222,33 @@ export default function AprovarAdminsPage() {
                       className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted rounded-xl border border-border gap-4"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#FF8C00] flex items-center justify-center text-foreground font-bold text-xl">
+                        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
                           {request.full_name?.charAt(0) || 'U'}
                         </div>
                         <div>
                           <p className="text-foreground font-semibold">{request.full_name || 'Sem nome'}</p>
-                          <p className="text-muted-foreground text-sm">{request.email}</p>
-                          <p className="text-foreground/50 text-xs">{request.phone}</p>
+                          <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                            <Mail className="w-3 h-3" />
+                            <span>{request.email}</span>
+                          </div>
+                          {request.phone && (
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs">
+                              <Phone className="w-3 h-3" />
+                              <span>{request.phone}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-4">
                         {request.is_approved ? (
-                          <div className="flex items-center gap-2 text-green-500">
-                            <CheckCircle className="w-5 h-5" />
+                          <div className="flex items-center gap-2 text-green-500 bg-green-500/10 px-3 py-1.5 rounded-full">
+                            <CheckCircle className="w-4 h-4" />
                             <span className="text-sm font-medium">Aprovado</span>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-2 text-yellow-500">
-                            <Clock className="w-5 h-5" />
+                          <div className="flex items-center gap-2 text-yellow-500 bg-yellow-500/10 px-3 py-1.5 rounded-full">
+                            <Clock className="w-4 h-4" />
                             <span className="text-sm font-medium">Pendente</span>
                           </div>
                         )}
@@ -244,16 +258,19 @@ export default function AprovarAdminsPage() {
                             <Button
                               onClick={() => handleApprove(request.id)}
                               disabled={actionLoading === request.id || approvedCount >= 2}
-                              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700 text-white"
                             >
-                              {actionLoading === request.id ? '...' : 'Aprovar'}
+                              {actionLoading === request.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Aprovar'}
                             </Button>
                             <Button
                               onClick={() => handleReject(request.id)}
                               disabled={actionLoading === request.id}
-                              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2"
+                              size="sm"
+                              variant="outline"
+                              className="border-destructive/50 text-destructive hover:bg-destructive/10"
                             >
-                              {actionLoading === request.id ? '...' : 'Rejeitar'}
+                              {actionLoading === request.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Rejeitar'}
                             </Button>
                           </div>
                         )}

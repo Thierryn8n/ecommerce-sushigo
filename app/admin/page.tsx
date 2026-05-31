@@ -11,7 +11,8 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Loader2
+  Loader2,
+  ArrowUpRight
 } from 'lucide-react'
 import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 import { createClient } from '@/lib/supabase/client'
@@ -79,7 +80,6 @@ export default function AdminDashboard() {
         const today = new Date().toISOString().split('T')[0]
         const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
-        // Vendas e pedidos de hoje
         const { data: todayOrders } = await supabase
           .from('orders')
           .select('total, created_at')
@@ -87,7 +87,6 @@ export default function AdminDashboard() {
           .lte('created_at', `${today}T23:59:59`)
           .neq('status', 'cancelled')
 
-        // Vendas e pedidos de ontem
         const { data: yesterdayOrders } = await supabase
           .from('orders')
           .select('total')
@@ -95,26 +94,22 @@ export default function AdminDashboard() {
           .lte('created_at', `${yesterday}T23:59:59`)
           .neq('status', 'cancelled')
 
-        // Clientes novos (usuários criados hoje)
         const { data: newUsers } = await supabase
           .from('profiles')
           .select('id')
           .gte('created_at', `${today}T00:00:00`)
 
-        // Pedidos recentes
         const { data: recentOrdersData } = await supabase
           .from('orders')
           .select('id, customer_name, total, status, created_at, items, payment_status')
           .order('created_at', { ascending: false })
           .limit(5)
 
-        // Produtos mais vendidos (simplificado)
         const { data: orderItems } = await supabase
           .from('order_items')
           .select('product_name, quantity, price')
           .limit(100)
 
-        // Quick stats por status
         const { data: statusCounts } = await supabase
           .from('orders')
           .select('status')
@@ -125,7 +120,6 @@ export default function AdminDashboard() {
         const pedidosOntem = yesterdayOrders?.length || 0
         const ticketMedio = pedidosHoje > 0 ? vendasHoje / pedidosHoje : 0
 
-        // Processar top produtos
         const productMap = new Map<string, { sales: number; revenue: number }>()
         orderItems?.forEach(item => {
           const existing = productMap.get(item.product_name) || { sales: 0, revenue: 0 }
@@ -139,7 +133,6 @@ export default function AdminDashboard() {
           .sort((a, b) => b.total_sales - a.total_sales)
           .slice(0, 5)
 
-        // Processar status counts
         const statusCount = statusCounts?.reduce((acc, order) => {
           acc[order.status] = (acc[order.status] || 0) + 1
           return acc
@@ -182,10 +175,10 @@ export default function AdminDashboard() {
   }, [supabase])
 
   const statCards = stats ? [
-    { label: 'Vendas Hoje', value: formatCurrency(stats.vendasHoje), change: `${stats.vendasOntem > 0 ? ((stats.vendasHoje - stats.vendasOntem) / stats.vendasOntem * 100).toFixed(0) : 0}%`, icon: DollarSign },
-    { label: 'Pedidos Hoje', value: stats.pedidosHoje.toString(), change: `${stats.pedidosOntem > 0 ? ((stats.pedidosHoje - stats.pedidosOntem) / stats.pedidosOntem * 100).toFixed(0) : 0}%`, icon: ShoppingCart },
-    { label: 'Ticket Médio', value: formatCurrency(stats.ticketMedio), change: '+0%', icon: TrendingUp },
-    { label: 'Clientes Novos', value: stats.clientesNovos.toString(), change: 'Hoje', icon: Users },
+    { label: 'Vendas Hoje', value: formatCurrency(stats.vendasHoje), change: `${stats.vendasOntem > 0 ? ((stats.vendasHoje - stats.vendasOntem) / stats.vendasOntem * 100).toFixed(0) : 0}%`, icon: DollarSign, color: 'bg-green-500/20 text-green-500' },
+    { label: 'Pedidos Hoje', value: stats.pedidosHoje.toString(), change: `${stats.pedidosOntem > 0 ? ((stats.pedidosHoje - stats.pedidosOntem) / stats.pedidosOntem * 100).toFixed(0) : 0}%`, icon: ShoppingCart, color: 'bg-blue-500/20 text-blue-500' },
+    { label: 'Ticket Medio', value: formatCurrency(stats.ticketMedio), change: '+0%', icon: TrendingUp, color: 'bg-primary/20 text-primary' },
+    { label: 'Clientes Novos', value: stats.clientesNovos.toString(), change: 'Hoje', icon: Users, color: 'bg-purple-500/20 text-purple-500' },
   ] : []
 
   if (loading) {
@@ -213,7 +206,18 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="text-2xl font-bold text-foreground mb-6">Dashboard</h1>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+                <p className="text-muted-foreground text-sm">Visao geral do seu negocio</p>
+              </div>
+              <Link href="/admin/pedidos/kanban">
+                <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+                  <Package className="w-4 h-4" />
+                  <span className="text-sm font-medium">Ver Pedidos</span>
+                </button>
+              </Link>
+            </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -226,8 +230,8 @@ export default function AdminDashboard() {
                   className="bg-card rounded-2xl p-6 border border-border"
                 >
                   <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <stat.icon className="w-6 h-6 text-primary" />
+                    <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
+                      <stat.icon className="w-6 h-6" />
                     </div>
                     <span className="text-muted-foreground text-sm font-medium">{stat.change}</span>
                   </div>
@@ -242,8 +246,9 @@ export default function AdminDashboard() {
               <div className="lg:col-span-2 bg-card rounded-2xl p-6 border border-border">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-foreground">Pedidos Recentes</h2>
-                  <Link href="/admin/pedidos" className="text-primary text-sm hover:underline">
+                  <Link href="/admin/pedidos" className="text-primary text-sm hover:underline flex items-center gap-1">
                     Ver todos
+                    <ArrowUpRight className="w-4 h-4" />
                   </Link>
                 </div>
                 <div className="overflow-x-auto">
@@ -306,7 +311,7 @@ export default function AdminDashboard() {
                       <p className="text-primary font-semibold">{formatCurrency(product.total_revenue)}</p>
                     </div>
                   )) : (
-                    <p className="text-muted-foreground text-center py-4">Nenhum dado disponível</p>
+                    <p className="text-muted-foreground text-center py-4">Nenhum dado disponivel</p>
                   )}
                 </div>
               </div>
@@ -338,7 +343,7 @@ export default function AdminDashboard() {
                     <CheckCircle className="w-8 h-8 text-green-500" />
                     <div>
                       <p className="text-2xl font-bold text-foreground">{quickStats.delivered}</p>
-                      <p className="text-muted-foreground text-xs">Entregues (Hoje)</p>
+                      <p className="text-muted-foreground text-xs">Entregues</p>
                     </div>
                   </div>
                 </Link>

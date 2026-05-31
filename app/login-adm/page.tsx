@@ -16,19 +16,11 @@ export default function AdminLoginPage() {
   const supabase = createClient()
   const { store } = useStore()
   
-  // Estados para verificação de admin existente
   const [hasAdmin, setHasAdmin] = useState<boolean | null>(null)
   const [checkingAdmin, setCheckingAdmin] = useState(true)
-  
-  // Estados para login
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: '',
-  })
-  
-  // Estados para cadastro (primeiro admin)
+  const [loginData, setLoginData] = useState({ email: '', password: '' })
   const [registerData, setRegisterData] = useState({
     fullName: '',
     email: '',
@@ -36,17 +28,12 @@ export default function AdminLoginPage() {
     password: '',
     confirmPassword: '',
   })
-  
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  // Verificar se existe algum admin no sistema
   useEffect(() => {
     async function checkAdminExists() {
-      console.log('🔍 Verificando se existe admin...')
-      
       try {
-        // Estratégia 1: Usar maybeSingle para evitar erro se não encontrar
         const { data: admin, error } = await supabase
           .from('profiles')
           .select('id, is_admin, email')
@@ -54,46 +41,23 @@ export default function AdminLoginPage() {
           .maybeSingle()
 
         if (error) {
-          console.error('❌ Erro na query maybeSingle:', error)
-          
-          // Estratégia 2: Tentar contar (head: true não retorna dados, só conta)
-          try {
-            const { count, error: countError } = await supabase
-              .from('profiles')
-              .select('*', { count: 'exact', head: true })
-              .eq('is_admin', true)
-            
-            if (countError) {
-              console.error('❌ Erro na contagem:', countError)
-              // EM CASO DE ERRO, ASSUMIR QUE TEM ADMIN (mais seguro)
-              console.log('⚠️ Assumindo que existe admin devido a erro de permissão')
-              setHasAdmin(true)
-            } else {
-              console.log('✅ Contagem de admins:', count)
-              setHasAdmin(count !== null && count > 0)
-            }
-          } catch (countErr) {
-            console.error('❌ Exceção na contagem:', countErr)
-            setHasAdmin(true) // Mais seguro assumir que tem admin
-          }
+          const { count } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('is_admin', true)
+          setHasAdmin(count !== null && count > 0)
         } else {
-          console.log('✅ Resultado maybeSingle:', admin)
           setHasAdmin(!!admin)
         }
-      } catch (err) {
-        console.error('❌ Erro geral ao verificar admins:', err)
-        // Em caso de erro grave, assumir que TEM admin (não mostrar cadastro)
+      } catch {
         setHasAdmin(true)
       } finally {
-        console.log('🏁 Verificação finalizada. hasAdmin:', hasAdmin)
         setCheckingAdmin(false)
       }
     }
-
     checkAdminExists()
   }, [supabase])
 
-  // Handler de login
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -117,185 +81,128 @@ export default function AdminLoginPage() {
 
       if (!profile.is_admin) {
         await supabase.auth.signOut()
-        setError('Você não tem permissão de administrador')
+        setError('Voce nao tem permissao de administrador')
         return
       }
 
       if (!profile.is_approved) {
         await supabase.auth.signOut()
-        setError('Seu acesso ainda não foi aprovado pelo dono da loja')
+        setError('Seu acesso ainda nao foi aprovado pelo dono da loja')
         return
       }
 
       router.push('/admin')
     } catch (error: any) {
-      console.error('Erro ao fazer login:', error)
       setError(error.message || 'Erro ao fazer login')
     } finally {
       setLoading(false)
     }
   }
 
-  // Handler de cadastro (primeiro admin)
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     
-    // Validações
     if (!registerData.fullName || !registerData.email || !registerData.phone || !registerData.password) {
-      setError('Todos os campos são obrigatórios')
+      setError('Todos os campos sao obrigatorios')
       return
     }
 
     if (registerData.password !== registerData.confirmPassword) {
-      setError('As senhas não coincidem')
+      setError('As senhas nao coincidem')
       return
     }
 
     if (registerData.password.length < 6) {
-      setError('A senha deve ter no mínimo 6 caracteres')
+      setError('A senha deve ter no minimo 6 caracteres')
       return
     }
 
     try {
       setLoading(true)
 
-      let userId: string | null = null
-      let userCreated = false
-
-      // TENTATIVA 1: Criar usuário no Supabase Auth
-      try {
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: registerData.email,
-          password: registerData.password,
-          options: {
-            data: {
-              full_name: registerData.fullName,
-              phone: registerData.phone,
-            },
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: registerData.email,
+        password: registerData.password,
+        options: {
+          data: {
+            full_name: registerData.fullName,
+            phone: registerData.phone,
           },
-        })
+        },
+      })
 
-        if (authError) {
-          console.error('Erro no signUp:', authError)
-          
-          // Verificar se o erro é de usuário já existente
-          if (authError.message?.includes('already registered') || authError.message?.includes('already exists')) {
-            throw new Error('Este email já está cadastrado. Tente fazer login.')
-          }
-          
-          // Outro erro no signUp
-          throw new Error(authError.message || 'Erro ao criar usuário')
-        } 
-        
-        if (authData.user) {
-          userId = authData.user.id
-          userCreated = true
-          console.log('Usuário criado com sucesso:', userId)
-          
-          // IMPORTANTE: O usuário foi criado mas precisa confirmar email
-          // O trigger já criou o profile, então vamos tentar atualizá-lo
-          // Como é o primeiro admin, vamos apenas mostrar sucesso
-          // O usuário precisará confirmar o email antes de fazer login
+      if (authError) {
+        if (authError.message?.includes('already registered')) {
+          throw new Error('Este email ja esta cadastrado. Tente fazer login.')
         }
-      } catch (signUpError: any) {
-        console.error('Exceção no signUp:', signUpError)
-        // Se já temos mensagem específica, propagar
-        if (signUpError.message?.includes('cadastrado') || signUpError.message?.includes('Erro ao criar')) {
-          throw signUpError
-        }
-        // Senão, tentar continuar
+        throw new Error(authError.message || 'Erro ao criar usuario')
       }
 
-      // Se usuário foi criado com sucesso, mostrar mensagem de sucesso
-      // (não tentar login pois email não está confirmado)
-      if (userCreated && userId) {
-        // Tentar atualizar o profile se possível (pode falhar por RLS, mas trigger já criou)
-        try {
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          
-          const { error: updateError } = await supabase
-            .from('profiles')
-            .update({
-              is_admin: true,
-              is_approved: true,
-              is_owner: true,
-              role: 'admin',
-            })
-            .eq('id', userId)
-          
-          if (updateError) {
-            console.log('Não foi possível atualizar profile (RLS):', updateError)
-            // Isso é OK, o profile foi criado pelo trigger com valores padrão
-            // O admin pode atualizar manualmente depois ou via SQL
-          } else {
-            console.log('Profile atualizado com sucesso')
-          }
-        } catch (profileError) {
-          console.log('Erro ao atualizar profile:', profileError)
-        }
+      if (authData.user) {
+        await new Promise(resolve => setTimeout(resolve, 1000))
         
-        // Mostrar sucesso - usuário precisa confirmar email
+        await supabase
+          .from('profiles')
+          .update({
+            is_admin: true,
+            is_approved: true,
+            is_owner: true,
+            role: 'admin',
+          })
+          .eq('id', authData.user.id)
+        
         setSuccess(true)
         setTimeout(() => {
-          // Redirecionar para página explicando que precisa confirmar email
           router.push('/login-adm?message=verify-email')
         }, 3000)
-        return
       }
-
-      // Se chegou aqui, algo deu errado
-      throw new Error('Não foi possível criar o usuário. Tente novamente.')
     } catch (error: any) {
-      console.error('Erro ao cadastrar admin:', error)
       setError(error.message || 'Erro ao cadastrar administrador')
     } finally {
       setLoading(false)
     }
   }
 
-  // Loading inicial enquanto verifica se tem admin
   if (checkingAdmin) {
     return (
-      <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-[#FF8C00] mx-auto mb-4" />
-          <p className="text-white/60">Verificando sistema...</p>
+          <Loader2 className="w-10 h-10 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Verificando sistema...</p>
         </div>
       </main>
     )
   }
 
-  // Tela de sucesso após cadastro do primeiro admin
   if (success) {
     return (
-      <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-[#1a0a25] rounded-3xl p-8 border border-[#3a2a45] max-w-md w-full text-center"
+          className="bg-card rounded-2xl p-8 border border-border max-w-md w-full text-center"
         >
           <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
             <Shield className="w-10 h-10 text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Cadastro Realizado!</h2>
-          <p className="text-white/70 mb-4">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Cadastro Realizado!</h2>
+          <p className="text-muted-foreground mb-4">
             Primeiro administrador cadastrado com sucesso!
           </p>
           
-          {/* Alerta sobre confirmação de email */}
-          <div className="mb-6 p-4 bg-yellow-500/20 border border-yellow-500/30 rounded-xl">
-            <p className="text-yellow-400 text-sm font-medium mb-1">⚠️ Atenção</p>
-            <p className="text-white/80 text-sm">
-              Enviamos um email de confirmação para <strong>{registerData.email}</strong>
+          <div className="mb-6 p-4 bg-accent/20 border border-accent/30 rounded-xl">
+            <p className="text-accent text-sm font-medium mb-1">Atencao</p>
+            <p className="text-foreground/80 text-sm">
+              Enviamos um email de confirmacao para <strong>{registerData.email}</strong>
             </p>
-            <p className="text-white/60 text-xs mt-2">
+            <p className="text-muted-foreground text-xs mt-2">
               Clique no link do email para ativar sua conta antes de fazer login.
             </p>
           </div>
           
           <Link href="/login-adm">
-            <Button className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full">
+            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-full">
               Ir para Login
             </Button>
           </Link>
@@ -304,13 +211,12 @@ export default function AdminLoginPage() {
     )
   }
 
-  // MODO CADASTRO: Se não tem admin, mostra formulário de cadastro
+  // Register Mode
   if (hasAdmin === false) {
     return (
-      <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* Back Button */}
-          <Link href="/" className="inline-flex items-center text-white/70 hover:text-white mb-8 transition-colors">
+          <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
             <ArrowLeft className="w-5 h-5 mr-2" />
             Voltar ao Site
           </Link>
@@ -318,103 +224,95 @@ export default function AdminLoginPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[#1a0a25] rounded-3xl p-8 border border-[#3a2a45]"
+            className="bg-card rounded-2xl p-8 border border-border"
           >
-            {/* Logo */}
             <div className="flex justify-center mb-6">
-              {store?.logo_url ? (
-                <Image
-                  src={store.logo_url}
-                  alt={store.name}
-                  width={100}
-                  height={100}
-                  className="object-contain"
-                />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-[#FF8C00] flex items-center justify-center text-white font-bold text-3xl">
-                  {store?.name?.charAt(0) || 'A'}
-                </div>
-              )}
+              <Image
+                src="/images/logo-sushigo.png"
+                alt="SushiGo"
+                width={160}
+                height={64}
+                className="object-contain"
+              />
             </div>
 
-            {/* Title */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Shield className="w-6 h-6 text-[#FF8C00]" />
-                <h1 className="text-2xl font-bold text-white">Primeiro Acesso</h1>
+                <Shield className="w-6 h-6 text-primary" />
+                <h1 className="text-2xl font-bold text-foreground">Primeiro Acesso</h1>
               </div>
-              <p className="text-white/60 text-sm">
+              <p className="text-muted-foreground text-sm">
                 Cadastre o primeiro administrador do sistema
               </p>
               <div className="mt-3 px-3 py-1 bg-green-500/20 border border-green-500/30 rounded-full inline-block">
-                <span className="text-green-400 text-xs">✓ Aprovação automática</span>
+                <span className="text-green-400 text-xs">Aprovacao automatica</span>
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 mb-6">
-                <p className="text-red-400 text-sm text-center">{error}</p>
+              <div className="bg-destructive/20 border border-destructive/50 rounded-lg p-3 mb-6">
+                <p className="text-destructive text-sm text-center">{error}</p>
               </div>
             )}
 
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Nome Completo</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Nome Completo</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type="text"
                     value={registerData.fullName}
                     onChange={(e) => setRegisterData({ ...registerData, fullName: e.target.value })}
-                    placeholder="João Silva"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    placeholder="Joao Silva"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">E-mail</label>
+                <label className="text-muted-foreground text-sm mb-2 block">E-mail</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type="email"
                     value={registerData.email}
                     onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                     placeholder="admin@loja.com"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Telefone</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Telefone</label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type="tel"
                     value={registerData.phone}
                     onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                    placeholder="(88) 9 9999-9999"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    placeholder="(00) 0 0000-0000"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Senha</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     value={registerData.password}
                     onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                     placeholder="********"
-                    className="pl-10 pr-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 pr-10 bg-muted border-border text-foreground"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -422,15 +320,15 @@ export default function AdminLoginPage() {
               </div>
 
               <div>
-                <label className="text-white/70 text-sm mb-2 block">Confirmar Senha</label>
+                <label className="text-muted-foreground text-sm mb-2 block">Confirmar Senha</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
                     value={registerData.confirmPassword}
                     onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                     placeholder="********"
-                    className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                    className="pl-10 bg-muted border-border text-foreground"
                   />
                 </div>
               </div>
@@ -438,7 +336,7 @@ export default function AdminLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-full mt-6"
               >
                 {loading ? (
                   <>
@@ -451,10 +349,9 @@ export default function AdminLoginPage() {
               </Button>
             </form>
 
-            {/* Info */}
-            <div className="mt-6 p-4 bg-[#2a1a35] rounded-xl">
-              <p className="text-white/60 text-xs text-center">
-                Como é o primeiro acesso, você será cadastrado como <strong>dono da loja</strong> com aprovação automática.
+            <div className="mt-6 p-4 bg-muted rounded-xl">
+              <p className="text-muted-foreground text-xs text-center">
+                Como e o primeiro acesso, voce sera cadastrado como <strong className="text-foreground">dono da loja</strong> com aprovacao automatica.
               </p>
             </div>
           </motion.div>
@@ -463,12 +360,11 @@ export default function AdminLoginPage() {
     )
   }
 
-  // MODO LOGIN: Se já tem admin, mostra formulário de login
+  // Login Mode
   return (
-    <main className="min-h-screen bg-[#120018] flex items-center justify-center p-4">
+    <main className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Back Button */}
-        <Link href="/" className="inline-flex items-center text-white/70 hover:text-white mb-8 transition-colors">
+        <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-8 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
           Voltar ao Site
         </Link>
@@ -476,80 +372,78 @@ export default function AdminLoginPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-[#1a0a25] rounded-3xl p-8 border border-[#3a2a45]"
+          className="bg-card rounded-2xl p-8 border border-border"
         >
-          {/* Logo */}
           <div className="flex justify-center mb-6">
-            {store?.logo_url ? (
-              <Image
-                src={store.logo_url}
-                alt={store.name}
-                width={100}
-                height={100}
-                className="object-contain"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-[#FF8C00] flex items-center justify-center text-white font-bold text-3xl">
-                {store?.name?.charAt(0) || 'A'}
-              </div>
-            )}
+            <Image
+              src="/images/logo-sushigo.png"
+              alt="SushiGo"
+              width={160}
+              height={64}
+              className="object-contain"
+            />
           </div>
 
-          {/* Title */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Shield className="w-6 h-6 text-[#FF8C00]" />
-              <h1 className="text-2xl font-bold text-white">Painel Admin</h1>
+              <Shield className="w-6 h-6 text-primary" />
+              <h1 className="text-2xl font-bold text-foreground">Painel Admin</h1>
             </div>
-            <p className="text-white/60 text-sm">Acesso restrito a administradores aprovados</p>
+            <p className="text-muted-foreground text-sm">Acesso restrito a administradores aprovados</p>
           </div>
 
           {error && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-3 mb-6">
-              <p className="text-red-400 text-sm text-center">{error}</p>
+            <div className="bg-destructive/20 border border-destructive/50 rounded-lg p-3 mb-6">
+              <p className="text-destructive text-sm text-center">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="text-white/70 text-sm mb-2 block">E-mail</label>
+              <label className="text-muted-foreground text-sm mb-2 block">E-mail</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type="email"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                   placeholder="admin@loja.com"
-                  className="pl-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                  className="pl-10 bg-muted border-border text-foreground"
                 />
               </div>
             </div>
 
             <div>
-              <label className="text-white/70 text-sm mb-2 block">Senha</label>
+              <label className="text-muted-foreground text-sm mb-2 block">Senha</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <Input
                   type={showPassword ? 'text' : 'password'}
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                   placeholder="********"
-                  className="pl-10 pr-10 bg-[#2a1a35] border-[#3a2a45] text-white"
+                  className="pl-10 pr-10 bg-muted border-border text-foreground"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
+            <div className="text-right">
+              <Link href="/esqueci-senha" className="text-primary text-sm hover:text-primary/80 transition-colors">
+                Esqueci minha senha
+              </Link>
+            </div>
+
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 rounded-full mt-4"
             >
               {loading ? (
                 <>
@@ -557,21 +451,32 @@ export default function AdminLoginPage() {
                   Entrando...
                 </>
               ) : (
-                'Acessar Painel'
+                'Entrar'
               )}
             </Button>
           </form>
 
-          {/* Info */}
-          <div className="mt-6 p-4 bg-[#2a1a35] rounded-xl">
-            <p className="text-white/60 text-xs text-center mb-2">
-              Precisa de acesso administrativo?
-            </p>
-            <Link href="/admin/cadastrar-admin" className="text-[#FF8C00] text-xs text-center block hover:text-[#FFC300]">
-              Solicitar cadastro de administrador
-            </Link>
+          <div className="flex items-center gap-4 my-6">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-muted-foreground text-sm">ou</span>
+            <div className="flex-1 h-px bg-border" />
           </div>
+
+          <Link href="/admin/cadastrar-admin" className="block">
+            <Button
+              variant="outline"
+              className="w-full border-border text-foreground hover:bg-muted rounded-full"
+            >
+              Solicitar Acesso Admin
+            </Button>
+          </Link>
         </motion.div>
+
+        <div className="text-center mt-6">
+          <Link href="/login" className="text-muted-foreground text-sm hover:text-foreground transition-colors">
+            Acesso de Cliente
+          </Link>
+        </div>
       </div>
     </main>
   )
