@@ -188,11 +188,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
       if (toppingsData) {
         setToppings(toppingsData)
-        
-        // Analisar descrição do produto e preencher automaticamente
-        if (productData?.description) {
-          analyzeDescriptionAndFill(productData.description, acaiTypesData || [], toppingsData || [])
-        }
+      }
+      
+      // Analisar descrição do produto e preencher automaticamente
+      if (productData?.description) {
+        analyzeDescriptionAndFill(productData.description, acaiTypesData || [], toppingsData || [])
       }
 
       // Buscar coberturas da tabela toppings com category='cobertura'
@@ -207,7 +207,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         setSauces(saucesData.map((s: any) => ({
           id: s.id,
           name: s.name,
-          price: Number(s.price),
           weight_grams: Number(s.weight_grams) || 0,
         })))
       }
