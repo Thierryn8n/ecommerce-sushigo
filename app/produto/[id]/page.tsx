@@ -334,7 +334,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       if (sauce) weight += sauce.weight_grams || 0
     })
     
-    return weight
+    // Arredonda para multiplo de 50g (aproximado)
+    return Math.ceil(weight / 50) * 50
   }
 
   // Calculate total weight in grams
@@ -514,7 +515,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <div>
                       <span className="text-muted-foreground text-sm sm:text-base">Total do Pedido</span>
                       {(acaiType?.price_per_kg || 0) > 0 && (
-                        <p className="text-xs text-muted-foreground/70">{totalWeight}g = {(totalWeight / 1000).toFixed(3).replace('.', ',')}kg</p>
+                        <p className="text-xs text-muted-foreground/70">{totalWeight}g = {(totalWeight / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg</p>
                       )}
                     </div>
                     <div className="text-right">
@@ -538,7 +539,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                   {(acaiType?.price_per_kg || 0) > 0 && (
                     <div className="flex justify-between text-muted-foreground">
                       <span>Peso Total:</span>
-                      <span className="text-foreground font-semibold">{totalWeight}g ({(totalWeight / 1000).toFixed(3).replace('.', ',')}kg)</span>
+                      <span className="text-foreground font-semibold">{totalWeight}g ({(totalWeight / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg)</span>
                     </div>
                   )}
                   {bowl && (
