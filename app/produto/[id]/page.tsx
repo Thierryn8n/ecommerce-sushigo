@@ -555,7 +555,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                       </div>
                       {totalWeight > (bowl.max_weight || 0) && (
                         <div className="text-red-400 text-xs bg-red-500/10 rounded-lg p-2 mt-1">
-                          Peso excede o limite da vasilha! ({totalWeight}g / {bowl.max_weight}g)
+                          <p>Peso excede o limite da vasilha! ({totalWeight}g / {bowl.max_weight}g)</p>
+                          <button
+                            onClick={() => {
+                              setCurrentStep(1)
+                              manualBowlSelection.current = false
+                            }}
+                            className="mt-1 text-[#FF8C00] hover:text-[#FFC300] font-semibold underline text-[10px]"
+                          >
+                            Trocar vasilha
+                          </button>
                         </div>
                       )}
                       {totalWeight > (bowl.max_weight || 0) * 0.8 && totalWeight <= (bowl.max_weight || 0) && (
