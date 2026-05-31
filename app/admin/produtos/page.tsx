@@ -241,14 +241,7 @@ export default function AdminProdutos() {
                           </button>
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          {product.promotion_price ? (
-                            <div>
-                              <span className="text-foreground/50 text-xs line-through mr-2">R$ {formatPrice(product.base_price)}</span>
-                              <span className="text-[#00BFFF] font-bold text-sm">R$ {formatPrice(product.promotion_price)}</span>
-                            </div>
-                          ) : (
-                            <span className="text-foreground font-medium text-sm">R$ {formatPrice(product.base_price)}</span>
-                          )}
+                          <span className="text-foreground/70 text-sm">{product.base_weight_grams}g</span>
                           <div className="flex gap-1">
                             <button onClick={() => openModal(product)} className="p-1.5 rounded-lg hover:bg-muted text-foreground/60">
                               <Edit2 className="w-4 h-4" />
@@ -273,7 +266,7 @@ export default function AdminProdutos() {
                     <tr className="bg-muted">
                       <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Produto</th>
                       <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Categoria</th>
-                      <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Preco</th>
+                      <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Peso</th>
                       <th className="text-left text-foreground/60 text-sm font-medium px-6 py-4">Status</th>
                       <th className="text-right text-foreground/60 text-sm font-medium px-6 py-4">Acoes</th>
                     </tr>
@@ -325,14 +318,7 @@ export default function AdminProdutos() {
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            {product.promotion_price ? (
-                              <div>
-                                <p className="text-foreground/50 text-sm line-through">R$ {formatPrice(product.base_price)}</p>
-                                <p className="text-[#00BFFF] font-bold">R$ {formatPrice(product.promotion_price)}</p>
-                              </div>
-                            ) : (
-                              <p className="text-foreground font-medium">R$ {formatPrice(product.base_price)}</p>
-                            )}
+                            <p className="text-foreground font-medium">{product.base_weight_grams}g</p>
                           </td>
                           <td className="px-6 py-4">
                             <button

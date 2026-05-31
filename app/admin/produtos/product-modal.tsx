@@ -137,9 +137,6 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
     if (!formData.slug.trim()) {
       newErrors.slug = 'Slug é obrigatório'
     }
-    if (formData.base_price <= 0) {
-      newErrors.base_price = 'Preço deve ser maior que zero'
-    }
     if (!formData.category_id) {
       newErrors.category_id = 'Categoria é obrigatória'
     }
@@ -166,8 +163,8 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_price: formData.base_price,
-            promotion_price: formData.promotion_price || null,
+            base_price: 0,
+            promotion_price: null,
             base_weight_grams: formData.base_weight_grams,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
@@ -192,8 +189,8 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_price: formData.base_price,
-            promotion_price: formData.promotion_price || null,
+            base_price: 0,
+            promotion_price: null,
             base_weight_grams: formData.base_weight_grams,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
@@ -459,7 +456,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             <div>
               <label className="text-white/70 text-sm mb-2 block">Descrição</label>
               <textarea
-                value={formData.description}
+                value={formData.description || ''}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Descrição do produto..."
                 rows={3}
@@ -467,48 +464,16 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
               />
             </div>
 
-            {/* Preços */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="text-white/70 text-sm mb-2 block">Preço Base (R$) *</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.base_price}
-                  onChange={(e) => setFormData({ ...formData, base_price: parseFloat(e.target.value) || 0 })}
-                  placeholder="0.00"
-                  className="bg-[#2a1a35] border-[#3a2a45] text-white"
-                />
-                {errors.base_price && (
-                  <p className="text-red-400 text-xs mt-1">{errors.base_price}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="text-white/70 text-sm mb-2 block">Preço Promoção (R$)</label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.promotion_price || ''}
-                  onChange={(e) => setFormData({ ...formData, promotion_price: e.target.value ? parseFloat(e.target.value) : null })}
-                  placeholder="0.00"
-                  className="bg-[#2a1a35] border-[#3a2a45] text-white"
-                />
-              </div>
-
-              <div>
-                <label className="text-white/70 text-sm mb-2 block">Peso Base (g)</label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={formData.base_weight_grams}
-                  onChange={(e) => setFormData({ ...formData, base_weight_grams: parseInt(e.target.value) || 0 })}
-                  placeholder="200"
-                  className="bg-[#2a1a35] border-[#3a2a45] text-white"
-                />
-              </div>
+            <div>
+              <label className="text-white/70 text-sm mb-2 block">Peso Base (g)</label>
+              <Input
+                type="number"
+                min="0"
+                value={formData.base_weight_grams}
+                onChange={(e) => setFormData({ ...formData, base_weight_grams: parseInt(e.target.value) || 0 })}
+                placeholder="200"
+                className="bg-[#2a1a35] border-[#3a2a45] text-white"
+              />
             </div>
 
             {/* Categoria e Ordem */}
