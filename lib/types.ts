@@ -215,6 +215,7 @@ export interface Bowl {
   price_addition: number
   image_url: string | null
   bowl_type: string | null
+  is_special: boolean
   is_active: boolean
   display_order: number
   created_at: string

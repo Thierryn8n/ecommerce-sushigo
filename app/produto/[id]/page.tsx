@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, use, useCallback } from 'react'
+import { useState, useEffect, useRef, use, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { ArrowLeft, ArrowRight, Check, Plus, Minus, ShoppingCart, Sparkles, Wand2 } from 'lucide-react'
@@ -44,6 +44,7 @@ interface Bowl {
   max_weight: number | null
   price_addition: number
   bowl_type: string | null
+  is_special: boolean
   image_url: string | null
 }
 
@@ -95,6 +96,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const [currentStep, setCurrentStep] = useState(1)
   const [selectedBowl, setSelectedBowl] = useState<string | null>(null)
+  const manualBowlSelection = useRef(false)
   const [selectedType, setSelectedType] = useState<string | null>(null)
   const [selectedToppings, setSelectedToppings] = useState<Record<string, number>>({})
   const [autoToppings, setAutoToppings] = useState<Set<string>>(new Set()) // Toppings automáticos (inclusos no preço)
@@ -233,12 +235,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     fetchData()
   }, [id])
 
-  // Auto-select bowl when ingredients change
+  // Auto-select bowl when ingredients change (ignores special bowls and manual selection)
   useEffect(() => {
     if (bowls.length === 0) return
+    if (manualBowlSelection.current) return
 
     const currentType = acaiTypes.find(t => t.id === selectedType)
-    const currentBowl = bowls.find(b => b.id === selectedBowl)
 
     const weight = (product?.base_weight_grams || 0) +
       (currentType?.weight_addition || 0) +
@@ -252,7 +254,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       }, 0)
 
     const sortedBowls = [...bowls]
-      .filter(b => b.max_weight != null && b.max_weight > 0)
+      .filter(b => !b.is_special && b.max_weight != null && b.max_weight > 0)
       .sort((a, b) => (a.max_weight || 0) - (b.max_weight || 0))
 
     let selected = sortedBowls.find(b => (b.max_weight || 0) >= weight)
@@ -410,6 +412,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     // Reset form
     setCurrentStep(1)
     setSelectedBowl(null)
+    manualBowlSelection.current = false
     setSelectedType(null)
     setSelectedToppings({})
     setSelectedSauces([])
@@ -652,11 +655,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <div>
                       <h2 className="text-xl font-bold text-foreground mb-2">Escolha o Tamanho</h2>
                       <p className="text-foreground/60 mb-3 sm:mb-6">Selecione a vasilha do seu acai</p>
+                      {/* Vasilias normais (auto-select) */}
                       <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4">
-                        {bowls.map((bowlItem) => (
+                        {bowls.filter(b => !b.is_special).map((bowlItem) => (
                           <button
                             key={bowlItem.id}
-                            onClick={() => setSelectedBowl(bowlItem.id)}
+                            onClick={() => {
+                              manualBowlSelection.current = true
+                              setSelectedBowl(bowlItem.id)
+                            }}
                             className={`p-2 sm:p-4 rounded-xl border-2 transition-all ${
                               selectedBowl === bowlItem.id
                                 ? 'border-[#FF8C00] bg-[#FF8C00]/10'
@@ -688,6 +695,53 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                           </button>
                         ))}
                       </div>
+                      {/* Vasilias especiais */}
+                      {bowls.some(b => b.is_special) && (
+                        <>
+                          <h3 className="text-lg font-bold text-foreground mt-6 mb-2">Vasilhas Especiais</h3>
+                          <p className="text-foreground/60 mb-3 sm:mb-4 text-sm">Opcionais — selecione manualmente</p>
+                          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-4">
+                            {bowls.filter(b => b.is_special).map((bowlItem) => (
+                              <button
+                                key={bowlItem.id}
+                                onClick={() => {
+                                  manualBowlSelection.current = true
+                                  setSelectedBowl(bowlItem.id)
+                                }}
+                                className={`p-2 sm:p-4 rounded-xl border-2 transition-all ${
+                                  selectedBowl === bowlItem.id
+                                    ? 'border-[#FF8C00] bg-[#FF8C00]/10'
+                                    : 'border-border hover:border-[#8A2BE2]/50'
+                                }`}
+                              >
+                                <div className="w-10 h-10 sm:w-16 sm:h-16 mx-auto mb-1 sm:mb-2 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                                  {bowlItem.image_url ? (
+                                    <Image
+                                      src={bowlItem.image_url}
+                                      alt={bowlItem.name}
+                                      width={64}
+                                      height={64}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className="text-xl sm:text-3xl">
+                                      {bowlItem.bowl_type === 'tigela' ? '🥣' : bowlItem.bowl_type === 'barco' ? '🛶' : '🥤'}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-foreground font-semibold text-xs leading-tight">{bowlItem.name}</p>
+                                <p className="text-muted-foreground/70 text-[10px] sm:text-xs">ate {bowlItem.max_weight}g</p>
+                                <span className="text-[10px] text-[#FF8C00] font-semibold">Especial</span>
+                                {Number(bowlItem.price_addition || 0) > 0 && (
+                                  <p className="text-[#FF8C00] text-[10px] sm:text-xs font-semibold mt-0.5">
+                                    +R$ {formatPrice(bowlItem.price_addition)}
+                                  </p>
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                        </>
+                      )}
                     </div>
                   )}
 

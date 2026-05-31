@@ -28,6 +28,7 @@ export default function VasilhasPage() {
     price_addition: '',
     image_url: '',
     bowl_type: '',
+    is_special: false,
     is_active: true,
     display_order: '0',
   })
@@ -74,6 +75,7 @@ export default function VasilhasPage() {
       price_addition: parseFloat(formData.price_addition),
       image_url: imageUrl || null,
       bowl_type: formData.bowl_type || null,
+      is_special: formData.is_special,
       is_active: formData.is_active,
       display_order: parseInt(formData.display_order),
     }
@@ -121,6 +123,7 @@ export default function VasilhasPage() {
       price_addition: bowl.price_addition.toString(),
       image_url: bowl.image_url || '',
       bowl_type: bowl.bowl_type || '',
+      is_special: bowl.is_special,
       is_active: bowl.is_active,
       display_order: bowl.display_order.toString(),
     })
@@ -137,6 +140,7 @@ export default function VasilhasPage() {
       price_addition: '',
       image_url: '',
       bowl_type: '',
+      is_special: false,
       is_active: true,
       display_order: '0',
     })
@@ -262,6 +266,14 @@ export default function VasilhasPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Switch
+                  id="is_special"
+                  checked={formData.is_special}
+                  onCheckedChange={(checked) => setFormData({ ...formData, is_special: checked })}
+                />
+                <Label htmlFor="is_special">Vasilha Especial (fora do auto-select)</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
                   id="is_active"
                   checked={formData.is_active}
                   onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
@@ -318,6 +330,11 @@ export default function VasilhasPage() {
               <span className={`px-2 py-1 rounded text-xs ${bowl.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                 {bowl.is_active ? 'Ativo' : 'Inativo'}
               </span>
+              {bowl.is_special && (
+                <span className="px-2 py-1 rounded text-xs bg-[#FF8C00]/20 text-[#FF8C00]">
+                  Especial
+                </span>
+              )}
               <span className="px-2 py-1 rounded text-xs bg-muted text-foreground/70">
                 {bowl.bowl_type}
               </span>
