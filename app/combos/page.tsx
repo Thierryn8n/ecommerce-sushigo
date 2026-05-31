@@ -4,28 +4,17 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Plus, ArrowRight } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import Header from '@/components/header'
 import { Footer } from '@/components/footer'
 import { CartSidebar } from '@/components/cart-sidebar'
 import { Button } from '@/components/ui/button'
-import { useCart } from '@/contexts/cart-context'
 import { createClient } from '@/lib/supabase/client'
-
-interface Combo {
-  id: string
-  name: string
-  slug: string
-  description: string | null
-  original_price: number
-  promo_price: number
-  image_url: string | null
-}
+import type { Combo } from '@/lib/types'
 
 export default function CombosPage() {
   const [combos, setCombos] = useState<Combo[]>([])
   const [loading, setLoading] = useState(true)
-  const { addItem } = useCart()
 
   useEffect(() => {
     async function fetchCombos() {
@@ -45,19 +34,6 @@ export default function CombosPage() {
 
     fetchCombos()
   }, [])
-
-  const handleAddCombo = (combo: Combo) => {
-    addItem({
-      id: crypto.randomUUID(),
-      productId: combo.id,
-      name: combo.name,
-      image: combo.image_url || '',
-      totalPrice: Number(combo.promo_price),
-      quantity: 1,
-      toppings: [],
-      sauces: [],
-    })
-  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -114,30 +90,16 @@ export default function CombosPage() {
                         fill
                         className="object-contain p-8 group-hover:scale-110 transition-transform duration-300"
                       />
-                      <div className="absolute top-4 right-4 bg-secondary text-secondary-foreground text-sm font-bold px-4 py-2 rounded-full animate-pulse">
-                        OFERTA
-                      </div>
                     </div>
                     <div className="p-6 bg-card">
                       <h3 className="text-2xl font-bold text-foreground mb-2">{combo.name}</h3>
                       <p className="text-muted-foreground mb-4">{combo.description}</p>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-muted-foreground text-sm line-through block">
-                            De R$ {Number(combo.original_price).toFixed(2).replace('.', ',')}
-                          </span>
-                          <span className="text-primary font-bold text-2xl">
-                            R$ {Number(combo.promo_price).toFixed(2).replace('.', ',')}
-                          </span>
-                        </div>
-                        <Button 
-                          onClick={() => handleAddCombo(combo)}
-                          className="bg-secondary hover:bg-secondary/90 rounded-full"
-                        >
-                          <Plus className="w-5 h-5 mr-2" />
-                          Pedir
+                      <Link href="/cardapio">
+                        <Button className="bg-secondary hover:bg-secondary/90 rounded-full w-full">
+                          Montar no Cardapio
+                          <ArrowRight className="w-5 h-5 ml-2" />
                         </Button>
-                      </div>
+                      </Link>
                     </div>
                   </div>
                 </motion.div>

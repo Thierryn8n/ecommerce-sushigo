@@ -15,8 +15,6 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  base_price: number
-  promotion_price: number | null
   base_weight_grams: number
   image_url: string | null
   banner_url: string | null
@@ -78,8 +76,6 @@ export default function AdminProdutos() {
         name: `${product.name} (Cópia)`,
         slug: `${product.slug}-copia-${Date.now()}`,
         description: product.description,
-        base_price: product.base_price,
-        promotion_price: product.promotion_price,
         image_url: product.image_url,
         is_active: false, // Inativo por padrão
         category_id: product.category?.name ? null : null,

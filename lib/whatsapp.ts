@@ -1,7 +1,7 @@
 export interface WhatsAppOrderItem {
   name: string
   quantity: number
-  price: number
+  weightGrams?: number
   size?: string
   toppings?: string[]
   sauces?: string[]
@@ -37,7 +37,11 @@ export function generateWhatsAppMessage(order: WhatsAppOrder): string {
   
   order.items.forEach((item, index) => {
     message += `${index + 1}. *${item.name}*\n`
-    message += `   Qtd: ${item.quantity}x | R$ ${item.price.toFixed(2)}\n`
+    message += `   Qtd: ${item.quantity}x\n`
+    
+    if (item.weightGrams) {
+      message += `   Peso: ${item.weightGrams}g\n`
+    }
     
     if (item.size) {
       message += `   Tamanho: ${item.size}\n`
@@ -55,7 +59,7 @@ export function generateWhatsAppMessage(order: WhatsAppOrder): string {
       message += `   Obs: ${item.notes}\n`
     }
     
-    message += `   Subtotal: R$ ${(item.price * item.quantity).toFixed(2)}\n\n`
+    message += `\n`
   })
   
   message += `${'─'.repeat(30)}\n`

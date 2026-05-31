@@ -21,7 +21,6 @@ export default function CoberturasPage() {
   const [editingSauce, setEditingSauce] = useState<Topping | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    price: '',
     category: 'cobertura',
     image_url: '',
     is_active: true,
@@ -67,7 +66,6 @@ export default function CoberturasPage() {
 
     const sauceData = {
       name: formData.name,
-      price: parseFloat(formData.price),
       category: 'cobertura',
       image_url: imageUrl || null,
       is_active: formData.is_active,
@@ -113,7 +111,6 @@ export default function CoberturasPage() {
     setEditingSauce(sauce)
     setFormData({
       name: sauce.name,
-      price: sauce.price.toString(),
       category: sauce.category || 'cobertura',
       image_url: sauce.image_url || '',
       is_active: sauce.is_active,
@@ -128,7 +125,6 @@ export default function CoberturasPage() {
     setEditingSauce(null)
     setFormData({
       name: '',
-      price: '',
       category: 'cobertura',
       image_url: '',
       is_active: true,
@@ -174,18 +170,6 @@ export default function CoberturasPage() {
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price">Preço (R$)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    required
-                    className="bg-muted border-border"
-                  />
-                </div>
                 <div>
                   <Label htmlFor="max_quantity">Quantidade Máxima</Label>
                   <Input
@@ -281,7 +265,6 @@ export default function CoberturasPage() {
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">{sauce.name}</h3>
             <div className="flex justify-between items-center text-sm mb-2">
-              <span className="text-[#FFC300] font-semibold">R$ {sauce.price.toFixed(2)}</span>
               <span className="text-foreground/70">Max: {sauce.max_quantity}x | {sauce.weight_grams}g</span>
             </div>
             <div className="mt-2">

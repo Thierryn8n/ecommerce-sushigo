@@ -12,8 +12,8 @@ export interface CartItem {
   size?: string
   sizeML?: number
   acaiType?: string
-  toppings: Array<{ name: string; price: number }>
-  sauces: Array<{ name: string; price: number }>
+  toppings: Array<{ name: string }>
+  sauces: Array<{ name: string }>
   notes?: string
   weightGrams?: number
 }

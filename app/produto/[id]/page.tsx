@@ -13,18 +13,6 @@ import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 
-// Helper para formatar preço de forma segura
-const formatPrice = (price: any): string => {
-  if (price === null || price === undefined || price === '') {
-    return '0,00'
-  }
-  const num = typeof price === 'string' ? parseFloat(price) : Number(price)
-  if (isNaN(num)) {
-    return '0,00'
-  }
-  return num.toFixed(2).replace('.', ',')
-}
-
 interface Product {
   id: string
   name: string
@@ -40,7 +28,6 @@ interface Bowl {
   name: string
   ml: number
   max_weight: number | null
-  price_addition: number
   bowl_type: string | null
   is_special: boolean
   image_url: string | null
@@ -50,7 +37,6 @@ interface AcaiType {
   id: string
   name: string
   description: string | null
-  price_addition: number
   weight_addition: number
   price_per_kg: number
   image_url: string | null
@@ -60,7 +46,6 @@ interface Topping {
   id: string
   name: string
   category: string
-  price: number
   max_quantity: number
   image_url?: string
   weight_grams: number
@@ -69,7 +54,6 @@ interface Topping {
 interface Sauce {
   id: string
   name: string
-  price: number
   weight_grams: number
 }
 
@@ -341,7 +325,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     return calculateIngredientsWeight()
   }
 
-  // Calculate total price (apenas por kg do tipo de acai)
+  // Calculate total price (apenas por peso do tipo de acai)
   const calculateTotal = () => {
     const typePricePerKg = acaiType?.price_per_kg || 0
     const weight = calculateWeight()
@@ -356,12 +340,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       .filter(([, qty]) => qty > 0)
       .map(([toppingId, qty]) => {
         const topping = toppings.find(t => t.id === toppingId)
-        return { name: `${topping?.name} (${qty}x)`, price: Number(topping?.price || 0) * qty }
+        return { name: `${topping?.name} (${qty}x)` }
       })
 
     const selectedSaucesList = selectedSauces.map(sauceId => {
       const sauce = sauces.find(s => s.id === sauceId)
-      return { name: sauce?.name || '', price: Number(sauce?.price || 0) }
+      return { name: sauce?.name || '' }
     })
 
     addItem({
@@ -473,18 +457,26 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{product.name}</h1>
                 <p className="text-muted-foreground text-sm sm:text-base mb-4">{product.description}</p>
 
-                {/* Weight Display */}
+                {/* Price Display */}
                 <div className="bg-muted rounded-xl p-3 sm:p-4 mb-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-muted-foreground text-sm sm:text-base">Peso Total</span>
+                      <span className="text-muted-foreground text-sm sm:text-base">Total do Pedido</span>
+                      {(acaiType?.price_per_kg || 0) > 0 && (
+                        <p className="text-xs text-muted-foreground/70">{totalWeight}g = {(totalWeight / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg</p>
+                      )}
                     </div>
                     <div className="text-right">
                       <p className="text-[#00BFFF] font-bold text-xl sm:text-2xl">
-                        {totalWeight}g
+                        R$ {(totalPrice * quantity).toFixed(2).replace('.', ',')}
                       </p>
+                      {quantity > 1 && (
+                        <p className="text-muted-foreground/70 text-sm">
+                          {quantity}x R$ {totalPrice.toFixed(2).replace('.', ',')}
+                        </p>
+                      )}
                       {(acaiType?.price_per_kg || 0) > 0 && (
-                        <p className="text-xs text-muted-foreground/70">{(totalWeight / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg</p>
+                        <p className="text-[10px] text-muted-foreground/60">R$ {acaiType?.price_per_kg || 0}/kg</p>
                       )}
                     </div>
                   </div>

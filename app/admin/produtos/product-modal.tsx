@@ -19,8 +19,6 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  base_price: number
-  promotion_price: number | null
   base_weight_grams: number
   image_url: string | null
   banner_url: string | null
@@ -52,8 +50,6 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
     name: '',
     slug: '',
     description: '',
-    base_price: 0,
-    promotion_price: null,
     base_weight_grams: 200,
     image_url: null,
     banner_url: null,
@@ -77,15 +73,12 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
       setFormData({
         ...product,
         description: product.description || '',
-        promotion_price: product.promotion_price || null,
       })
     } else {
       setFormData({
         name: '',
         slug: '',
         description: '',
-        base_price: 0,
-        promotion_price: null,
         base_weight_grams: 200,
         image_url: null,
         banner_url: null,
@@ -163,8 +156,6 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_price: 0,
-            promotion_price: null,
             base_weight_grams: formData.base_weight_grams,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
@@ -189,8 +180,6 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_price: 0,
-            promotion_price: null,
             base_weight_grams: formData.base_weight_grams,
             image_url: formData.image_url,
             banner_url: formData.banner_url,

@@ -22,7 +22,6 @@ export default function TiposAcaiPage() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    price_addition: '',
     weight_addition: '',
     price_per_kg: '',
     image_url: '',
@@ -65,7 +64,6 @@ export default function TiposAcaiPage() {
     const typeData = {
       name: formData.name,
       description: formData.description || null,
-      price_addition: parseFloat(formData.price_addition) || 0,
       weight_addition: parseInt(formData.weight_addition) || 0,
       price_per_kg: parseFloat(formData.price_per_kg) || 0,
       image_url: imageUrl || null,
@@ -100,7 +98,6 @@ export default function TiposAcaiPage() {
     setFormData({
       name: type.name,
       description: type.description || '',
-      price_addition: type.price_addition.toString(),
       weight_addition: type.weight_addition.toString(),
       price_per_kg: type.price_per_kg?.toString() || '',
       image_url: type.image_url || '',
@@ -113,7 +110,7 @@ export default function TiposAcaiPage() {
   const resetForm = () => {
     setEditingType(null)
     setFormData({
-      name: '', description: '', price_addition: '', weight_addition: '', price_per_kg: '',
+      name: '', description: '', weight_addition: '', price_per_kg: '',
       image_url: '', is_active: true, display_order: '0',
     })
     setImageFile(null)
@@ -172,10 +169,6 @@ export default function TiposAcaiPage() {
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="price_addition">Adicional Preco Fixo (R$)</Label>
-                      <Input id="price_addition" type="number" step="0.01" value={formData.price_addition} onChange={(e) => setFormData({ ...formData, price_addition: e.target.value })} className="bg-muted border-border" />
-                    </div>
                     <div>
                       <Label htmlFor="display_order">Ordem</Label>
                       <Input id="display_order" type="number" value={formData.display_order} onChange={(e) => setFormData({ ...formData, display_order: e.target.value })} className="bg-muted border-border" />

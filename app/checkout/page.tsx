@@ -49,7 +49,7 @@ export default function CheckoutPage() {
       let text = `*${item.name}* (${item.quantity}x)\n`
       if (item.size) text += `  Tamanho: ${item.size}\n`
       if (item.acaiType) text += `  Tipo: ${item.acaiType}\n`
-      if (item.weightGrams && item.weightGrams > 0) text += `  Peso: ${item.weightGrams}g ($((item.weightGrams / 1000).toFixed(3).replace('.', ','))kg)\n`
+      if (item.weightGrams && item.weightGrams > 0) text += `  Peso: ${item.weightGrams}g\n`
       if (item.toppings.length > 0) {
         text += `  Adicionais: ${item.toppings.map(t => t.name).join(', ')}\n`
       }
@@ -57,7 +57,6 @@ export default function CheckoutPage() {
         text += `  Coberturas: ${item.sauces.map(s => s.name).join(', ')}\n`
       }
       if (item.notes) text += `  Obs: ${item.notes}\n`
-      text += `  Valor: R$ ${((item.totalPrice || 0) * item.quantity).toFixed(2).replace('.', ',')}`
       return text
     }).join('\n\n')
 
@@ -531,11 +530,8 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-foreground font-medium text-sm truncate">{item.name}</p>
-                        <p className="text-foreground/50 text-xs">{item.quantity}x R$ {Number(item.totalPrice || 0).toFixed(2).replace('.', ',')}</p>
+                        <p className="text-foreground/50 text-xs">{item.quantity}x · {item.weightGrams || 0}g</p>
                       </div>
-                      <p className="text-foreground font-semibold text-sm">
-                        R$ {((item.totalPrice || 0) * item.quantity).toFixed(2).replace('.', ',')}
-                      </p>
                     </div>
                   ))}
                 </div>

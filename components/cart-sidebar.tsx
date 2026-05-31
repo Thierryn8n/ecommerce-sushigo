@@ -27,6 +27,7 @@ export function CartSidebar() {
       let text = `*${item.name}* (${item.quantity}x)\n`
       if (item.size) text += `  Tamanho: ${item.size}\n`
       if (item.acaiType) text += `  Tipo: ${item.acaiType}\n`
+      if (item.weightGrams && item.weightGrams > 0) text += `  Peso: ${item.weightGrams}g\n`
       if (item.toppings.length > 0) {
         text += `  Adicionais: ${item.toppings.map(t => t.name).join(', ')}\n`
       }
@@ -34,7 +35,6 @@ export function CartSidebar() {
         text += `  Coberturas: ${item.sauces.map(s => s.name).join(', ')}\n`
       }
       if (item.notes) text += `  Obs: ${item.notes}\n`
-      text += `  Valor: R$ ${(item.totalPrice * item.quantity).toFixed(2).replace('.', ',')}`
       return text
     }).join('\n\n')
 
@@ -115,12 +115,9 @@ export function CartSidebar() {
                           )}
                           {item.weightGrams && item.weightGrams > 0 && (
                             <p className="text-muted-foreground/70 text-xs">
-                              {item.weightGrams}g ({(item.weightGrams / 1000).toFixed(3).replace('.', ',')}kg)
+                              {item.weightGrams}g ({(item.weightGrams / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg)
                             </p>
                           )}
-                          <p className="text-[#00BFFF] font-bold mt-1">
-                            R$ {formatPrice(item.totalPrice)}
-                          </p>
                         </div>
                       </div>
 

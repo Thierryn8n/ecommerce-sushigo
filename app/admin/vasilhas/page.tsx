@@ -25,7 +25,6 @@ export default function VasilhasPage() {
     description: '',
     ml: '',
     max_weight: '',
-    price_addition: '',
     image_url: '',
     bowl_type: '',
     is_special: false,
@@ -72,7 +71,6 @@ export default function VasilhasPage() {
       description: formData.description || null,
       ml: parseInt(formData.ml),
       max_weight: formData.max_weight ? parseInt(formData.max_weight) : null,
-      price_addition: parseFloat(formData.price_addition),
       image_url: imageUrl || null,
       bowl_type: formData.bowl_type || null,
       is_special: formData.is_special,
@@ -120,7 +118,6 @@ export default function VasilhasPage() {
       description: bowl.description || '',
       ml: bowl.ml.toString(),
       max_weight: bowl.max_weight?.toString() || '',
-      price_addition: bowl.price_addition.toString(),
       image_url: bowl.image_url || '',
       bowl_type: bowl.bowl_type || '',
       is_special: bowl.is_special,
@@ -137,7 +134,6 @@ export default function VasilhasPage() {
       description: '',
       ml: '',
       max_weight: '',
-      price_addition: '',
       image_url: '',
       bowl_type: '',
       is_special: false,
@@ -214,18 +210,6 @@ export default function VasilhasPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price_addition">Preço Adicional (R$)</Label>
-                  <Input
-                    id="price_addition"
-                    type="number"
-                    step="0.01"
-                    value={formData.price_addition}
-                    onChange={(e) => setFormData({ ...formData, price_addition: e.target.value })}
-                    required
-                    className="bg-muted border-border"
-                  />
-                </div>
                 <div>
                   <Label htmlFor="display_order">Ordem de Exibição</Label>
                   <Input
@@ -322,9 +306,6 @@ export default function VasilhasPage() {
             <p className="text-muted-foreground text-sm mb-2">{bowl.description}</p>
             <div className="flex justify-between items-center text-sm">
               <span className="text-foreground/70">{bowl.ml}ml</span>
-              <span className="text-[#FFC300] font-semibold">
-                {bowl.price_addition > 0 ? `+R$ ${bowl.price_addition.toFixed(2)}` : 'Sem custo adicional'}
-              </span>
             </div>
             <div className="mt-2 flex items-center gap-2">
               <span className={`px-2 py-1 rounded text-xs ${bowl.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>

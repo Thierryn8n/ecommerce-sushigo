@@ -13,8 +13,6 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  base_price: number
-  promotion_price: number | null
   image_url: string | null
   is_featured: boolean
   category: {
@@ -240,11 +238,6 @@ export function ProductsSection() {
                         fill
                         className="object-contain p-2 sm:p-4 group-hover:scale-110 transition-transform duration-300"
                       />
-                      {product.promotion_price && (
-                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-primary text-primary-foreground text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
-                          PROMO
-                        </div>
-                      )}
                     </div>
 
                     {/* Product Info */}
@@ -253,22 +246,7 @@ export function ProductsSection() {
                       <p className="text-muted-foreground text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{product.description}</p>
                       
                       <div className="flex items-center justify-between">
-                        <div>
-                          {product.promotion_price ? (
-                            <>
-                              <span className="text-muted-foreground text-[10px] sm:text-sm line-through">
-                                R$ {Number(product.base_price).toFixed(2).replace('.', ',')}
-                              </span>
-                              <p className="text-primary font-bold text-base sm:text-xl">
-                                R$ {Number(product.promotion_price).toFixed(2).replace('.', ',')}
-                              </p>
-                            </>
-                          ) : (
-                            <p className="text-primary font-bold text-base sm:text-xl">
-                              R$ {Number(product.base_price).toFixed(2).replace('.', ',')}
-                            </p>
-                          )}
-                        </div>
+                        <span className="text-primary font-bold text-sm">Monte do seu jeito</span>
                         <button className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary hover:bg-primary/90 flex items-center justify-center text-primary-foreground transition-colors">
                           <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                         </button>

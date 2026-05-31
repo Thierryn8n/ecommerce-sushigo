@@ -21,7 +21,6 @@ export interface Product {
   name: string
   slug: string
   description: string | null
-  base_price: number
   image_url: string | null
   category_id: string | null
   is_active: boolean
@@ -29,7 +28,6 @@ export interface Product {
   display_order: number
   created_at: string
   updated_at: string
-  promotion_price: number | null
   base_weight_grams: number
   category?: Category
 }
@@ -38,7 +36,6 @@ export interface Size {
   id: string
   name: string
   ml: number
-  price_multiplier: number
   display_order: number
   is_active: boolean
   created_at: string
@@ -47,7 +44,6 @@ export interface Size {
 export interface Topping {
   id: string
   name: string
-  price: number
   category: string | null
   image_url: string | null
   is_active: boolean
@@ -143,8 +139,6 @@ export interface Combo {
   name: string
   slug: string
   description: string | null
-  original_price: number
-  promo_price: number
   image_url: string | null
   is_active: boolean
   display_order: number
@@ -212,7 +206,6 @@ export interface Bowl {
   description: string | null
   ml: number
   max_weight: number | null
-  price_addition: number
   image_url: string | null
   bowl_type: string | null
   is_special: boolean
@@ -225,7 +218,6 @@ export interface AcaiType {
   id: string
   name: string
   description: string | null
-  price_addition: number
   weight_addition: number
   price_per_kg: number
   image_url: string | null
@@ -300,7 +292,6 @@ export interface CartItem {
   toppings: Topping[]
   quantity: number
   notes: string
-  unitPrice: number
   totalPrice: number
 }
 
