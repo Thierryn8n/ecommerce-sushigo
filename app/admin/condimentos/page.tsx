@@ -22,7 +22,6 @@ export default function CondimentosPage() {
   const [editingTopping, setEditingTopping] = useState<Topping | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    price: '',
     category: '',
     image_url: '',
     is_active: true,
@@ -68,7 +67,7 @@ export default function CondimentosPage() {
 
     const toppingData = {
       name: formData.name,
-      price: parseFloat(formData.price),
+      price: 0,
       category: formData.category || null,
       image_url: imageUrl || null,
       is_active: formData.is_active,
@@ -114,7 +113,6 @@ export default function CondimentosPage() {
     setEditingTopping(topping)
     setFormData({
       name: topping.name,
-      price: topping.price.toString(),
       category: topping.category || '',
       image_url: topping.image_url || '',
       is_active: topping.is_active,
@@ -129,7 +127,6 @@ export default function CondimentosPage() {
     setEditingTopping(null)
     setFormData({
       name: '',
-      price: '',
       category: '',
       image_url: '',
       is_active: true,
@@ -176,18 +173,6 @@ export default function CondimentosPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="price">Preço (R$)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    required
-                    className="bg-muted border-border"
-                  />
-                </div>
-                <div>
                   <Label htmlFor="max_quantity">Quantidade Máxima</Label>
                   <Input
                     id="max_quantity"
@@ -195,6 +180,17 @@ export default function CondimentosPage() {
                     value={formData.max_quantity}
                     onChange={(e) => setFormData({ ...formData, max_quantity: e.target.value })}
                     className="bg-muted border-border"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="weight_grams">Peso (gramas)</Label>
+                  <Input
+                    id="weight_grams"
+                    type="number"
+                    value={formData.weight_grams}
+                    onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
+                    className="bg-muted border-border"
+                    placeholder="Ex: 15"
                   />
                 </div>
               </div>
@@ -225,19 +221,6 @@ export default function CondimentosPage() {
                     value={formData.display_order}
                     onChange={(e) => setFormData({ ...formData, display_order: e.target.value })}
                     className="bg-muted border-border"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="weight_grams">Peso (gramas)</Label>
-                  <Input
-                    id="weight_grams"
-                    type="number"
-                    value={formData.weight_grams}
-                    onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
-                    className="bg-muted border-border"
-                    placeholder="Ex: 15"
                   />
                 </div>
               </div>
@@ -302,7 +285,6 @@ export default function CondimentosPage() {
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">{topping.name}</h3>
             <div className="flex justify-between items-center text-sm mb-2">
-              <span className="text-[#FFC300] font-semibold">R$ {topping.price.toFixed(2)}</span>
               <span className="text-foreground/70">Max: {topping.max_quantity}x | {topping.weight_grams}g</span>
             </div>
             <div className="mt-2 flex items-center gap-2">
