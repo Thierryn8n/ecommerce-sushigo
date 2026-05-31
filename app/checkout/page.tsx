@@ -211,7 +211,16 @@ export default function CheckoutPage() {
           updated_at: new Date().toISOString(),
         })
         if (deliveryType === 'delivery') {
-          await supabase.from('addresses').upsert({
+          // Atualizar endereço existente ou criar novo
+          const { data: existingAddr } = await supabase
+            .from('addresses')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('is_default', true)
+            .limit(1)
+            .single()
+
+          const addrPayload = {
             user_id: user.id,
             street: address.street,
             number: address.number,
@@ -221,7 +230,13 @@ export default function CheckoutPage() {
             state: address.state || 'CE',
             zip_code: unmask(address.cep),
             is_default: true,
-          }, { onConflict: 'user_id, street, number' })
+          }
+
+          if (existingAddr) {
+            await supabase.from('addresses').update(addrPayload).eq('id', existingAddr.id)
+          } else {
+            await supabase.from('addresses').insert(addrPayload)
+          }
         }
       } else {
         // Salvar no localStorage para não logados
@@ -297,11 +312,11 @@ export default function CheckoutPage() {
 
       // Redirecionar para página de acompanhamento
       router.push(`/pedido/${orderData.id}/acompanhamento`)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao salvar pedido:', error)
       toast({
-        title: 'Erro',
-        description: 'Não foi possível salvar o pedido. Tente novamente.',
+        title: 'Erro ao salvar pedido',
+        description: error?.message || 'Não foi possível salvar o pedido. Tente novamente.',
         variant: 'destructive'
       })
     } finally {
@@ -343,7 +358,16 @@ export default function CheckoutPage() {
           updated_at: new Date().toISOString(),
         })
         if (deliveryType === 'delivery') {
-          await supabase.from('addresses').upsert({
+          // Atualizar endereço existente ou criar novo
+          const { data: existingAddr } = await supabase
+            .from('addresses')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('is_default', true)
+            .limit(1)
+            .single()
+
+          const addrPayload = {
             user_id: user.id,
             street: address.street,
             number: address.number,
@@ -353,7 +377,13 @@ export default function CheckoutPage() {
             state: address.state || 'CE',
             zip_code: unmask(address.cep),
             is_default: true,
-          }, { onConflict: 'user_id, street, number' })
+          }
+
+          if (existingAddr) {
+            await supabase.from('addresses').update(addrPayload).eq('id', existingAddr.id)
+          } else {
+            await supabase.from('addresses').insert(addrPayload)
+          }
         }
       } else {
         // Salvar no localStorage para não logados
@@ -425,11 +455,11 @@ export default function CheckoutPage() {
 
       // Redirecionar para página de acompanhamento
       router.push(`/pedido/${orderData.id}/acompanhamento`)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao finalizar pedido:', error)
       toast({
-        title: 'Erro',
-        description: 'Não foi possível finalizar o pedido. Tente novamente.',
+        title: 'Erro ao finalizar pedido',
+        description: error?.message || 'Verifique os dados e tente novamente.',
         variant: 'destructive'
       })
     } finally {
