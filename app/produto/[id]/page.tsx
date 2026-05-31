@@ -55,6 +55,7 @@ interface Sauce {
   id: string
   name: string
   weight_grams: number
+  image_url: string | null
 }
 
 const STEPS = [
@@ -208,6 +209,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
           id: s.id,
           name: s.name,
           weight_grams: Number(s.weight_grams) || 0,
+          image_url: s.image_url || null,
         })))
       }
 
@@ -527,6 +529,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                           : 'border-red-400/30 bg-red-500/5 text-red-300 hover:border-[#FF8C00]/50'
                                       }`}
                                     >
+                                      {b.image_url && (
+                                        <div className="w-8 h-8 mx-auto mb-1 rounded-full overflow-hidden bg-muted">
+                                          <Image src={b.image_url} alt={b.name} width={32} height={32} className="w-full h-full object-cover" />
+                                        </div>
+                                      )}
                                       <span className="block font-semibold text-foreground">{b.name}</span>
                                       <span className="block text-[9px]">ate {b.max_weight}g</span>
                                     </button>
@@ -859,12 +866,18 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 : 'border-border hover:border-[#8A2BE2]/50'
                             }`}
                           >
-                            <div className="flex items-center justify-between">
-                              <div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              {sauce.image_url && (
+                                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                                  <Image src={sauce.image_url} alt={sauce.name} width={56} height={56} className="w-full h-full object-cover" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
                                 <p className="text-foreground font-semibold text-xs sm:text-sm">{sauce.name}</p>
+                                <p className="text-muted-foreground text-[10px] sm:text-xs">{sauce.weight_grams}g</p>
                               </div>
                               {selectedSauces.includes(sauce.id) && (
-                                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF8C00] flex-shrink-0 ml-1 sm:ml-2" />
+                                <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF8C00] flex-shrink-0 ml-1" />
                               )}
                             </div>
                           </button>
