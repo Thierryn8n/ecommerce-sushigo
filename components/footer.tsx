@@ -14,26 +14,13 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            {storeLoading ? (
-              <div className="w-32 h-12 bg-muted animate-pulse rounded mb-4" />
-            ) : store?.logo_url ? (
-              <Image
-                src={store.logo_url}
-                alt={store.name}
-                width={120}
-                height={50}
-                className="mb-4 object-contain"
-              />
-            ) : (
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-lg">S</span>
-                </div>
-                <span className="text-xl font-bold text-foreground">
-                  Sushi<span className="text-primary">Go</span>
-                </span>
-              </div>
-            )}
+            <Image
+              src="/images/logo-sushigo.png"
+              alt="SushiGo Delivery"
+              width={140}
+              height={50}
+              className="mb-4 object-contain"
+            />
             <p className="text-foreground/60 text-sm leading-relaxed">
               O melhor sushi da cidade, com qualidade premium e entrega rapida na sua casa.
             </p>

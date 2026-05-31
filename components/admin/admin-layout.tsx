@@ -30,16 +30,15 @@ import { createClient } from '@/lib/supabase/client'
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/produtos', label: 'Produtos', icon: Package },
-  { href: '/admin/vasilhas', label: 'Vasilhas', icon: Utensils },
   { href: '/admin/condimentos', label: 'Condimentos', icon: Palette },
-  { href: '/admin/coberturas', label: 'Coberturas', icon: Tag },
+  { href: '/admin/molhos', label: 'Molhos', icon: Tag },
   { href: '/admin/banners', label: 'Banners', icon: Bell },
   { href: '/admin/pedidos', label: 'Lista de Pedidos', icon: ShoppingCart },
   { href: '/admin/pedidos/kanban', label: 'Kanban de Pedidos', icon: Columns2 },
   { href: '/admin/cupons', label: 'Cupons', icon: Ticket },
   { href: '/admin/entrega', label: 'Entrega', icon: ChevronDown },
   { href: '/admin/aprovar-admins', label: 'Admins', icon: Users },
-  { href: '/admin/configuracoes', label: 'Configurações', icon: Settings },
+  { href: '/admin/configuracoes', label: 'Configuracoes', icon: Settings },
 ]
 
 export function AdminSidebar() {
@@ -72,23 +71,13 @@ export function AdminSidebar() {
         {/* Logo */}
         <div className="p-4 border-b border-border">
           <Link href="/admin" className="flex items-center gap-2">
-            {store?.logo_url ? (
-              <Image
-                src={store.logo_url}
-                alt={store.name}
-                width={40}
-                height={40}
-                className="rounded-lg object-contain"
-              />
-            ) : (
-              <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-lg">
-                {store?.name?.charAt(0) || 'A'}
-              </div>
-            )}
-            <div>
-              <h1 className="text-foreground font-bold text-sm">{store?.name || 'Loja'}</h1>
-              <p className="text-muted-foreground text-[10px]">Painel Admin</p>
-            </div>
+            <Image
+              src="/images/logo-sushigo.png"
+              alt="SushiGo Delivery"
+              width={120}
+              height={40}
+              className="object-contain"
+            />
           </Link>
         </div>
 
@@ -197,7 +186,7 @@ export function AdminHeader() {
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 lg:pl-[14rem] relative">
       <div className="flex items-center gap-4">
-        <h2 className="text-foreground font-semibold hidden sm:block">Painel Admin - {store?.name || 'Loja'}</h2>
+        <h2 className="text-foreground font-semibold hidden sm:block">Painel Admin - SushiGo</h2>
       </div>
       
       <div className="flex items-center gap-4">
@@ -271,9 +260,9 @@ export function AdminHeader() {
             className="profile-btn flex items-center gap-3 px-3 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
           >
             <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
-              {store?.name?.charAt(0) || 'A'}
+              S
             </div>
-            <span className="text-foreground font-medium hidden sm:block">{store?.name || 'Admin'}</span>
+            <span className="text-foreground font-medium hidden sm:block">SushiGo</span>
             <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${showProfile ? 'rotate-180' : ''}`} />
           </button>
           
@@ -281,7 +270,7 @@ export function AdminHeader() {
           {showProfile && (
             <div className="profile-dropdown absolute right-0 top-full mt-2 w-56 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
               <div className="p-4 border-b border-border">
-                <p className="font-semibold text-foreground">{store?.name || 'Admin'}</p>
+                <p className="font-semibold text-foreground">SushiGo Delivery</p>
                 <p className="text-xs text-muted-foreground">Administrador</p>
               </div>
               <div className="p-2">

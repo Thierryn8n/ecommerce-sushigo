@@ -7,29 +7,26 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { createClient } from '@/lib/supabase/client'
 import { uploadImage } from '@/lib/supabase/storage'
-import { Bowl } from '@/lib/types'
+import { Topping } from '@/lib/types'
 import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 
-export default function VasilhasPage() {
-  const [bowls, setBowls] = useState<Bowl[]>([])
+export default function MolhosPage() {
+  const [sauces, setSauces] = useState<Topping[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingBowl, setEditingBowl] = useState<Bowl | null>(null)
+  const [editingSauce, setEditingSauce] = useState<Topping | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    ml: '',
-    max_weight: '',
-    price_addition: '',
+    price: '',
+    category: 'molho',
     image_url: '',
-    bowl_type: '',
     is_active: true,
     display_order: '0',
+    max_quantity: '2',
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -37,19 +34,20 @@ export default function VasilhasPage() {
   const supabase = createClient()
 
   useEffect(() => {
-    fetchBowls()
+    fetchSauces()
   }, [])
 
-  const fetchBowls = async () => {
+  const fetchSauces = async () => {
     const { data, error } = await supabase
-      .from('bowls')
+      .from('toppings')
       .select('*')
+      .eq('category', 'molho')
       .order('display_order')
     
     if (error) {
-      console.error('Erro ao buscar vasilhas:', error)
+      console.error('Erro ao buscar molhos:', error)
     } else {
-      setBowls(data || [])
+      setSauces(data || [])
     }
     setLoading(false)
   }
@@ -60,35 +58,33 @@ export default function VasilhasPage() {
 
     let imageUrl = formData.image_url
     if (imageFile) {
-      const result = await uploadImage(imageFile, 'bowls', 'bowls')
+      const result = await uploadImage(imageFile, 'sauces', 'sauces')
       if (result.url) {
         imageUrl = result.url
       }
     }
 
-    const bowlData = {
+    const sauceData = {
       name: formData.name,
-      description: formData.description || null,
-      ml: parseInt(formData.ml),
-      max_weight: formData.max_weight ? parseInt(formData.max_weight) : null,
-      price_addition: parseFloat(formData.price_addition),
+      price: parseFloat(formData.price),
+      category: 'cobertura',
       image_url: imageUrl || null,
-      bowl_type: formData.bowl_type || null,
       is_active: formData.is_active,
       display_order: parseInt(formData.display_order),
+      max_quantity: parseInt(formData.max_quantity),
     }
 
-    if (editingBowl) {
+    if (editingSauce) {
       const { error } = await supabase
-        .from('bowls')
-        .update(bowlData)
-        .eq('id', editingBowl.id)
+        .from('toppings')
+        .update(sauceData)
+        .eq('id', editingSauce.id)
       
       if (error) console.error('Erro ao atualizar:', error)
     } else {
       const { error } = await supabase
-        .from('bowls')
-        .insert([bowlData])
+        .from('toppings')
+        .insert([sauceData])
       
       if (error) console.error('Erro ao criar:', error)
     }
@@ -96,49 +92,45 @@ export default function VasilhasPage() {
     setUploading(false)
     setDialogOpen(false)
     resetForm()
-    fetchBowls()
+    fetchSauces()
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Tem certeza que deseja excluir esta vasilha?')) {
+    if (confirm('Tem certeza que deseja excluir esta cobertura?')) {
       const { error } = await supabase
-        .from('bowls')
+        .from('toppings')
         .delete()
         .eq('id', id)
       
       if (error) console.error('Erro ao excluir:', error)
-      else fetchBowls()
+      else fetchSauces()
     }
   }
 
-  const handleEdit = (bowl: Bowl) => {
-    setEditingBowl(bowl)
+  const handleEdit = (sauce: Topping) => {
+    setEditingSauce(sauce)
     setFormData({
-      name: bowl.name,
-      description: bowl.description || '',
-      ml: bowl.ml.toString(),
-      max_weight: bowl.max_weight?.toString() || '',
-      price_addition: bowl.price_addition.toString(),
-      image_url: bowl.image_url || '',
-      bowl_type: bowl.bowl_type || '',
-      is_active: bowl.is_active,
-      display_order: bowl.display_order.toString(),
+      name: sauce.name,
+      price: sauce.price.toString(),
+      category: sauce.category || 'cobertura',
+      image_url: sauce.image_url || '',
+      is_active: sauce.is_active,
+      display_order: sauce.display_order.toString(),
+      max_quantity: sauce.max_quantity?.toString() || '2',
     })
     setDialogOpen(true)
   }
 
   const resetForm = () => {
-    setEditingBowl(null)
+    setEditingSauce(null)
     setFormData({
       name: '',
-      description: '',
-      ml: '',
-      max_weight: '',
-      price_addition: '',
+      price: '',
+      category: 'cobertura',
       image_url: '',
-      bowl_type: '',
       is_active: true,
       display_order: '0',
+      max_quantity: '2',
     })
     setImageFile(null)
   }
@@ -154,17 +146,17 @@ export default function VasilhasPage() {
         <AdminHeader />
         <main className="p-4 md:p-6 lg:p-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Gerenciar Vasilhas</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">Gerenciar Coberturas</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#FF8C00] hover:bg-[#FFC300]">
               <Plus className="w-4 h-4 mr-2" />
-              Nova Vasilha
+              Nova Cobertura
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-card border-border text-foreground max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-auto">
             <DialogHeader>
-              <DialogTitle>{editingBowl ? 'Editar Vasilha' : 'Nova Vasilha'}</DialogTitle>
+              <DialogTitle>{editingSauce ? 'Editar Cobertura' : 'Nova Cobertura'}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -177,75 +169,39 @@ export default function VasilhasPage() {
                   className="bg-muted border-border"
                 />
               </div>
-              <div>
-                <Label htmlFor="description">Descrição</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="bg-muted border-border"
-                />
-              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="ml">ML</Label>
+                  <Label htmlFor="price">Preço (R$)</Label>
                   <Input
-                    id="ml"
-                    type="number"
-                    value={formData.ml}
-                    onChange={(e) => setFormData({ ...formData, ml: e.target.value })}
-                    required
-                    className="bg-muted border-border"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="max_weight">Peso Máximo (g)</Label>
-                  <Input
-                    id="max_weight"
-                    type="number"
-                    value={formData.max_weight}
-                    onChange={(e) => setFormData({ ...formData, max_weight: e.target.value })}
-                    className="bg-muted border-border"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price_addition">Preço Adicional (R$)</Label>
-                  <Input
-                    id="price_addition"
+                    id="price"
                     type="number"
                     step="0.01"
-                    value={formData.price_addition}
-                    onChange={(e) => setFormData({ ...formData, price_addition: e.target.value })}
+                    value={formData.price}
+                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
                     className="bg-muted border-border"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="display_order">Ordem de Exibição</Label>
+                  <Label htmlFor="max_quantity">Quantidade Máxima</Label>
                   <Input
-                    id="display_order"
+                    id="max_quantity"
                     type="number"
-                    value={formData.display_order}
-                    onChange={(e) => setFormData({ ...formData, display_order: e.target.value })}
+                    value={formData.max_quantity}
+                    onChange={(e) => setFormData({ ...formData, max_quantity: e.target.value })}
                     className="bg-muted border-border"
                   />
                 </div>
               </div>
               <div>
-                <Label htmlFor="bowl_type">Tipo</Label>
-                <Select value={formData.bowl_type} onValueChange={(value) => setFormData({ ...formData, bowl_type: value })}>
-                  <SelectTrigger className="bg-muted border-border">
-                    <SelectValue placeholder="Selecione o tipo" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-muted border-border">
-                    <SelectItem value="copo">Copo</SelectItem>
-                    <SelectItem value="tigela">Tigela</SelectItem>
-                    <SelectItem value="barco">Barco</SelectItem>
-                    <SelectItem value="especial">Especial</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="display_order">Ordem de Exibição</Label>
+                <Input
+                  id="display_order"
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({ ...formData, display_order: e.target.value })}
+                  className="bg-muted border-border"
+                />
               </div>
               <div>
                 <Label htmlFor="image">Imagem</Label>
@@ -281,45 +237,39 @@ export default function VasilhasPage() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {bowls.map((bowl) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {sauces.map((sauce) => (
           <motion.div
-            key={bowl.id}
+            key={sauce.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="bg-card border border-border rounded-xl p-4 md:p-6"
           >
             <div className="flex justify-between items-start mb-4">
               <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                {bowl.image_url ? (
-                  <img src={bowl.image_url} alt={bowl.name} className="w-full h-full object-cover rounded-lg" />
+                {sauce.image_url ? (
+                  <img src={sauce.image_url} alt={sauce.name} className="w-full h-full object-cover rounded-lg" />
                 ) : (
                   <ImageIcon className="w-8 h-8 text-foreground/50" />
                 )}
               </div>
               <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={() => handleEdit(bowl)} className="text-foreground hover:bg-muted">
+                <Button size="sm" variant="ghost" onClick={() => handleEdit(sauce)} className="text-foreground hover:bg-muted">
                   <Edit className="w-4 h-4" />
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => handleDelete(bowl.id)} className="text-red-500 hover:bg-red-500/10">
+                <Button size="sm" variant="ghost" onClick={() => handleDelete(sauce.id)} className="text-red-500 hover:bg-red-500/10">
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">{bowl.name}</h3>
-            <p className="text-muted-foreground text-sm mb-2">{bowl.description}</p>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-foreground/70">{bowl.ml}ml</span>
-              <span className="text-[#FFC300] font-semibold">
-                {bowl.price_addition > 0 ? `+R$ ${bowl.price_addition.toFixed(2)}` : 'Sem custo adicional'}
-              </span>
+            <h3 className="text-xl font-bold text-foreground mb-2">{sauce.name}</h3>
+            <div className="flex justify-between items-center text-sm mb-2">
+              <span className="text-[#FFC300] font-semibold">R$ {sauce.price.toFixed(2)}</span>
+              <span className="text-foreground/70">Max: {sauce.max_quantity}x</span>
             </div>
-            <div className="mt-2 flex items-center gap-2">
-              <span className={`px-2 py-1 rounded text-xs ${bowl.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
-                {bowl.is_active ? 'Ativo' : 'Inativo'}
-              </span>
-              <span className="px-2 py-1 rounded text-xs bg-muted text-foreground/70">
-                {bowl.bowl_type}
+            <div className="mt-2">
+              <span className={`px-2 py-1 rounded text-xs ${sauce.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                {sauce.is_active ? 'Ativo' : 'Inativo'}
               </span>
             </div>
           </motion.div>

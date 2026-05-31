@@ -1,11 +1,11 @@
 {
-  "name": "Açaí da Praia",
-  "short_name": "Açaí da Praia",
-  "description": "O melhor açaí de Canoa Quebrada. Peça online e receba em casa!",
+  "name": "SushiGo Delivery",
+  "short_name": "SushiGo",
+  "description": "O melhor sushi da cidade. Peca online e receba em casa!",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#120018",
-  "theme_color": "#5B1E87",
+  "background_color": "#0A0A0A",
+  "theme_color": "#D62828",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [
@@ -23,25 +23,11 @@
     }
   ],
   "categories": ["food", "delivery"],
-  "screenshots": [
-    {
-      "src": "/screenshot1.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshot2.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Cardápio",
-      "short_name": "Cardápio",
-      "description": "Ver nosso cardápio completo",
+      "name": "Cardapio",
+      "short_name": "Cardapio",
+      "description": "Ver nosso cardapio completo",
       "url": "/cardapio",
       "icons": [
         {

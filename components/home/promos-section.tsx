@@ -14,7 +14,7 @@ export function PromosSection() {
             <h2 className="text-2xl md:text-3xl font-black text-white mb-2">PROMOÇÕES EXCLUSIVAS</h2>
             <p className="text-white/90 md:text-lg">Ofertas especiais toda a semana para você aproveitar!</p>
           </div>
-          <Link href="/promotions">
+          <Link href="/promocoes">
             <Button className="bg-white text-primary hover:bg-white/90 font-black px-8 h-12 whitespace-nowrap">
               VER PROMOÇÕES
             </Button>

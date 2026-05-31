@@ -41,28 +41,15 @@ export default function Header() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="relative z-10 flex items-center gap-2">
-            {storeLoading ? (
-              <div className="w-12 h-12 rounded-full bg-muted animate-pulse" />
-            ) : store?.logo_url ? (
-              <Image
-                src={store.logo_url}
-                alt={store.name}
-                width={50}
-                height={50}
-                className="object-contain"
-                priority
-              />
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-lg">S</span>
-                </div>
-                <span className="text-xl font-bold text-foreground">
-                  Sushi<span className="text-primary">Go</span>
-                </span>
-              </div>
-            )}
+          <Link href="/" className="relative z-10 flex items-center">
+            <Image
+              src="/images/logo-sushigo.png"
+              alt="SushiGo Delivery"
+              width={140}
+              height={50}
+              className="object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}
