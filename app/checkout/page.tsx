@@ -140,6 +140,7 @@ export default function CheckoutPage() {
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
         weight_grams: item.weightGrams || 0,
+        acai_type: item.acaiType || null,
         toppings: item.toppings,
         sauces: item.sauces
       }))
@@ -234,6 +235,7 @@ export default function CheckoutPage() {
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
         weight_grams: item.weightGrams || 0,
+        acai_type: item.acaiType || null,
         toppings: item.toppings,
         sauces: item.sauces
       }))

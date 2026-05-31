@@ -639,6 +639,7 @@ function printOrder(order) {
         size_name: item.size_name || '',
         notes: item.notes || '',
         weight_grams: item.weight_grams || 0,
+        acai_type: item.acai_type || '',
         toppings: allToppings,
         sauces: sauces
       };
