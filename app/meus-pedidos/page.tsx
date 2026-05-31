@@ -115,7 +115,7 @@ export default function MeusPedidosPage() {
                 Nenhum pedido ainda
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Que tal fazer seu primeiro pedido? Temos deliciosos açaís esperando por você!
+                Que tal fazer seu primeiro pedido? Temos deliciosos combos de sushi esperando por você!
               </p>
               <Link href="/cardapio">
                 <Button size="lg" className="gap-2">

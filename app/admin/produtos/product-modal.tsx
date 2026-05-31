@@ -19,12 +19,16 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  base_weight_grams: number
+  price: number
   image_url: string | null
   banner_url: string | null
   is_active: boolean
   is_featured: boolean
   is_promotion: boolean
+  is_combo: boolean
+  base_pieces: number
+  allow_quantity_change: boolean
+  molhos_included: boolean
   display_order: number
   category_id: string | null
 }
@@ -50,12 +54,16 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
     name: '',
     slug: '',
     description: '',
-    base_weight_grams: 200,
+    price: 0,
     image_url: null,
     banner_url: null,
     is_active: true,
     is_featured: false,
     is_promotion: false,
+    is_combo: false,
+    base_pieces: 8,
+    allow_quantity_change: false,
+    molhos_included: true,
     display_order: 0,
     category_id: null,
   })
@@ -79,12 +87,16 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
         name: '',
         slug: '',
         description: '',
-        base_weight_grams: 200,
+        price: 0,
         image_url: null,
         banner_url: null,
         is_active: true,
         is_featured: false,
         is_promotion: false,
+        is_combo: false,
+        base_pieces: 8,
+        allow_quantity_change: false,
+        molhos_included: true,
         display_order: 0,
         category_id: null,
       })
@@ -156,7 +168,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_weight_grams: formData.base_weight_grams,
+            base_pieces: formData.base_pieces,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
             is_active: formData.is_active,
@@ -180,7 +192,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
             name: formData.name,
             slug: formData.slug,
             description: formData.description || null,
-            base_weight_grams: formData.base_weight_grams,
+            base_pieces: formData.base_pieces,
             image_url: formData.image_url,
             banner_url: formData.banner_url,
             is_active: formData.is_active,
@@ -329,7 +341,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   )}
                   {uploadingImage && (
                     <div className="absolute inset-0 bg-[#1a0a25]/80 flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 text-[#FF8C00] animate-spin" />
+                      <Loader2 className="w-6 h-6 text-[#D62828] animate-spin" />
                     </div>
                   )}
                 </div>
@@ -384,7 +396,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   )}
                   {uploadingBanner && (
                     <div className="absolute inset-0 bg-[#1a0a25]/80 flex items-center justify-center">
-                      <Loader2 className="w-6 h-6 text-[#FF8C00] animate-spin" />
+                      <Loader2 className="w-6 h-6 text-[#D62828] animate-spin" />
                     </div>
                   )}
                 </div>
@@ -419,7 +431,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 <Input
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  placeholder="Ex: Açaí 500g"
+                  placeholder="Ex: Combo 8 peças"
                   className="bg-[#2a1a35] border-[#3a2a45] text-white"
                 />
                 {errors.name && (
@@ -432,7 +444,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 <Input
                   value={formData.slug}
                   onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  placeholder="acai-500g"
+                  placeholder="combo-8-pecas"
                   className="bg-[#2a1a35] border-[#3a2a45] text-white"
                 />
                 {errors.slug && (
@@ -449,18 +461,18 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Descrição do produto..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#FF8C00]/50"
+                className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#D62828]/50"
               />
             </div>
 
             <div>
-              <label className="text-white/70 text-sm mb-2 block">Peso Base (g)</label>
+              <label className="text-white/70 text-sm mb-2 block">Quantidade Base (peças)</label>
               <Input
                 type="number"
                 min="0"
-                value={formData.base_weight_grams}
-                onChange={(e) => setFormData({ ...formData, base_weight_grams: parseInt(e.target.value) || 0 })}
-                placeholder="200"
+                value={formData.base_pieces}
+                onChange={(e) => setFormData({ ...formData, base_pieces: parseInt(e.target.value) || 0 })}
+                placeholder="8"
                 className="bg-[#2a1a35] border-[#3a2a45] text-white"
               />
             </div>
@@ -472,7 +484,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                 <select
                   value={formData.category_id || ''}
                   onChange={(e) => setFormData({ ...formData, category_id: e.target.value || null })}
-                  className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#FF8C00]/50"
+                  className="w-full px-3 py-2 bg-[#2a1a35] border border-[#3a2a45] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#D62828]/50"
                 >
                   <option value="">Selecione...</option>
                   {categories.map((cat) => (
@@ -506,7 +518,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   type="checkbox"
                   checked={formData.is_active}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#FF8C00] focus:ring-[#FF8C00]"
+                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#D62828] focus:ring-[#D62828]"
                 />
                 <span className="text-white text-sm">Ativo</span>
               </label>
@@ -516,7 +528,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   type="checkbox"
                   checked={formData.is_featured}
                   onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#FF8C00] focus:ring-[#FF8C00]"
+                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#D62828] focus:ring-[#D62828]"
                 />
                 <span className="text-white text-sm">Destaque</span>
               </label>
@@ -526,7 +538,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
                   type="checkbox"
                   checked={formData.is_promotion}
                   onChange={(e) => setFormData({ ...formData, is_promotion: e.target.checked })}
-                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#FF8C00] focus:ring-[#FF8C00]"
+                  className="w-4 h-4 rounded border-[#3a2a45] bg-[#2a1a35] text-[#D62828] focus:ring-[#D62828]"
                 />
                 <span className="text-white text-sm">Promoção</span>
               </label>
@@ -546,7 +558,7 @@ export default function ProductModal({ isOpen, onClose, product, onSave }: Produ
               <Button
                 type="submit"
                 disabled={loading}
-                className="bg-[#FF8C00] hover:bg-[#FFC300] text-white"
+                className="bg-[#D62828] hover:bg-[#FFC300] text-white"
               >
                 {loading ? (
                   <>

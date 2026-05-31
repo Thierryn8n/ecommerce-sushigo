@@ -363,7 +363,7 @@ export default function ContaPage() {
             onClick={() => {
               toast({ 
                 title: 'Entre em contato', 
-                description: 'Para excluir sua conta, envie um e-mail para suporte@acaipraia.com',
+                description: 'Para excluir sua conta, envie um e-mail para contato@sushigo.com',
                 variant: 'destructive'
               })
             }}

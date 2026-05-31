@@ -128,7 +128,7 @@ export default function EntregaPage() {
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Areas de Entrega</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#FF8C00] hover:bg-[#FFC300]">
+            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#D62828] hover:bg-[#FFC300]">
               <Plus className="w-4 h-4 mr-2" />
               Nova Área
             </Button>
@@ -195,7 +195,7 @@ export default function EntregaPage() {
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={uploading} className="bg-[#FF8C00] hover:bg-[#FFC300]">
+                <Button type="submit" disabled={uploading} className="bg-[#D62828] hover:bg-[#FFC300]">
                   {uploading ? 'Salvando...' : 'Salvar'}
                 </Button>
               </div>
@@ -248,7 +248,7 @@ export default function EntregaPage() {
               )}
               {area.delivery_fee === 0 && (
                 <div className="mt-2">
-                  <span className="px-3 py-1 bg-[#FF8C00]/20 text-[#FF8C00] rounded-full text-xs font-semibold">
+                  <span className="px-3 py-1 bg-[#D62828]/20 text-[#D62828] rounded-full text-xs font-semibold">
                     Frete Grátis
                   </span>
                 </div>

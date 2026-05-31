@@ -1,11 +1,11 @@
 {
-  "name": "Açaí da Praia",
-  "short_name": "Açaí da Praia",
-  "description": "O melhor açaí de Canoa Quebrada. Peça online e receba em casa!",
+  "name": "SushiGo",
+  "short_name": "SushiGo",
+  "description": "Sushi premium acessível. Delivery rápido com visual moderno japonês. Peça agora!",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#120018",
-  "theme_color": "#5B1E87",
+  "background_color": "#FFFFFF",
+  "theme_color": "#D62828",
   "orientation": "portrait-primary",
   "scope": "/",
   "icons": [

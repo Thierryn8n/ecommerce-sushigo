@@ -122,7 +122,7 @@ export default function AcompanhamentoPedidoPage() {
         <Header />
         <section className="pt-28 pb-12">
           <div className="container mx-auto px-4 text-center">
-            <Loader2 className="w-12 h-12 animate-spin text-[#FF8C00] mx-auto" />
+            <Loader2 className="w-12 h-12 animate-spin text-[#D62828] mx-auto" />
             <p className="mt-4 text-foreground/70">Carregando pedido...</p>
           </div>
         </section>
@@ -141,7 +141,7 @@ export default function AcompanhamentoPedidoPage() {
             <h1 className="text-2xl font-bold text-foreground mb-2">Pedido não encontrado</h1>
             <p className="text-foreground/70 mb-6">Não conseguimos localizar este pedido.</p>
             <Link href="/cardapio">
-              <Button className="bg-[#FF8C00] hover:bg-[#FFC300]">
+              <Button className="bg-[#D62828] hover:bg-[#FFC300]">
                 Fazer Novo Pedido
               </Button>
             </Link>
@@ -166,14 +166,14 @@ export default function AcompanhamentoPedidoPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FF8C00] to-[#FFC300] mb-4">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#D62828] to-[#FFC300] mb-4">
               <Sparkles className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
               Pedido Recebido!
             </h1>
             <p className="text-foreground/70 text-lg">
-              Obrigado, <span className="font-semibold text-[#FF8C00]">{order.customer_name}</span>!
+              Obrigado, <span className="font-semibold text-[#D62828]">{order.customer_name}</span>!
             </p>
             <p className="text-foreground/60 mt-2">
               Seu pedido está sendo preparado com muito carinho.
@@ -191,7 +191,7 @@ export default function AcompanhamentoPedidoPage() {
               <div className="text-center sm:text-left">
                 <p className="text-foreground/60 text-sm mb-1">Número do Pedido</p>
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold text-[#FF8C00]">
+                  <span className="text-3xl font-bold text-[#D62828]">
                     #{order.order_number}
                   </span>
                   <button
@@ -229,7 +229,7 @@ export default function AcompanhamentoPedidoPage() {
             className="bg-card rounded-2xl p-6 border border-border mb-6"
           >
             <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#FF8C00]" />
+              <Clock className="w-5 h-5 text-[#D62828]" />
               Acompanhamento em Tempo Real
             </h2>
 
@@ -251,7 +251,7 @@ export default function AcompanhamentoPedidoPage() {
                       transition={{ delay: 0.1 * index }}
                       className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
                         isCurrent 
-                          ? 'bg-[#FF8C00]/10 border-2 border-[#FF8C00]' 
+                          ? 'bg-[#D62828]/10 border-2 border-[#D62828]' 
                           : isCompleted 
                             ? 'bg-green-500/10 border border-green-500/30' 
                             : 'bg-muted/50 border border-border'
@@ -259,7 +259,7 @@ export default function AcompanhamentoPedidoPage() {
                     >
                       <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
                         isCurrent 
-                          ? 'bg-[#FF8C00] text-white' 
+                          ? 'bg-[#D62828] text-white' 
                           : isCompleted 
                             ? 'bg-green-500 text-white' 
                             : 'bg-muted text-foreground/40'
@@ -269,7 +269,7 @@ export default function AcompanhamentoPedidoPage() {
                       <div className="flex-1">
                         <p className={`font-semibold ${
                           isCurrent 
-                            ? 'text-[#FF8C00]' 
+                            ? 'text-[#D62828]' 
                             : isCompleted 
                               ? 'text-green-500' 
                               : 'text-foreground/40'
@@ -301,7 +301,7 @@ export default function AcompanhamentoPedidoPage() {
           >
             <div className="bg-card rounded-2xl p-6 border border-border">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-[#8A2BE2]" />
+                <MapPin className="w-5 h-5 text-[#D62828]" />
                 Endereço de Entrega
               </h3>
               <p className="text-foreground/70">{order.delivery_address}</p>
@@ -309,7 +309,7 @@ export default function AcompanhamentoPedidoPage() {
 
             <div className="bg-card rounded-2xl p-6 border border-border">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Phone className="w-5 h-5 text-[#8A2BE2]" />
+                <Phone className="w-5 h-5 text-[#D62828]" />
                 Contato
               </h3>
               <p className="text-foreground/70">{order.customer_phone}</p>
@@ -324,11 +324,11 @@ export default function AcompanhamentoPedidoPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className="mt-6 bg-gradient-to-r from-[#FF8C00]/20 to-[#FFC300]/20 rounded-2xl p-6 border border-[#FF8C00]/30"
+            className="mt-6 bg-gradient-to-r from-[#D62828]/20 to-[#FFC300]/20 rounded-2xl p-6 border border-[#D62828]/30"
           >
             <div className="flex items-center justify-between">
               <span className="text-foreground font-medium">Total do Pedido</span>
-              <span className="text-3xl font-bold text-[#FF8C00]">
+              <span className="text-3xl font-bold text-[#D62828]">
                 R$ {order.total.toFixed(2).replace('.', ',')}
               </span>
             </div>

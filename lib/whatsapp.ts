@@ -1,7 +1,7 @@
 export interface WhatsAppOrderItem {
   name: string
   quantity: number
-  weightGrams?: number
+  quantityPieces?: number
   size?: string
   toppings?: string[]
   sauces?: string[]
@@ -23,7 +23,7 @@ export interface WhatsAppOrder {
 }
 
 export function generateWhatsAppMessage(order: WhatsAppOrder): string {
-  let message = `🥤 *PEDIDO AÇAÍ DA PRAIA*\n\n`
+  let message = `🍣 *PEDIDO SUSHIGO*\n\n`
   
   message += `👤 *Cliente:* ${order.customerName}\n`
   message += `📱 *Telefone:* ${order.customerPhone}\n`
@@ -39,8 +39,8 @@ export function generateWhatsAppMessage(order: WhatsAppOrder): string {
     message += `${index + 1}. *${item.name}*\n`
     message += `   Qtd: ${item.quantity}x\n`
     
-    if (item.weightGrams) {
-      message += `   Peso: ${item.weightGrams}g\n`
+    if (item.quantityPieces) {
+      message += `   Peças: ${item.quantityPieces}\n`
     }
     
     if (item.size) {

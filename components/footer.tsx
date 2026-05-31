@@ -82,7 +82,7 @@ export function Footer() {
               </div>
             )}
             <p className="text-foreground/70 text-sm leading-relaxed">
-              {store?.description || 'O melhor açaí, direto para você! Ingredientes selecionados e aquele sabor especial.'}
+              {store?.description || 'Sushi premium acessível. Delivery rápido com ingredientes frescos e aquele toque especial japonês.'}
             </p>
           </div>
 

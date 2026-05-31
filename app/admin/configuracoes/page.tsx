@@ -358,7 +358,7 @@ export default function AdminConfiguracoes() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#120018] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#FF8C00] animate-spin" />
+        <Loader2 className="w-8 h-8 text-[#D62828] animate-spin" />
       </div>
     )
   }
@@ -416,7 +416,7 @@ export default function AdminConfiguracoes() {
                         {/* Overlay de loading */}
                         {uploading && (
                           <div className="absolute inset-0 bg-card/80 flex flex-col items-center justify-center">
-                            <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#FF8C00] animate-spin mb-1" />
+                            <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-[#D62828] animate-spin mb-1" />
                             <span className="text-foreground/70 text-[10px] sm:text-xs">Enviando...</span>
                           </div>
                         )}
@@ -677,12 +677,12 @@ export default function AdminConfiguracoes() {
                 <div className="mt-5 border-t border-border pt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">Titulo - Linha 1</label>
-                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">Açaí</span></p>
+                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">Sushi</span></p>
                     <input
                       type="text"
                       value={settings.heroTitleLine1}
                       onChange={e => setSettings(prev => ({ ...prev, heroTitleLine1: e.target.value }))}
-                      placeholder="Açaí"
+                      placeholder="Sushi"
                       className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
@@ -699,12 +699,12 @@ export default function AdminConfiguracoes() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">Subtitulo</label>
-                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">O melhor açaí, com o sabor</span></p>
+                    <p className="text-xs text-muted-foreground mb-1.5">Ex: <span className="italic">O melhor sushi, com o sabor</span></p>
                     <input
                       type="text"
                       value={settings.heroSubtitle}
                       onChange={e => setSettings(prev => ({ ...prev, heroSubtitle: e.target.value }))}
-                      placeholder="O melhor açaí, com o sabor"
+                      placeholder="O melhor sushi, com o sabor"
                       className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
@@ -795,7 +795,7 @@ export default function AdminConfiguracoes() {
                     <textarea
                       value={settings.heroDescription}
                       onChange={e => setSettings(prev => ({ ...prev, heroDescription: e.target.value }))}
-                      placeholder="Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!"
+                      placeholder="Sushi fresco, ingredientes selecionados e aquele toque especial que só a gente tem!"
                       rows={2}
                       className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                     />
@@ -898,7 +898,7 @@ export default function AdminConfiguracoes() {
                 <Button 
                   type="submit" 
                   disabled={saving}
-                  className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold px-8"
+                  className="bg-[#D62828] hover:bg-[#FFC300] text-foreground font-bold px-8"
                 >
                   {saving ? (
                     <>

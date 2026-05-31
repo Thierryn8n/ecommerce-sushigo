@@ -11,22 +11,22 @@ import { Switch } from '@/components/ui/switch'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { createClient } from '@/lib/supabase/client'
 import { uploadImage } from '@/lib/supabase/storage'
-import { Topping } from '@/lib/types'
+import { Sauce } from '@/lib/types'
 import { AdminSidebar, AdminHeader } from '@/components/admin/admin-layout'
 
-export default function CoberturasPage() {
-  const [sauces, setSauces] = useState<Topping[]>([])
+export default function MolhosPage() {
+  const [sauces, setSauces] = useState<Sauce[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingSauce, setEditingSauce] = useState<Topping | null>(null)
+  const [editingSauce, setEditingSauce] = useState<Sauce | null>(null)
   const [formData, setFormData] = useState({
     name: '',
-    category: 'cobertura',
+    description: '',
     image_url: '',
     is_active: true,
     display_order: '0',
-    max_quantity: '2',
-    weight_grams: '0',
+    max_quantity: '3',
+    is_free: true,
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -39,9 +39,8 @@ export default function CoberturasPage() {
 
   const fetchSauces = async () => {
     const { data, error } = await supabase
-      .from('toppings')
+      .from('sauces')
       .select('*')
-      .eq('category', 'cobertura')
       .order('display_order')
     
     if (error) {
@@ -66,24 +65,24 @@ export default function CoberturasPage() {
 
     const sauceData = {
       name: formData.name,
-      category: 'cobertura',
+      description: formData.description || null,
       image_url: imageUrl || null,
       is_active: formData.is_active,
       display_order: parseInt(formData.display_order),
       max_quantity: parseInt(formData.max_quantity),
-      weight_grams: parseInt(formData.weight_grams) || 0,
+      is_free: formData.is_free,
     }
 
     if (editingSauce) {
       const { error } = await supabase
-        .from('toppings')
+        .from('sauces')
         .update(sauceData)
         .eq('id', editingSauce.id)
       
       if (error) console.error('Erro ao atualizar:', error)
     } else {
       const { error } = await supabase
-        .from('toppings')
+        .from('sauces')
         .insert([sauceData])
       
       if (error) console.error('Erro ao criar:', error)
@@ -98,7 +97,7 @@ export default function CoberturasPage() {
   const handleDelete = async (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta cobertura?')) {
       const { error } = await supabase
-        .from('toppings')
+        .from('sauces')
         .delete()
         .eq('id', id)
       
@@ -107,16 +106,16 @@ export default function CoberturasPage() {
     }
   }
 
-  const handleEdit = (sauce: Topping) => {
+  const handleEdit = (sauce: Sauce) => {
     setEditingSauce(sauce)
     setFormData({
       name: sauce.name,
-      category: sauce.category || 'cobertura',
+      description: sauce.description || '',
       image_url: sauce.image_url || '',
       is_active: sauce.is_active,
       display_order: sauce.display_order.toString(),
-      max_quantity: sauce.max_quantity?.toString() || '2',
-      weight_grams: sauce.weight_grams?.toString() || '0',
+      max_quantity: sauce.max_quantity?.toString() || '3',
+      is_free: sauce.is_free ?? true,
     })
     setDialogOpen(true)
   }
@@ -125,12 +124,12 @@ export default function CoberturasPage() {
     setEditingSauce(null)
     setFormData({
       name: '',
-      category: 'cobertura',
+      description: '',
       image_url: '',
       is_active: true,
       display_order: '0',
-      max_quantity: '2',
-      weight_grams: '0',
+      max_quantity: '3',
+      is_free: true,
     })
     setImageFile(null)
   }
@@ -146,10 +145,13 @@ export default function CoberturasPage() {
         <AdminHeader />
         <main className="p-3 sm:p-4 md:p-6 lg:p-8 pb-20 lg:pb-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Gerenciar Coberturas</h1>
+        <div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Molhos e Acompanhamentos</h1>
+          <p className="text-muted-foreground text-sm mt-1">Shoyu, Wasabi, Gengibre, Hashis</p>
+        </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#FF8C00] hover:bg-[#FFC300]">
+            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#D62828] hover:bg-[#FFC300]">
               <Plus className="w-4 h-4 mr-2" />
               Nova Cobertura
             </Button>
@@ -191,19 +193,6 @@ export default function CoberturasPage() {
                   className="bg-muted border-border"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="weight_grams">Peso (gramas)</Label>
-                  <Input
-                    id="weight_grams"
-                    type="number"
-                    value={formData.weight_grams}
-                    onChange={(e) => setFormData({ ...formData, weight_grams: e.target.value })}
-                    className="bg-muted border-border"
-                    placeholder="Ex: 10"
-                  />
-                </div>
-              </div>
               <div>
                 <Label htmlFor="image">Imagem</Label>
                 <Input
@@ -229,7 +218,7 @@ export default function CoberturasPage() {
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={uploading} className="bg-[#FF8C00] hover:bg-[#FFC300]">
+                <Button type="submit" disabled={uploading} className="bg-[#D62828] hover:bg-[#FFC300]">
                   {uploading ? 'Salvando...' : 'Salvar'}
                 </Button>
               </div>
@@ -265,7 +254,7 @@ export default function CoberturasPage() {
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">{sauce.name}</h3>
             <div className="flex justify-between items-center text-sm mb-2">
-              <span className="text-foreground/70">Max: {sauce.max_quantity}x | {sauce.weight_grams}g</span>
+              <span className="text-foreground/70">Max: {sauce.max_quantity}x</span>
             </div>
             <div className="mt-2">
               <span className={`px-2 py-1 rounded text-xs ${sauce.is_active ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>

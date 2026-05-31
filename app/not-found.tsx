@@ -22,9 +22,9 @@ export default function NotFound() {
               transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
               className="relative w-48 h-48 mx-auto"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#FF8C00]/20 to-[#FFC300]/20 rounded-full blur-2xl" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#D62828]/20 to-[#FFC300]/20 rounded-full blur-2xl" />
               <div className="relative w-full h-full flex items-center justify-center">
-                <span className="text-8xl font-bold text-[#FF8C00]">404</span>
+                <span className="text-8xl font-bold text-[#D62828]">404</span>
               </div>
             </motion.div>
           </div>
@@ -41,7 +41,7 @@ export default function NotFound() {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link href="/">
-                <Button className="w-full sm:w-auto bg-[#FF8C00] hover:bg-[#FFC300] text-white font-semibold px-6">
+                <Button className="w-full sm:w-auto bg-[#D62828] hover:bg-[#FFC300] text-white font-semibold px-6">
                   <Home className="w-4 h-4 mr-2" />
                   Pagina Inicial
                 </Button>
@@ -58,7 +58,7 @@ export default function NotFound() {
           {/* Help Text */}
           <p className="mt-6 text-sm text-muted-foreground">
             Precisa de ajuda?{' '}
-            <Link href="/contato" className="text-[#FF8C00] hover:text-[#FFC300] transition-colors">
+            <Link href="/contato" className="text-[#D62828] hover:text-[#FFC300] transition-colors">
               Fale conosco
             </Link>
           </p>

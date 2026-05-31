@@ -53,7 +53,7 @@ export function BenefitsSection() {
     },
     {
       icon: Leaf,
-      title: settings.benefit_2_title || 'Acai 100% Natural',
+      title: settings.benefit_2_title || 'Sushi 100% Fresco',
       description: settings.benefit_2_subtitle || 'Puro e saudavel',
       color: 'hsl(var(--secondary))'
     },

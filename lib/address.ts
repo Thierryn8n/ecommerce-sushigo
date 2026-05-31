@@ -50,8 +50,8 @@ export function unmask(value: string): string {
 }
 
 // localStorage keys
-const LS_CUSTOMER_KEY = 'acai_customer_data'
-const LS_ADDRESS_KEY = 'acai_address_data'
+const LS_CUSTOMER_KEY = 'sushi_customer_data'
+const LS_ADDRESS_KEY = 'sushi_address_data'
 
 export interface LocalStorageCustomer {
   name: string

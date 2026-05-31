@@ -100,7 +100,7 @@ export default function AplicativoPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Acai Printer
+                SushiGo Printer
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
                 Aplicativo desktop para Windows que conecta sua loja com impressao automatica de pedidos em tempo real.

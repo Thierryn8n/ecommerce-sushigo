@@ -29,7 +29,7 @@ export function PwaInstallBanner() {
             <Smartphone className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground text-sm">Instale o App Açaí da Praia</h3>
+            <h3 className="font-semibold text-foreground text-sm">Instale o App SushiGo</h3>
             <p className="text-xs text-muted-foreground mt-0.5">
               Acesse o cardápio rapidamente da tela inicial do seu celular!
             </p>

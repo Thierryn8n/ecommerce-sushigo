@@ -104,7 +104,7 @@ function CardapioContent() {
               Nosso <span className="text-secondary">Cardapio</span>
             </h1>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Escolha seu acai favorito e monte do seu jeito com os melhores ingredientes!
+              Escolha seus sushis favoritos e monte do seu jeito com os melhores ingredientes!
             </p>
           </motion.div>
         </div>

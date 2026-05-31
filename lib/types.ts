@@ -1,4 +1,4 @@
-// Tipos do banco de dados Açaí da Praia
+// Tipos do banco de dados SushiGo
 
 export type OrderStatus = 'pendente' | 'confirmado' | 'preparando' | 'saiu_entrega' | 'entregue' | 'cancelado'
 export type PaymentMethod = 'pix' | 'cartao_credito' | 'cartao_debito' | 'dinheiro'
@@ -22,35 +22,68 @@ export interface Product {
   slug: string
   description: string | null
   image_url: string | null
+  banner_url: string | null
   category_id: string | null
   is_active: boolean
   is_featured: boolean
+  is_promotion: boolean
   display_order: number
   created_at: string
   updated_at: string
-  base_weight_grams: number
+  price: number
+  // Campos específicos para sushi
+  is_combo: boolean
+  is_variable_quantity: boolean
+  base_pieces: number
+  min_quantity: number
+  max_quantity: number
+  sushi_type_id: string | null
+  molhos_included: boolean
   category?: Category
+  variants?: ProductVariant[]
+  combo_items?: ComboProductItem[]
 }
 
-export interface Size {
+// Variações de produto (para produtos com quantidades variáveis como Sashimi)
+export interface ProductVariant {
   id: string
-  name: string
-  ml: number
-  display_order: number
+  product_id: string
+  variant_name: string
+  quantity_value: number
+  price: number
+  is_default: boolean
   is_active: boolean
+  display_order: number
   created_at: string
 }
 
-export interface Topping {
+// Molhos para sushi (Shoyu, Wasabi, Gengibre)
+export interface Sauce {
   id: string
   name: string
-  category: string | null
+  description: string | null
+  image_url: string | null
+  is_free: boolean
+  max_quantity: number
+  is_active: boolean
+  display_order: number
+  created_at: string
+}
+
+// Tipo de sushi (Hot Roll, Uramaki, Sashimi, etc)
+export interface SushiType {
+  id: string
+  name: string
+  description: string | null
+  category: 'sashimi' | 'nigiri' | 'hot' | 'uramaki' | 'hossomaki' | 'joe' | 'porcao' | 'sobremesa' | 'especial'
+  pieces_per_serving: number
+  is_raw: boolean
+  is_fried: boolean
   image_url: string | null
   is_active: boolean
   display_order: number
-  max_quantity: number | null
-  weight_grams: number
   created_at: string
+  updated_at: string
 }
 
 export interface Profile {
@@ -114,48 +147,41 @@ export interface OrderItem {
   order_id: string
   product_id: string | null
   product_name: string
-  size_id: string | null
-  size_name: string | null
+  variant_id: string | null
+  variant_name: string | null
   quantity: number
   unit_price: number
   total_price: number
   notes: string | null
   created_at: string
-  toppings?: OrderItemTopping[]
+  // Campos específicos para sushi
+  quantity_pieces: number
+  selected_molhos: string[]
+  combo_details: ComboDetail[] | null
 }
 
-export interface OrderItemTopping {
-  id: string
-  order_item_id: string
-  topping_id: string | null
-  topping_name: string
-  price: number
+// Detalhes dos itens quando o pedido é um combo
+export interface ComboDetail {
+  sushi_type_id: string
+  sushi_name: string
+  category: string
   quantity: number
-  created_at: string
+  pieces_per_serving: number
+  total_pieces: number
 }
 
-export interface Combo {
+// Removido - sistema antigo de toppings
+
+// Item dentro de um combo (ex: 4 Hot Rolls no Combo Individual)
+export interface ComboProductItem {
   id: string
-  name: string
-  slug: string
-  description: string | null
-  image_url: string | null
-  is_active: boolean
+  combo_product_id: string
+  sushi_type_id: string
+  quantity: number
+  is_substitutable: boolean
   display_order: number
   created_at: string
-  updated_at: string
-  items?: ComboItem[]
-}
-
-export interface ComboItem {
-  id: string
-  combo_id: string
-  product_id: string | null
-  size_id: string | null
-  quantity: number
-  created_at: string
-  product?: Product
-  size?: Size
+  sushi_type?: SushiType
 }
 
 export interface Coupon {
@@ -200,31 +226,9 @@ export interface DeliveryArea {
   created_at: string
 }
 
-export interface Bowl {
-  id: string
-  name: string
-  description: string | null
-  ml: number
-  max_weight: number | null
-  image_url: string | null
-  bowl_type: string | null
-  is_special: boolean
-  is_active: boolean
-  display_order: number
-  created_at: string
-}
+// Removido - sistema antigo de vasilhas
 
-export interface AcaiType {
-  id: string
-  name: string
-  description: string | null
-  weight_addition: number
-  price_per_kg: number
-  image_url: string | null
-  is_active: boolean
-  display_order: number
-  created_at: string
-}
+// SushiType já definido acima
 
 export interface Banner {
   id: string
@@ -287,12 +291,16 @@ export interface Wishlist {
 // Tipos para o carrinho
 export interface CartItem {
   id: string
+  productId: string
   product: Product
-  size: Size
-  toppings: Topping[]
+  variant?: ProductVariant
   quantity: number
   notes: string
   totalPrice: number
+  selectedMolhos: string[]
+  quantityPieces: number
+  // Se for combo, guardar detalhes
+  comboItems?: ComboProductItem[]
 }
 
 export interface Cart {
@@ -302,4 +310,18 @@ export interface Cart {
   discount: number
   total: number
   coupon: Coupon | null
+}
+
+// Tipo Combo (mantido para compatibilidade)
+export interface Combo {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image_url: string | null
+  is_active: boolean
+  display_order: number
+  created_at: string
+  updated_at: string
+  items?: ComboProductItem[]
 }

@@ -9,13 +9,12 @@ export interface CartItem {
   image: string
   totalPrice: number
   quantity: number
-  size?: string
-  sizeML?: number
-  acaiType?: string
-  toppings: Array<{ name: string }>
-  sauces: Array<{ name: string }>
   notes?: string
-  weightGrams?: number
+  quantityPieces?: number
+  variant?: { variant_name: string; quantity_value?: number }
+  selectedMolhos?: string[]
+  comboItems?: any[]
+  product?: any
 }
 
 interface CartContextType {
@@ -37,14 +36,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('acai-cart')
+    const saved = localStorage.getItem('sushi-cart')
     if (saved) {
       setItems(JSON.parse(saved))
     }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem('acai-cart', JSON.stringify(items))
+    localStorage.setItem('sushi-cart', JSON.stringify(items))
   }, [items])
 
   const addItem = (item: CartItem) => {

@@ -326,12 +326,12 @@ export default function HistoricoPage() {
                                       </span>
                                     </div>
                                     
-                                    {/* Vasilha */}
+                                    {/* Embalagem */}
                                     {item.bowl_image && (
                                       <div className="flex items-center gap-2 mt-2">
                                         <img 
                                           src={item.bowl_image} 
-                                          alt={item.bowl_type || 'Vasilha'}
+                                          alt={item.bowl_type || 'Embalagem'}
                                           className="w-6 h-6 object-cover rounded"
                                           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
                                         />

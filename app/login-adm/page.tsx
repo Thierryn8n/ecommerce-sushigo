@@ -259,7 +259,7 @@ export default function AdminLoginPage() {
     return (
       <main className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-[#FF8C00] mx-auto mb-4" />
+          <Loader2 className="w-10 h-10 animate-spin text-[#D62828] mx-auto mb-4" />
           <p className="text-muted-foreground">Verificando sistema...</p>
         </div>
       </main>
@@ -295,7 +295,7 @@ export default function AdminLoginPage() {
           </div>
           
           <Link href="/login-adm">
-            <Button className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full">
+            <Button className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full">
               Ir para Login
             </Button>
           </Link>
@@ -331,7 +331,7 @@ export default function AdminLoginPage() {
                   className="object-contain"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-[#FF8C00] flex items-center justify-center text-white font-bold text-3xl">
+                <div className="w-24 h-24 rounded-full bg-[#D62828] flex items-center justify-center text-white font-bold text-3xl">
                   {store?.name?.charAt(0) || 'A'}
                 </div>
               )}
@@ -340,7 +340,7 @@ export default function AdminLoginPage() {
             {/* Title */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Shield className="w-6 h-6 text-[#FF8C00]" />
+                <Shield className="w-6 h-6 text-[#D62828]" />
                 <h1 className="text-2xl font-bold text-foreground">Primeiro Acesso</h1>
               </div>
               <p className="text-muted-foreground text-sm">
@@ -438,7 +438,7 @@ export default function AdminLoginPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
+                className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
               >
                 {loading ? (
                   <>
@@ -489,7 +489,7 @@ export default function AdminLoginPage() {
                 className="object-contain"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-[#FF8C00] flex items-center justify-center text-white font-bold text-3xl">
+              <div className="w-24 h-24 rounded-full bg-[#D62828] flex items-center justify-center text-white font-bold text-3xl">
                 {store?.name?.charAt(0) || 'A'}
               </div>
             )}
@@ -498,7 +498,7 @@ export default function AdminLoginPage() {
           {/* Title */}
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Shield className="w-6 h-6 text-[#FF8C00]" />
+              <Shield className="w-6 h-6 text-[#D62828]" />
               <h1 className="text-2xl font-bold text-foreground">Painel Admin</h1>
             </div>
             <p className="text-muted-foreground text-sm">Acesso restrito a administradores aprovados</p>
@@ -549,7 +549,7 @@ export default function AdminLoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
+              className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6"
             >
               {loading ? (
                 <>
@@ -567,7 +567,7 @@ export default function AdminLoginPage() {
             <p className="text-muted-foreground text-xs text-center mb-2">
               Precisa de acesso administrativo?
             </p>
-            <Link href="/admin/cadastrar-admin" className="text-[#FF8C00] text-xs text-center block hover:text-[#FFC300]">
+            <Link href="/admin/cadastrar-admin" className="text-[#D62828] text-xs text-center block hover:text-[#FFC300]">
               Solicitar cadastro de administrador
             </Link>
           </div>

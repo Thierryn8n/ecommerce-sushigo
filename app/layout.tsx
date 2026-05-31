@@ -14,30 +14,30 @@ const poppins = Poppins({
 })
 
 export const metadata: Metadata = {
-  title: 'Açaí da Praia | O Melhor Açaí com o Sabor do Paraíso',
-  description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem! Peça agora o melhor açaí da região.',
-  keywords: ['açaí', 'delivery', 'açaí da praia', 'açaí premium', 'canoa quebrada', 'açaí natural'],
-  authors: [{ name: 'Açaí da Praia' }],
-  creator: 'Açaí da Praia',
+  title: 'SushiGo | Sushi Premium Delivery',
+  description: 'Sushi premium acessível. Delivery rápido com visual moderno japonês. Peça agora o melhor sushi da cidade!',
+  keywords: ['sushi', 'delivery', 'sushigo', 'sushi premium', 'japonês', 'delivery sushi', 'sashimi', 'nigiri', 'maki'],
+  authors: [{ name: 'SushiGo' }],
+  creator: 'SushiGo',
   manifest: '/manifest.json',
   openGraph: {
     type: 'website',
     locale: 'pt_BR',
-    url: 'https://acaidapraia.com.br',
-    title: 'Açaí da Praia | O Melhor Açaí com o Sabor do Paraíso',
-    description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!',
-    siteName: 'Açaí da Praia',
+    url: 'https://sushigo.com.br',
+    title: 'SushiGo | Sushi Premium Delivery',
+    description: 'Sushi premium acessível. Delivery rápido com visual moderno japonês.',
+    siteName: 'SushiGo',
     images: [{
       url: '/apple-icon.png',
       width: 512,
       height: 512,
-      alt: 'Açaí da Praia Logo',
+      alt: 'SushiGo Logo',
     }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Açaí da Praia | O Melhor Açaí com o Sabor do Paraíso',
-    description: 'Açaí cremoso, ingredientes selecionados e aquele toque especial que só a gente tem!',
+    title: 'SushiGo | Sushi Premium Delivery',
+    description: 'Sushi premium acessível. Delivery rápido com visual moderno japonês.',
     images: ['/apple-icon.png'],
   },
   // favicon.ico e icon.png na pasta app/ são detectados automaticamente pelo Next.js
@@ -47,7 +47,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#5B1E87',
+  themeColor: '#D62828',
 }
 
 export default function RootLayout({

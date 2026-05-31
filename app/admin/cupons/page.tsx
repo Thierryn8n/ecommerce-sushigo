@@ -146,7 +146,7 @@ export default function CuponsPage() {
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Cupons</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#FF8C00] hover:bg-[#FFC300]">
+            <Button onClick={() => { resetForm(); setDialogOpen(true) }} className="bg-[#D62828] hover:bg-[#FFC300]">
               <Plus className="w-4 h-4 mr-2" />
               Novo Cupom
             </Button>
@@ -262,7 +262,7 @@ export default function CuponsPage() {
                 <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} className="border-border text-foreground hover:bg-muted">
                   Cancelar
                 </Button>
-                <Button type="submit" disabled={uploading} className="bg-[#FF8C00] hover:bg-[#FFC300]">
+                <Button type="submit" disabled={uploading} className="bg-[#D62828] hover:bg-[#FFC300]">
                   {uploading ? 'Salvando...' : 'Salvar'}
                 </Button>
               </div>

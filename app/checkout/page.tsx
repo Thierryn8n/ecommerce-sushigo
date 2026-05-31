@@ -143,14 +143,10 @@ export default function CheckoutPage() {
   const getWhatsAppMessage = useCallback(() => {
     const itemsList = items.map(item => {
       let text = `*${item.name}* (${item.quantity}x)\n`
-      if (item.size) text += `  Tamanho: ${item.size}\n`
-      if (item.acaiType) text += `  Tipo: ${item.acaiType}\n`
-      if (item.weightGrams && item.weightGrams > 0) text += `  Peso: ${item.weightGrams}g\n`
-      if (item.toppings.length > 0) {
-        text += `  Adicionais: ${item.toppings.map(t => t.name).join(', ')}\n`
-      }
-      if (item.sauces.length > 0) {
-        text += `  Coberturas: ${item.sauces.map(s => s.name).join(', ')}\n`
+      if (item.variant) text += `  Variação: ${item.variant.variant_name}\n`
+      if (item.quantityPieces && item.quantityPieces > 0) text += `  Peças: ${item.quantityPieces}\n`
+      if (item.selectedMolhos.length > 0) {
+        text += `  Molhos: ${item.selectedMolhos.join(', ')}\n`
       }
       if (item.notes) text += `  Obs: ${item.notes}\n`
       return text
@@ -173,7 +169,7 @@ export default function CheckoutPage() {
     const finalTotalText = `\n*TOTAL:* R$ ${finalTotal.toFixed(2).replace('.', ',')}`
 
     return encodeURIComponent(
-      `*PEDIDO AÇAÍ DA PRAIA*\n\n${itemsList}${customerInfo}${deliveryInfo}${paymentInfo}${total}${delivery}${finalTotalText}`
+      `*PEDIDO SUSHIGO*\n\n${itemsList}${customerInfo}${deliveryInfo}${paymentInfo}${total}${delivery}${finalTotalText}`
     )
   }, [items, address, deliveryType, paymentMethod, change, customer, totalPrice, finalTotal])
 
@@ -286,8 +282,8 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
-        weight_grams: item.weightGrams || 0,
-        acai_type: item.acaiType || null,
+        quantity_pieces: (item as any).quantityPieces || item.quantity || 1,
+        selected_molhos: (item as any).selectedMolhos || [],
         toppings: item.toppings,
         sauces: item.sauces
       }))
@@ -433,8 +429,8 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         unit_price: item.totalPrice || 0,
         total_price: (item.totalPrice || 0) * item.quantity,
-        weight_grams: item.weightGrams || 0,
-        acai_type: item.acaiType || null,
+        quantity_pieces: (item as any).quantityPieces || item.quantity || 1,
+        selected_molhos: (item as any).selectedMolhos || [],
         toppings: item.toppings,
         sauces: item.sauces
       }))
@@ -476,7 +472,7 @@ export default function CheckoutPage() {
             <h1 className="text-3xl font-bold text-foreground mb-4">Seu carrinho está vazio</h1>
             <p className="text-foreground/70 mb-8">Adicione produtos para continuar</p>
             <Link href="/cardapio">
-              <Button className="bg-[#FF8C00] hover:bg-[#FFC300]">
+              <Button className="bg-[#D62828] hover:bg-[#FFC300]">
                 Ver Cardápio
               </Button>
             </Link>
@@ -510,7 +506,7 @@ export default function CheckoutPage() {
                 className="bg-card rounded-2xl p-4 sm:p-6 border border-border"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-xs sm:text-sm font-bold">1</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D62828] flex items-center justify-center text-xs sm:text-sm font-bold">1</span>
                   Seus Dados
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -544,7 +540,7 @@ export default function CheckoutPage() {
                 className="bg-card rounded-2xl p-4 sm:p-6 border border-border"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-xs sm:text-sm font-bold">2</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D62828] flex items-center justify-center text-xs sm:text-sm font-bold">2</span>
                   Tipo de Entrega
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -552,11 +548,11 @@ export default function CheckoutPage() {
                     onClick={() => setDeliveryType('delivery')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all flex items-center gap-3 sm:gap-4 ${
                       deliveryType === 'delivery'
-                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
-                        : 'border-border hover:border-[#8A2BE2]/50'
+                        ? 'border-[#D62828] bg-[#D62828]/10'
+                        : 'border-border hover:border-[#D62828]/50'
                     }`}
                   >
-                    <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-[#FF8C00]" />
+                    <Truck className="w-6 h-6 sm:w-8 sm:h-8 text-[#D62828]" />
                     <div className="text-left">
                       <p className="text-foreground font-semibold text-sm sm:text-base">Entrega</p>
                       <p className="text-foreground/50 text-xs sm:text-sm">+R$ {DELIVERY_FEE.toFixed(2).replace('.', ',')}</p>
@@ -566,11 +562,11 @@ export default function CheckoutPage() {
                     onClick={() => setDeliveryType('pickup')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all flex items-center gap-3 sm:gap-4 ${
                       deliveryType === 'pickup'
-                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
-                        : 'border-border hover:border-[#8A2BE2]/50'
+                        ? 'border-[#D62828] bg-[#D62828]/10'
+                        : 'border-border hover:border-[#D62828]/50'
                     }`}
                   >
-                    <Store className="w-6 h-6 sm:w-8 sm:h-8 text-[#8A2BE2]" />
+                    <Store className="w-6 h-6 sm:w-8 sm:h-8 text-[#D62828]" />
                     <div className="text-left">
                       <p className="text-foreground font-semibold text-sm sm:text-base">Retirar no Local</p>
                       <p className="text-foreground/50 text-xs sm:text-sm">Grátis</p>
@@ -659,7 +655,7 @@ export default function CheckoutPage() {
                 className="bg-card rounded-2xl p-4 sm:p-6 border border-border"
               >
                 <h2 className="text-lg sm:text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#FF8C00] flex items-center justify-center text-xs sm:text-sm font-bold">3</span>
+                  <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#D62828] flex items-center justify-center text-xs sm:text-sm font-bold">3</span>
                   Forma de Pagamento
                 </h2>
                 <div className="grid grid-cols-3 gap-2 sm:gap-4">
@@ -667,8 +663,8 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod('pix')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                       paymentMethod === 'pix'
-                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
-                        : 'border-border hover:border-[#8A2BE2]/50'
+                        ? 'border-[#D62828] bg-[#D62828]/10'
+                        : 'border-border hover:border-[#D62828]/50'
                     }`}
                   >
                     <QrCode className="w-6 h-6 sm:w-8 sm:h-8 text-[#00BFFF] mx-auto mb-1 sm:mb-2" />
@@ -678,19 +674,19 @@ export default function CheckoutPage() {
                     onClick={() => setPaymentMethod('card')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                       paymentMethod === 'card'
-                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
-                        : 'border-border hover:border-[#8A2BE2]/50'
+                        ? 'border-[#D62828] bg-[#D62828]/10'
+                        : 'border-border hover:border-[#D62828]/50'
                     }`}
                   >
-                    <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-[#8A2BE2] mx-auto mb-1 sm:mb-2" />
+                    <CreditCard className="w-6 h-6 sm:w-8 sm:h-8 text-[#D62828] mx-auto mb-1 sm:mb-2" />
                     <p className="text-foreground font-semibold text-center text-xs sm:text-sm">Cartão</p>
                   </button>
                   <button
                     onClick={() => setPaymentMethod('cash')}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all ${
                       paymentMethod === 'cash'
-                        ? 'border-[#FF8C00] bg-[#FF8C00]/10'
-                        : 'border-border hover:border-[#8A2BE2]/50'
+                        ? 'border-[#D62828] bg-[#D62828]/10'
+                        : 'border-border hover:border-[#D62828]/50'
                     }`}
                   >
                     <Banknote className="w-6 h-6 sm:w-8 sm:h-8 text-[#00FF7F] mx-auto mb-1 sm:mb-2" />
@@ -735,7 +731,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-foreground font-medium text-sm truncate">{item.name}</p>
-                        <p className="text-foreground/50 text-xs">{item.quantity}x · {item.weightGrams || 0}g</p>
+                        <p className="text-foreground/50 text-xs">{item.quantity}x · {(item as any).quantityPieces || item.quantity || 0} peças</p>
                       </div>
                     </div>
                   ))}
@@ -763,7 +759,7 @@ export default function CheckoutPage() {
                   <Button
                     onClick={handleFinalizeOrder}
                     disabled={isSubmitting}
-                    className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 sm:py-4 rounded-full text-base sm:text-lg"
+                    className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 sm:py-4 rounded-full text-base sm:text-lg"
                   >
                     {isSubmitting ? (
                       <>

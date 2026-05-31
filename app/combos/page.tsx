@@ -126,7 +126,7 @@ export default function CombosPage() {
             Quer mais opcoes?
           </h2>
           <p className="text-secondary-foreground/80 mb-6">
-            Confira nosso cardapio completo e monte seu acai do seu jeito!
+            Confira nosso cardapio completo de sushis e monte seu pedido do seu jeito!
           </p>
           <Link href="/cardapio">
             <Button className="bg-background hover:bg-background/90 text-foreground font-bold px-8 py-3 rounded-full">

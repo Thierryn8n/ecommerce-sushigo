@@ -1,14 +1,14 @@
 {
-  "name": "acai-printer",
+  "name": "sushigo-printer",
   "version": "1.0.0",
-  "description": "Aplicativo de impressao automatica de pedidos - Acai da Praia",
+  "description": "Aplicativo de impressao automatica de pedidos - SushiGo",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --win --x64",
     "build:dir": "electron-builder --win --x64 --dir"
   },
-  "author": "Acai da Praia",
+  "author": "SushiGo",
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.0.0",
@@ -19,8 +19,8 @@
     "electron-store": "^8.1.0"
   },
   "build": {
-    "appId": "com.acaidapraia.printer",
-    "productName": "Acai Printer",
+    "appId": "com.sushigo.printer",
+    "productName": "SushiGo Printer",
     "directories": {
       "output": "dist"
     },

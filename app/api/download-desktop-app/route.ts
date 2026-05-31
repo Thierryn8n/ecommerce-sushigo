@@ -4,7 +4,7 @@ import path from 'path'
 
 export async function GET() {
   try {
-    const exePath = path.join(process.cwd(), 'public', 'downloads', 'acai-printer-setup.exe')
+    const exePath = path.join(process.cwd(), 'public', 'downloads', 'sushigo-printer-setup.exe')
 
     if (!fs.existsSync(exePath)) {
       return NextResponse.json({ error: 'Instalador nao encontrado' }, { status: 404 })
@@ -15,7 +15,7 @@ export async function GET() {
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': 'application/octet-stream',
-        'Content-Disposition': 'attachment; filename="Acai Printer Setup.exe"',
+        'Content-Disposition': 'attachment; filename="SushiGo Printer Setup.exe"',
         'Content-Length': String(fileBuffer.length)
       }
     })

@@ -15,15 +15,20 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  base_weight_grams: number
+  price: number
   image_url: string | null
   banner_url: string | null
   is_active: boolean
   is_featured: boolean
   is_promotion: boolean
+  is_combo: boolean
+  base_pieces: number
+  allow_quantity_change: boolean
+  molhos_included: boolean
   display_order: number
   category_id: string | null
   category: { name: string; slug: string; color: string | null } | null
+  variants?: { id: string; variant_name: string; price: number; quantity_value: number; is_default: boolean }[]
 }
 
 // Helper para formatar preço de forma segura
@@ -76,12 +81,19 @@ export default function AdminProdutos() {
         name: `${product.name} (Cópia)`,
         slug: `${product.slug}-copia-${Date.now()}`,
         description: product.description,
+        price: product.price,
         image_url: product.image_url,
-        is_active: false, // Inativo por padrão
-        category_id: product.category?.name ? null : null,
+        is_active: false,
+        is_featured: product.is_featured,
+        is_promotion: product.is_promotion,
+        is_combo: product.is_combo,
+        base_pieces: product.base_pieces,
+        allow_quantity_change: product.allow_quantity_change,
+        molhos_included: product.molhos_included,
+        category_id: product.category_id,
         display_order: product.display_order,
       })
-      .select('*, category:categories(name, slug, color)')
+      .select('*, category:categories(name, slug, color), variants:product_variants(*)')
       .single()
 
     if (!error && data) {
@@ -97,7 +109,8 @@ export default function AdminProdutos() {
         .from('products')
         .select(`
           *,
-          category:categories(name, slug, color)
+          category:categories(name, slug, color),
+          variants:product_variants(*)
         `)
         .order('display_order')
 
@@ -160,7 +173,7 @@ export default function AdminProdutos() {
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">Produtos</h1>
               <Button 
                 onClick={() => openModal()}
-                className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground w-full sm:w-auto"
+                className="bg-[#D62828] hover:bg-[#FFC300] text-foreground w-full sm:w-auto"
               >
                 <Plus className="w-5 h-5 mr-2" />
                 Novo Produto
@@ -220,8 +233,8 @@ export default function AdminProdutos() {
                             <span 
                               className="inline-block px-2 py-0.5 rounded-full text-[10px] mt-1"
                               style={{ 
-                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#8A2BE220',
-                                color: product.category?.color || '#8A2BE2'
+                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#D6282820',
+                                color: product.category?.color || '#D62828'
                               }}
                             >
                               {product.category?.name || 'Sem categoria'}
@@ -237,7 +250,7 @@ export default function AdminProdutos() {
                           </button>
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-foreground/70 text-sm">{product.base_weight_grams}g</span>
+                          <span className="text-foreground/70 text-sm">{product.base_pieces} peças</span>
                           <div className="flex gap-1">
                             <button onClick={() => openModal(product)} className="p-1.5 rounded-lg hover:bg-muted text-foreground/60">
                               <Edit2 className="w-4 h-4" />
@@ -306,15 +319,15 @@ export default function AdminProdutos() {
                             <span 
                               className="px-3 py-1 rounded-full text-sm"
                               style={{ 
-                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#8A2BE220',
-                                color: product.category?.color || '#8A2BE2'
+                                backgroundColor: product.category?.color ? `${product.category.color}20` : '#D6282820',
+                                color: product.category?.color || '#D62828'
                               }}
                             >
                               {product.category?.name || 'Sem categoria'}
                             </span>
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-foreground font-medium">{product.base_weight_grams}g</p>
+                            <p className="text-foreground font-medium">{product.base_pieces} peças</p>
                           </td>
                           <td className="px-6 py-4">
                             <button
@@ -338,7 +351,7 @@ export default function AdminProdutos() {
                             <div className="flex items-center justify-end gap-2">
                               <button 
                                 onClick={() => openModal(product)}
-                                className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-foreground/70 hover:text-[#FF8C00] transition-colors"
+                                className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-foreground/70 hover:text-[#D62828] transition-colors"
                                 title="Editar"
                               >
                                 <Edit className="w-4 h-4" />

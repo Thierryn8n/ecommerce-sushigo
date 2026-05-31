@@ -87,8 +87,8 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/logo%20a%C3%A7a%C3%AD%20da%20praia%20sem%20fundo-f7nqFBR8xSzITFhI7km23gMgUdIh6o.png"
-              alt="Açaí da Praia"
+              src="/logo-sushigo.png"
+              alt="SushiGo"
               width={100}
               height={100}
             />
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 setError('')
               }}
               className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all ${
-                isLogin ? 'bg-[#FF8C00] text-white' : 'text-muted-foreground'
+                isLogin ? 'bg-[#D62828] text-white' : 'text-muted-foreground'
               }`}
             >
               Entrar
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 setError('')
               }}
               className={`flex-1 py-3 rounded-full text-sm font-semibold transition-all ${
-                !isLogin ? 'bg-[#FF8C00] text-white' : 'text-muted-foreground'
+                !isLogin ? 'bg-[#D62828] text-white' : 'text-muted-foreground'
               }`}
             >
               Criar Conta
@@ -196,7 +196,7 @@ export default function LoginPage() {
 
             {isLogin && (
               <div className="text-right">
-                <Link href="/esqueci-senha" className="text-[#FF8C00] text-sm hover:text-[#FFC300] transition-colors">
+                <Link href="/esqueci-senha" className="text-[#D62828] text-sm hover:text-[#FFC300] transition-colors">
                   Esqueci minha senha
                 </Link>
               </div>
@@ -205,7 +205,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6 disabled:opacity-50"
+              className="w-full bg-[#D62828] hover:bg-[#FFC300] text-white font-bold py-3 rounded-full mt-6 disabled:opacity-50"
             >
               {loading ? 'Processando...' : isLogin ? 'Entrar' : 'Criar Conta'}
             </Button>

@@ -196,7 +196,7 @@ export default function AdminPedidos() {
         <div className="lg:ml-56">
           <AdminHeader />
           <main className="p-6 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-[#FF8C00]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#D62828]" />
           </main>
         </div>
       </div>
@@ -263,7 +263,7 @@ export default function AdminPedidos() {
                   variant={selectedStatus === null ? 'default' : 'outline'}
                   onClick={() => setSelectedStatus(null)}
                   size="sm"
-                  className={selectedStatus === null ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs shrink-0' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs shrink-0'}
+                  className={selectedStatus === null ? 'bg-[#D62828] text-white h-6 sm:h-7 text-[10px] sm:text-xs shrink-0' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs shrink-0'}
                 >
                   Todos
                 </Button>
@@ -277,7 +277,7 @@ export default function AdminPedidos() {
                       variant={selectedStatus === key ? 'default' : 'outline'}
                       onClick={() => setSelectedStatus(selectedStatus === key ? null : key)}
                       size="sm"
-                      className={selectedStatus === key ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs shrink-0' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs shrink-0'}
+                      className={selectedStatus === key ? 'bg-[#D62828] text-white h-6 sm:h-7 text-[10px] sm:text-xs shrink-0' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs shrink-0'}
                     >
                       {config.label}
                     </Button>
@@ -294,7 +294,7 @@ export default function AdminPedidos() {
                     variant={selectedDate === d ? 'default' : 'outline'}
                     onClick={() => setSelectedDate(selectedDate === d ? null : d)}
                     size="sm"
-                    className={selectedDate === d ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs'}
+                    className={selectedDate === d ? 'bg-[#D62828] text-white h-6 sm:h-7 text-[10px] sm:text-xs' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs'}
                   >
                     {d === 'hoje' ? 'Hoje' : d === 'ontem' ? 'Ontem' : 'Semana'}
                   </Button>
@@ -308,7 +308,7 @@ export default function AdminPedidos() {
                         variant={selectedPayment === method ? 'default' : 'outline'}
                         onClick={() => setSelectedPayment(selectedPayment === method ? null : method)}
                         size="sm"
-                        className={selectedPayment === method ? 'bg-[#FF8C00] text-white h-6 sm:h-7 text-[10px] sm:text-xs' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs'}
+                        className={selectedPayment === method ? 'bg-[#D62828] text-white h-6 sm:h-7 text-[10px] sm:text-xs' : 'border-border text-foreground/70 h-6 sm:h-7 text-[10px] sm:text-xs'}
                       >
                         {method}
                       </Button>
@@ -382,7 +382,7 @@ export default function AdminPedidos() {
                       <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-border flex flex-wrap gap-1 sm:gap-2">
                         <p className="text-foreground/50 text-[10px] sm:text-sm mr-1 sm:mr-2 w-full sm:w-auto">Atualizar:</p>
                         {updating === order.id ? (
-                          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-[#FF8C00]" />
+                          <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-[#D62828]" />
                         ) : (
                           <>
                             {(order.status === 'pendente' || order.status === 'confirmado') && (

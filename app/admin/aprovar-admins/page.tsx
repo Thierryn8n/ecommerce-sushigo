@@ -143,7 +143,7 @@ export default function AprovarAdminsPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-6">
               <h1 className="text-xl sm:text-2xl font-bold text-foreground">Administradores</h1>
               <Link href="/admin/cadastrar-admin">
-                <Button className="bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold w-full sm:w-auto">
+                <Button className="bg-[#D62828] hover:bg-[#FFC300] text-foreground font-bold w-full sm:w-auto">
                   <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                   <span className="hidden sm:inline">Cadastrar Novo Admin</span>
                   <span className="sm:hidden">Novo Admin</span>
@@ -155,8 +155,8 @@ export default function AprovarAdminsPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <div className="bg-card rounded-2xl p-6 border border-border">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#FF8C00]/20 flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-[#FF8C00]" />
+                  <div className="w-12 h-12 rounded-xl bg-[#D62828]/20 flex items-center justify-center">
+                    <Shield className="w-6 h-6 text-[#D62828]" />
                   </div>
                   <div>
                     <p className="text-muted-foreground text-sm">Total de Admins</p>
@@ -205,7 +205,7 @@ export default function AprovarAdminsPage() {
                 <div className="text-center py-12">
                   <Shield className="w-16 h-16 text-foreground/20 mx-auto mb-4" />
                   <p className="text-muted-foreground">Nenhum administrador cadastrado</p>
-                  <Link href="/admin/cadastrar-admin" className="text-[#FF8C00] text-sm mt-2 inline-block">
+                  <Link href="/admin/cadastrar-admin" className="text-[#D62828] text-sm mt-2 inline-block">
                     Cadastrar o primeiro administrador
                   </Link>
                 </div>
@@ -217,7 +217,7 @@ export default function AprovarAdminsPage() {
                       className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted rounded-xl border border-border gap-4"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-[#FF8C00] flex items-center justify-center text-foreground font-bold text-xl">
+                        <div className="w-12 h-12 rounded-full bg-[#D62828] flex items-center justify-center text-foreground font-bold text-xl">
                           {request.full_name?.charAt(0) || 'U'}
                         </div>
                         <div>

@@ -420,7 +420,7 @@ export default function AdminCategorias() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => handleNameChange(e.target.value)}
-                    placeholder="Ex: Acai Tradicional"
+                    placeholder="Ex: Sushi Tradicional"
                     required
                     className="bg-muted border-border"
                   />
@@ -433,7 +433,7 @@ export default function AdminCategorias() {
                     id="slug"
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    placeholder="acai-tradicional"
+                    placeholder="sushi-tradicional"
                     className="bg-muted border-border"
                   />
                   <p className="text-xs text-muted-foreground mt-1">

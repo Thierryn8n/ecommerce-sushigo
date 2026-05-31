@@ -115,7 +115,7 @@ export function CategoriesSection() {
                 ) : (
                   <>
                     Escolha o seu<br />
-                    <span className="text-primary">Acai Perfeito!</span>
+                    <span className="text-primary">Sushi Perfeito!</span>
                   </>
                 )}
               </h2>
