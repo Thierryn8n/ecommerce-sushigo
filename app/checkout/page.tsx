@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -14,6 +14,16 @@ import { Input } from '@/components/ui/input'
 import { useCart } from '@/contexts/cart-context'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/hooks/use-toast'
+import {
+  fetchAddressByCep,
+  maskCep,
+  maskPhone,
+  unmask,
+  saveCustomerToLocal,
+  saveAddressToLocal,
+  loadCustomerFromLocal,
+  loadAddressFromLocal,
+} from '@/lib/address'
 
 const DELIVERY_FEE = 5.00
 
@@ -34,6 +44,7 @@ export default function CheckoutPage() {
     complement: '',
     neighborhood: '',
     city: '',
+    state: 'CE',
   })
 
   const [customer, setCustomer] = useState({
@@ -41,7 +52,92 @@ export default function CheckoutPage() {
     phone: '',
   })
 
+  const [isLoadingCep, setIsLoadingCep] = useState(false)
+
   const finalTotal = deliveryType === 'delivery' ? totalPrice + DELIVERY_FEE : totalPrice
+
+  // Carregar dados salvos ao montar
+  useEffect(() => {
+    async function loadSavedData() {
+      // Tenta carregar do Supabase se usuário estiver logado
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name, phone')
+          .eq('id', user.id)
+          .single()
+        if (profile) {
+          setCustomer({
+            name: profile.full_name || '',
+            phone: profile.phone ? maskPhone(profile.phone) : '',
+          })
+        }
+        const { data: addresses } = await supabase
+          .from('addresses')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('is_default', { ascending: false })
+          .limit(1)
+        if (addresses && addresses.length > 0) {
+          const a = addresses[0]
+          setAddress({
+            cep: a.zip_code ? maskCep(a.zip_code) : '',
+            street: a.street || '',
+            number: a.number || '',
+            complement: a.complement || '',
+            neighborhood: a.neighborhood || '',
+            city: a.city || '',
+            state: a.state || 'CE',
+          })
+        }
+        return
+      }
+
+      // Usuário não logado: carrega do localStorage
+      const savedCustomer = loadCustomerFromLocal()
+      if (savedCustomer) {
+        setCustomer({
+          name: savedCustomer.name,
+          phone: maskPhone(savedCustomer.phone),
+        })
+      }
+      const savedAddress = loadAddressFromLocal()
+      if (savedAddress) {
+        setAddress({
+          cep: maskCep(savedAddress.cep),
+          street: savedAddress.street,
+          number: savedAddress.number,
+          complement: savedAddress.complement,
+          neighborhood: savedAddress.neighborhood,
+          city: savedAddress.city,
+          state: savedAddress.state || 'CE',
+        })
+      }
+    }
+    loadSavedData()
+  }, [supabase])
+
+  // Buscar CEP
+  const handleCepChange = async (value: string) => {
+    const masked = maskCep(value)
+    setAddress(prev => ({ ...prev, cep: masked }))
+    const raw = unmask(masked)
+    if (raw.length === 8) {
+      setIsLoadingCep(true)
+      const data = await fetchAddressByCep(raw)
+      if (data) {
+        setAddress(prev => ({
+          ...prev,
+          street: data.logradouro || prev.street,
+          neighborhood: data.bairro || prev.neighborhood,
+          city: data.localidade || prev.city,
+          state: data.uf || 'CE',
+        }))
+      }
+      setIsLoadingCep(false)
+    }
+  }
 
   // Gerar mensagem do WhatsApp
   const getWhatsAppMessage = useCallback(() => {
@@ -106,13 +202,50 @@ export default function CheckoutPage() {
       // Buscar usuário logado
       const { data: { user } } = await supabase.auth.getUser()
 
+      // Salvar dados do usuário logado no Supabase
+      if (user) {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          full_name: customer.name,
+          phone: unmask(customer.phone),
+          updated_at: new Date().toISOString(),
+        })
+        if (deliveryType === 'delivery') {
+          await supabase.from('addresses').upsert({
+            user_id: user.id,
+            street: address.street,
+            number: address.number,
+            complement: address.complement || null,
+            neighborhood: address.neighborhood,
+            city: address.city,
+            state: address.state || 'CE',
+            zip_code: unmask(address.cep),
+            is_default: true,
+          }, { onConflict: 'user_id, street, number' })
+        }
+      } else {
+        // Salvar no localStorage para não logados
+        saveCustomerToLocal({ name: customer.name, phone: unmask(customer.phone) })
+        if (deliveryType === 'delivery') {
+          saveAddressToLocal({
+            cep: unmask(address.cep),
+            street: address.street,
+            number: address.number,
+            complement: address.complement,
+            neighborhood: address.neighborhood,
+            city: address.city,
+            state: address.state || 'CE',
+          })
+        }
+      }
+
       // Criar pedido no banco
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
           user_id: user?.id || null,
           customer_name: customer.name,
-          customer_phone: customer.phone,
+          customer_phone: unmask(customer.phone),
           customer_email: user?.email || null,
           delivery_address: deliveryType === 'delivery'
             ? `${address.street}, ${address.number}${address.complement ? ` - ${address.complement}` : ''} - ${address.neighborhood}, ${address.city} - CEP: ${address.cep}`
@@ -198,8 +331,45 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true)
     try {
-      // Buscar usuário logado ou criar um guest
+      // Buscar usuário logado
       const { data: { user } } = await supabase.auth.getUser()
+
+      // Salvar dados do usuário logado no Supabase
+      if (user) {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          full_name: customer.name,
+          phone: unmask(customer.phone),
+          updated_at: new Date().toISOString(),
+        })
+        if (deliveryType === 'delivery') {
+          await supabase.from('addresses').upsert({
+            user_id: user.id,
+            street: address.street,
+            number: address.number,
+            complement: address.complement || null,
+            neighborhood: address.neighborhood,
+            city: address.city,
+            state: address.state || 'CE',
+            zip_code: unmask(address.cep),
+            is_default: true,
+          }, { onConflict: 'user_id, street, number' })
+        }
+      } else {
+        // Salvar no localStorage para não logados
+        saveCustomerToLocal({ name: customer.name, phone: unmask(customer.phone) })
+        if (deliveryType === 'delivery') {
+          saveAddressToLocal({
+            cep: unmask(address.cep),
+            street: address.street,
+            number: address.number,
+            complement: address.complement,
+            neighborhood: address.neighborhood,
+            city: address.city,
+            state: address.state || 'CE',
+          })
+        }
+      }
 
       // Criar pedido
       const { data: orderData, error: orderError } = await supabase
@@ -207,7 +377,7 @@ export default function CheckoutPage() {
         .insert({
           user_id: user?.id || null,
           customer_name: customer.name,
-          customer_phone: customer.phone,
+          customer_phone: unmask(customer.phone),
           customer_email: user?.email || null,
           delivery_address: deliveryType === 'delivery' 
             ? `${address.street}, ${address.number}${address.complement ? ` - ${address.complement}` : ''} - ${address.neighborhood}, ${address.city} - CEP: ${address.cep}`
@@ -327,8 +497,9 @@ export default function CheckoutPage() {
                     <label className="text-foreground/70 text-sm mb-2 block">WhatsApp</label>
                     <Input
                       value={customer.phone}
-                      onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
+                      onChange={(e) => setCustomer({ ...customer, phone: maskPhone(e.target.value) })}
                       placeholder="(00) 00000-0000"
+                      maxLength={15}
                       className="bg-muted border-border text-foreground"
                     />
                   </div>
@@ -385,14 +556,18 @@ export default function CheckoutPage() {
                     className="mt-4 sm:mt-6 space-y-3 sm:space-y-4"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                      <div>
+                      <div className="relative">
                         <label className="text-foreground/70 text-sm mb-1 sm:mb-2 block">CEP</label>
                         <Input
                           value={address.cep}
-                          onChange={(e) => setAddress({ ...address, cep: e.target.value })}
+                          onChange={(e) => handleCepChange(e.target.value)}
                           placeholder="00000-000"
+                          maxLength={9}
                           className="bg-muted border-border text-foreground"
                         />
+                        {isLoadingCep && (
+                          <Loader2 className="absolute right-3 top-[2.1rem] w-4 h-4 animate-spin text-muted-foreground" />
+                        )}
                       </div>
                       <div className="sm:col-span-2">
                         <label className="text-foreground/70 text-sm mb-1 sm:mb-2 block">Rua</label>
