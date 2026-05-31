@@ -52,7 +52,6 @@ export default function CombosPage() {
       productId: combo.id,
       name: combo.name,
       image: combo.image_url || '',
-      basePrice: Number(combo.promo_price),
       totalPrice: Number(combo.promo_price),
       quantity: 1,
       toppings: [],

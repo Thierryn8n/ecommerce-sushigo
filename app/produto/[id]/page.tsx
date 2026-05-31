@@ -30,8 +30,6 @@ interface Product {
   name: string
   slug: string
   description: string | null
-  base_price: number
-  promotion_price: number | null
   image_url: string | null
   category: { name: string; slug: string; color: string | null } | null
   base_weight_grams: number
@@ -343,39 +341,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     return calculateIngredientsWeight()
   }
 
-  // Calculate total price
+  // Calculate total price (apenas por kg do tipo de acai)
   const calculateTotal = () => {
-    // Preco por kg vem do tipo de acai selecionado
     const typePricePerKg = acaiType?.price_per_kg || 0
-    if (typePricePerKg > 0) {
-      const weight = calculateWeight()
-      return (weight / 1000) * typePricePerKg
-    }
-    
-    // Sistema antigo: preco fixo + adicionais
-    let total = product.promotion_price ? Number(product.promotion_price) : Number(product.base_price)
-    
-    if (bowl) total += Number(bowl.price_addition)
-    if (acaiType) total += Number(acaiType.price_addition)
-    
-    Object.entries(selectedToppings).forEach(([toppingId, qty]) => {
-      const topping = toppings.find(t => t.id === toppingId)
-      if (topping) {
-        if (autoToppings.has(toppingId)) {
-          const extraQty = Math.max(0, qty - 1)
-          total += Number(topping.price) * extraQty
-        } else {
-          total += Number(topping.price) * qty
-        }
-      }
-    })
-    
-    selectedSauces.forEach(sauceId => {
-      const sauce = sauces.find(s => s.id === sauceId)
-      if (sauce) total += Number(sauce.price)
-    })
-    
-    return total
+    const weight = calculateWeight()
+    return (weight / 1000) * typePricePerKg
   }
 
   const totalPrice = calculateTotal()
@@ -399,7 +369,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
       productId: product.id,
       name: product.name,
       image: product.image_url || '',
-      basePrice: Number(product.base_price),
       totalPrice,
       quantity,
       size: bowl?.name,
@@ -499,36 +468,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     className="object-contain"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
-                  {product.promotion_price && (
-                    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-[#FF8C00] text-foreground text-xs sm:text-sm font-bold px-3 py-1 sm:px-4 sm:py-2 rounded-full">
-                      PROMO
-                    </div>
-                  )}
                 </div>
 
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{product.name}</h1>
                 <p className="text-muted-foreground text-sm sm:text-base mb-4">{product.description}</p>
 
-                {/* Price Display */}
+                {/* Weight Display */}
                 <div className="bg-muted rounded-xl p-3 sm:p-4 mb-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-muted-foreground text-sm sm:text-base">Total do Pedido</span>
-                      {(acaiType?.price_per_kg || 0) > 0 && (
-                        <p className="text-xs text-muted-foreground/70">{totalWeight}g = {(totalWeight / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg</p>
-                      )}
+                      <span className="text-muted-foreground text-sm sm:text-base">Peso Total</span>
                     </div>
                     <div className="text-right">
                       <p className="text-[#00BFFF] font-bold text-xl sm:text-2xl">
-                        R$ {(totalPrice * quantity).toFixed(2).replace('.', ',')}
+                        {totalWeight}g
                       </p>
-                      {quantity > 1 && (
-                        <p className="text-muted-foreground/70 text-sm">
-                          {quantity}x R$ {totalPrice.toFixed(2).replace('.', ',')}
-                        </p>
-                      )}
                       {(acaiType?.price_per_kg || 0) > 0 && (
-                        <p className="text-[10px] text-muted-foreground/60">R$ {acaiType?.price_per_kg || 0}/kg</p>
+                        <p className="text-xs text-muted-foreground/70">{(totalWeight / 1000).toFixed(2).replace('.', ',').replace(/,00$/g, '').replace(/([1-9])0$/g, '$1')}kg</p>
                       )}
                     </div>
                   </div>
@@ -722,11 +678,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             </div>
                             <p className="text-foreground font-semibold text-xs leading-tight">{bowlItem.name}</p>
                             <p className="text-muted-foreground/70 text-[10px] sm:text-xs">ate {bowlItem.max_weight}g</p>
-                            {Number(bowlItem.price_addition || 0) > 0 && (
-                              <p className="text-[#FF8C00] text-[10px] sm:text-xs font-semibold mt-0.5">
-                                +R$ {formatPrice(bowlItem.price_addition)}
-                              </p>
-                            )}
                           </button>
                         ))}
                       </div>
@@ -767,11 +718,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                 <p className="text-foreground font-semibold text-xs leading-tight">{bowlItem.name}</p>
                                 <p className="text-muted-foreground/70 text-[10px] sm:text-xs">ate {bowlItem.max_weight}g</p>
                                 <span className="text-[10px] text-[#FF8C00] font-semibold">Especial</span>
-                                {Number(bowlItem.price_addition || 0) > 0 && (
-                                  <p className="text-[#FF8C00] text-[10px] sm:text-xs font-semibold mt-0.5">
-                                    +R$ {formatPrice(bowlItem.price_addition)}
-                                  </p>
-                                )}
                               </button>
                             ))}
                           </div>
@@ -810,11 +756,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             <p className="text-foreground font-semibold text-xs sm:text-sm">{type.name}</p>
                             {type.description && (
                               <p className="text-muted-foreground/70 text-[10px] sm:text-xs mt-0.5 line-clamp-1 sm:line-clamp-2">{type.description}</p>
-                            )}
-                            {Number(type.price_addition) > 0 && (
-                              <p className="text-[#FF8C00] text-[10px] sm:text-xs font-semibold mt-0.5">
-                                +R$ {Number(type.price_addition).toFixed(2).replace('.', ',')}
-                              </p>
                             )}
                           </button>
                         ))}
@@ -930,9 +871,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             <div className="flex items-center justify-between">
                               <div>
                                 <p className="text-foreground font-semibold text-xs sm:text-sm">{sauce.name}</p>
-                                <p className="text-[#FF8C00] text-[10px] sm:text-xs">
-                                  +R$ {Number(sauce.price).toFixed(2).replace('.', ',')}
-                                </p>
                               </div>
                               {selectedSauces.includes(sauce.id) && (
                                 <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF8C00] flex-shrink-0 ml-1 sm:ml-2" />
@@ -988,7 +926,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         className="w-full bg-[#FF8C00] hover:bg-[#FFC300] text-foreground font-bold py-4 rounded-full text-lg"
                       >
                         <ShoppingCart className="w-5 h-5 mr-2" />
-                        Adicionar R$ {formatPrice((totalPrice || 0) * quantity)}
+                        Adicionar ao Carrinho
                       </Button>
                     </div>
                   )}
